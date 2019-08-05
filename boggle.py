@@ -502,7 +502,7 @@ def page(form):
     #"""
 
         board = myGame[5]
-        display(board, 1)
+        text += display(board, 1)
 
     #<a style="text-decoration:none;color:#000000" href="javascript:type(' ')">Space</a><br>
     #<a style="text-decoration:none;color:#000000" href="javascript:backspace()">Backpace</a><br>
