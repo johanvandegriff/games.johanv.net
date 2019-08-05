@@ -21,6 +21,10 @@ def header():
 def footer():
     return render_template("footer.html")
 
+#replace quotes
+def rq(s):
+  return cgi.escape(s).replace("'", "&apos;").replace('"', '&quot;')
+
 def create(size=5):
     #all the dice found in boggle deluxe
     dice = [
