@@ -178,7 +178,7 @@ def solve(game, minWordLength):
     #        points = 11
     #    if points < 1:
     #        points = 1;
-    #    text += ("%2d" %(points)) + word
+    #    text += ("%2d" %(points)) + " " + word
     #    global score
     #    score += points
     #    global numwords
@@ -301,7 +301,7 @@ def page(form):
             for word in words:
                 allPlayerWords.append(word)
                 points = calculatePoints(word)
-                text += ("%2d" %(points)) + word + "<br>"
+                text += ("%2d" %(points)) + " " + word + "<br>"
                 score += points
                 numwords += 1
             text += "Word Count:  " + str(numwords) + "<br>"
@@ -326,7 +326,7 @@ def page(form):
                     text += '<span style="color:green; font-weight:bold">'
                     found += 1
                 points = calculatePoints(word)
-                text += ("%2d" %(points)) + word + "<br>"
+                text += ("%2d" %(points)) + " " + word + "<br>"
                 score += points
                 numwords += 1
                 if word in allPlayerWords:
