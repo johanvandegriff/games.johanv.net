@@ -6,8 +6,6 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-
-
 @app.route("/", methods=["GET", "POST"])
 def main():
     form = request.form
@@ -151,17 +149,17 @@ def merge_get_post(request):
 def carl_raw():
     form = request.args #merge_get_post(request)
     if "carl" in form:
-        carl = form["carl"].value
+        carl = form["carl"]
     else:
         carl = ""
 
     if "user" in form:
-        user = form["user"].value
+        user = form["user"]
     else:
         user = ""
 
     if "channelID" in form:
-        channelID = form["channelID"].value
+        channelID = form["channelID"]
     else:
         channelID = "0"
     return answer(carl, user, int(channelID))
@@ -170,17 +168,17 @@ def carl_raw():
 def carl_interface():
     form = request.args #merge_get_post(request)
     if "carl" in form:
-        carl = form["carl"].value
+        carl = form["carl"]
     else:
         carl = ""
 
     if "user" in form:
-        user = form["user"].value
+        user = form["user"]
     else:
         user = ""
 
     if "channelID" in form:
-        channelID = form["channelID"].value
+        channelID = form["channelID"]
     else:
         channelID = "0"
 
@@ -198,13 +196,12 @@ def carl_interface():
 <option value="1"'''+selected1+'''>E2 (no filter)</option>
 <option value="2"'''+selected2+'''>movies (no memory of what you said)</option>
 </select>
-<br/>
-'''+    "CARL: "+carl+"<br/>"+    "YOU: "+user+"<br/>"+    "CARL: "+carl2+"<br/>"+'''
+<br/>'''+    "CARL: "+carl+"<br/>"+    "YOU: "+user+"<br/>"+    "CARL: "+carl2+"<br/>"+'''
 YOU: <input type="text" name="user" autocomplete="off" style="height:75px">
 <input type="hidden" name="carl" value="'''+carl2+'''"><br/>
 <input type="submit" value="Talk">
 </form></div>'''
 #END CARL
-#"""
+
 if __name__ == "__main__":
   app.run()
