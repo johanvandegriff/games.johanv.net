@@ -1,3 +1,5 @@
+{% include 'header.html' %}
+
 <div style="font-size:50px"><form method="GET">
 <select name="channelID">
 <option value="0"{{ selected0 }}>default (profanity filter)</option>
@@ -11,3 +13,5 @@
 <input type="hidden" name="carl" value="{{ carl2 }}"><br/>
 <input type="submit" value="Talk">
 </form></div>
+
+{% include 'footer.html' %}
