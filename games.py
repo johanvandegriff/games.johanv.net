@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 
 #from flask_wtf import FlaskForm
 #from wtforms import StringField, PasswordField, BooleanField, SubmitField
@@ -10,9 +10,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def main():
-#    form = request.form
-#    return form.get('name') + '''
-    return '''
+    form = request.form
+#    return '''
+    return form.get('name') + '''
 <h1>Games<h1>
 <h2>A work in progress!</h2>
 <ul>
