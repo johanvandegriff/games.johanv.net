@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def main():
-    return render_template("index.html")
+    return url_for("static", filename="style.css") +"<br/>"+ render_template("index.html")
 
 #START CARL
 @app.route("/carl_raw", methods=["GET", "POST"])
