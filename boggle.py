@@ -84,7 +84,7 @@ def create(size=5):
 #x, y: the current position on the board
 #word: the current word
 #used: the spots the word has letters from 
-def solve_aux(x, y, word, used):
+def solve_aux(x, y, word, used, board, words, found, size):
     myused = []
     for item in used: #copy used to myused
         myused.append(item)
@@ -95,14 +95,14 @@ def solve_aux(x, y, word, used):
 #    text += myword
 #    time.sleep(0.25)
     if myword in words: #if the word is in the list of possible words
-        add(myword)
+        found.append(myword)
         words.remove(myword)
     if not any(re.search("^" + myword, word) for word in words):
         return
     for newx in range(x-1,x+2):
         for newy in range(y-1,y+2):
             if (newx>=0 and newy>=0 and newx<size and newy<size and not [newx,newy] in myused):
-                solve_aux(newx, newy, myword, myused)
+                solve_aux(newx, newy, myword, myused, board, words, found, size)
 
 def solve(game, minWordLength):
     #game = json.load(open(filename,'r'))
@@ -163,8 +163,8 @@ def solve(game, minWordLength):
     score = 0
     numwords = 0
     found = []
-    def add(word):
-        found.append(word)
+#    def add(word):
+#        found.append(word)
     #    length = len(word)
     #    if length < 7:
     #        points = length - 3
@@ -184,7 +184,7 @@ def solve(game, minWordLength):
         for y in range(size):
             used = []
             word = ""
-            solve_aux(x, y, word, used)
+            solve_aux(x, y, word, used, board, words, found, size)
 
     #text += "Word Count:    " + str(numwords)
     #text += "Total Score: " + str(score)
