@@ -13,6 +13,8 @@ GAMES_FILE = os.path.join(ROOT_DIR, "games.json")
 GAME_DURATION = 3 * 60 * 1000 #3 minutes in milliseconds
 formMethod = "get"
 
+nav = ["Boggle", "/boggle"]
+
 def header():
     return render_template("header.html", nav=nav, active="Boggle")
 
