@@ -18,7 +18,7 @@ def carl_raw():
     carl = form.get("carl", "")
     user = form.get("user", "")
     channelID = int(form.get("channelID", "0"))
-    return answer(carl, user, channelID)
+    return carl.answer(carl, user, channelID)
 
 @app.route("/carl")
 def carl_interface():
@@ -32,7 +32,7 @@ def carl_interface():
     
     selected = ["", "", ""]
     selected[channelID] = " selected"
-    carl2 = answer(carl, user, channelID)
+    carl2 = carl.answer(carl, user, channelID)
 
     return render_template(
         "carl.html",
