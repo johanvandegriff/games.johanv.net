@@ -23,7 +23,7 @@ def main():
 
 <h6><a href="https://johanv.xyz/">Back to main site</a></h6>
 '''
-
+"""
 
 ROOT_DIR = "/srv"
 
@@ -196,6 +196,6 @@ YOU: <input type="text" name="user" autocomplete="off" style="height:75px">
 <input type="submit" value="Talk">
 </form></div>'''
 #END CARL
-
+"""
 if __name__ == "__main__":
   app.run()
