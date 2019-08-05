@@ -12,7 +12,7 @@ app = Flask(__name__)
 def main():
     form = request.form
 #    return form.get('name') + '''
-    return '''
+    return str(form) + '''
 <h1>Games<h1>
 <h2>A work in progress!</h2>
 <ul>
