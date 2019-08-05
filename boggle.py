@@ -1,0 +1,808 @@
+import sys, cgi, json, datetime, re, os, time, decimal, subprocess, random
+
+LOGIN = 0
+LOBBY = 1
+JOIN_GAME = 2
+VIEW_GAME = 3
+PLAY_GAME = 4
+GAME_OVER = 5
+
+ROOT_DIR = "/srv/Boggle"
+GAMES_FILE = os.path.join(ROOT_DIR, "games.json")
+GAME_DURATION = 3 * 60 * 1000 #3 minutes in milliseconds
+formMethod = "get"
+
+def header():
+    print 'TODO: header'
+
+def footer():
+    print 'TODO: footer'
+
+def create(size=5):
+    #all the dice found in boggle deluxe
+    dice = [
+        ['O','O','O','T','T','U'],
+        ['D','H','H','N','O','T'],
+        ['N','O','U','T','O','W'],
+        ['A','A','A','S','F','R'],
+        ['A','E','E','M','U','G'],
+        ['A','E','N','N','M','G'],
+        ['A','D','E','N','N','N'],
+        ['D','D','N','R','L','O'],
+        ['C','C','T','S','N','W'],
+        ['F','S','I','P','R','Y'],
+        ['A','E','E','E','E','M'],
+        ['I','R','R','P','H','Y'],
+        ['E','O','T','T','T','M'],
+        ['A','A','F','I','S','R'],
+        ['D','O','L','H','N','R'],
+        ['C','E','S','P','T','I'],
+        ['A','A','E','E','E','E'],
+        ['E','I','I','I','T','T'],
+        ['A','F','I','S','R','Y'],
+        ['C','E','P','I','T','L'],
+        ['E','N','S','S','S','U'],
+        ['C','E','I','I','L','T'],
+        ['D','H','H','O','L','R'],
+        ['G','O','V','R','R','W'],
+        ['K','Z','X','B','J','Qu']
+    ]
+
+    if size > 5:
+        size = 5
+
+    #the empty board
+    board = []
+
+    numbers = [] #the order of the dice
+    for i in range(len(dice)): #randomize the dice order
+        numbers.insert(random.randint(0, i),i)
+
+    for i in range(size):
+        row = []
+        for j in range(size): #for each board spot
+            letter = dice[numbers[i*size+j]][random.randint(0,size)] #roll the dice
+            row.append(letter) #set the letter on the board
+        board.append(row)
+
+    #if filename == "":
+        #for i in range(size):
+            #for j in range(size): #for each board spot
+                #sys.stdout.write("%-2s" %(board[i][j])) #write the letter padded with spaces
+            #print #write a new row
+
+    #file = []
+    #file.append(board)
+    #if len(sys.argv) > 1:
+        #json.dump(file, open(filename,'w'))
+    return [board]
+
+
+#x, y: the current position on the board
+#word: the current word
+#used: the spots the word has letters from 
+def solve_aux(x, y, word, used):
+    myused = []
+    for item in used: #copy used to myused
+        myused.append(item)
+
+    myused.append([x,y]); #use the current spot
+    myword = word + board[x][y].lower() #add on to the word
+
+#    print myword
+#    time.sleep(0.25)
+    if myword in words: #if the word is in the list of possible words
+        add(myword)
+        words.remove(myword)
+    if not any(re.search("^" + myword, word) for word in words):
+        return
+    for newx in range(x-1,x+2):
+        for newy in range(y-1,y+2):
+            if (newx>=0 and newy>=0 and newx<size and newy<size and not [newx,newy] in myused):
+                solve_aux(newx, newy, myword, myused)
+
+def solve(game, minWordLength):
+    #game = json.load(open(filename,'r'))
+    board = game[0]
+    size = len(board)
+
+    minwordlength = 4
+    if len(sys.argv) > 2 and sys.argv[2].isdigit():
+        minwordlength = int(sys.argv[2])
+
+    #the boggle alphabet
+    alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
+                'N','O','P','Qu','R','S','T','U','V','W','X','Y','Z']
+
+    quantities = [] #the quantities of each letter
+
+    excluded = [] #which letters are not on the board
+    for letter in alphabet:
+        excluded.append(letter) #copy the alphabet to excluded
+        quantities.append(0) #fill quantities with 0's
+        for letter2 in alphabet:
+            excluded.append(letter + letter2)
+    for x in range(size):
+        for y in range(size):
+            letter = board[x][y]
+            quantities[alphabet.index(letter)] += 1 #increase the quantity of the letter
+            if letter in excluded: #if the letter is in excluded
+                excluded.remove(letter) #remove the letter from excluded
+            if letter == 'Qu' and 'U' in excluded: #if the letter is in excluded
+                excluded.remove('U') #remove the letter from excluded
+            for newx in range(x-1,x+2):
+                for newy in range(y-1,y+2):
+                    if (newx>=0 and newy>=0 and newx<size and newy<size
+                            and not (newx == x and newy == y)):
+                        newletter = board[newx][newy]
+                        seq = letter + newletter
+                        if seq in excluded: #if the sequence is in excluded
+                            excluded.remove(seq) #remove the sequence from excluded
+                        if letter == 'Qu':
+                            seq = 'U' + newletter
+                        if seq in excluded: #if the sequence is in excluded
+                            excluded.remove(seq) #remove the sequence from excluded
+
+    #increase the number of U's by the number of Qu's
+    quantities[alphabet.index('U')] += quantities[alphabet.index('Qu')]
+
+    words = [] #the list of possible words
+
+    for line in open(ROOT_DIR + "/lists/list.txt", 'r'): #sort through each word
+        line = line.strip() #remove the newline
+        if len(line) >= minwordlength: #if the word is long enough
+            #if the word does not have too many of any letter
+            if not any(line.count(alphabet[i].lower()) > quantities[i] for i in range(len(alphabet))):
+                #if there are no letters not on the board in this word
+                if not any(letter.lower() in line for letter in excluded):
+                    words.append(line); #add the word to the list of possible words
+
+    score = 0
+    numwords = 0
+    found = []
+    def add(word):
+        found.append(word)
+    #    length = len(word)
+    #    if length < 7:
+    #        points = length - 3
+    #    elif length == 7:
+    #        points = 5
+    #    else:
+    #        points = 11
+    #    if points < 1:
+    #        points = 1;
+    #    print ("%2d" %(points)), word
+    #    global score
+    #    score += points
+    #    global numwords
+    #    numwords += 1
+
+    for x in range(size):
+        for y in range(size):
+            used = []
+            word = ""
+            solve_aux(x, y, word, used)
+
+    #print "Word Count:    " + str(numwords)
+    #print "Total Score: " + str(score)
+
+    #outfile = []
+    #outfile.append(board)
+    #outfile.append(found)
+    #json.dump(outfile, open(filename,'w'))
+    return [board, found]
+
+def tableRow(row, tableItem='td'):
+  text = ''
+  for item in row:
+    text += '<'+tableItem+'>' + item + '</'+tableItem+'>'
+  return '<tr>' + text + '</tr>'
+
+def table(rows, properties, head=True):
+  text = '<table '+properties+'>\n'
+  if head:
+    text += '<thead>'
+    text += tableRow(rows[0], 'th') + '\n'
+    text += '<thead>'
+    rows = rows[1:]
+  text += '<tbody>'
+  for row in rows:
+    text += tableRow(row) + '\n'
+  text += '<tbody>'
+  return text + '</table>'
+
+def page(form):
+    games = json.load(open(GAMES_FILE, 'r'))
+
+    #form = cgi.FieldStorage()
+
+    if "action" in form:
+        action = int(form["action"])
+    else:
+        action = LOBBY
+
+    #print html.startPage("Action")
+    #print action
+
+    if not "username" in form:
+        header()
+        #  print html.startPage("Boggle")
+        print '<h1>Boggle</h1>'
+        print '<p>Boggle is a word game with a grid of random letters. The goal is to find letters next to each other that form words. The game lasts 3 minutes and the person with the highest score (longer words are worth more) at the end wins.</p>'
+        print '<h3>Enter your nickname</h3>'
+        print '<form method="' + formMethod + '">'
+        print '<input type="text" name="username" required>'
+        print '<input type="submit" value="Enter" required>'
+        print '<input type="hidden" name="action" value="'+str(LOBBY)+'">'
+        print '</form>'
+        footer()
+        #  print html.endPage()
+        quit()
+
+    username = form["username"]
+    if action == VIEW_GAME:
+        header()
+        #  print html.startPage("Boggle Past Game")
+        print '<h1>Boggle</h1>'
+        print '<h3>Past Game</h3>'
+
+        myGameID = 0
+        username = ""
+        if len(sys.argv) == 3:
+            myGameID = sys.argv[1]
+            username = sys.argv[2]
+        else:
+            myGameID = int(form["gameID"])
+            username = form["username"]
+
+        myGame = []
+        for game in games:
+            gameID = game[0]
+            if myGameID == gameID:
+            break
+        myGame = game
+
+        board = myGame[5]
+
+        size = myGame[2]
+        size2 = int(size[0])
+
+        players = myGame[7]
+        playerWords = myGame[8]
+        host = myGame[1][0]
+
+        print '<a href="/boggle?username=' + rq(username) + '">Back to Lobby</a>'
+        print "<h4>Game hosted by " + rq(host)  + ".</h4>"
+        print "<table cellpadding=10><tr><td>"
+        display(board, 0)
+        print "</td><td>"
+
+        print """<table border=1 cellpadding=7>
+        <tr><td>Players:</td>"""
+
+        for player in players:
+            print '<td>' + rq(player) + '</td>'
+        print '</tr><tr><td valign="top" style="vertical-align:top">Words:</td>'
+
+        allPlayerWords = []
+        for words in playerWords:
+            print '<td valign="top" style="vertical-align:top">'
+            words.sort()
+            score = 0
+            numwords = 0
+            for word in words:
+                allPlayerWords.append(word)
+                points = calculatePoints(word)
+                print ("%2d" %(points)), word, "<br>"
+                score += points
+                numwords += 1
+            print "Word Count:  " + str(numwords) + "<br>"
+            print "Total Score: " + str(score) + "<br>"
+            print '</td>'
+
+
+        print "</tr></table></td></tr></table>"
+
+
+        print "<br>All possible words for this board:<br><br>"
+
+        if(len(myGame) > 6):
+            words = myGame[6]
+            words.sort()
+            found = 0
+            total = len(words)
+            score = 0
+            numwords = 0
+            for word in words:
+                if word in allPlayerWords:
+                    print '<span style="color:green; font-weight:bold">'
+                    found += 1
+                points = calculatePoints(word)
+                print ("%2d" %(points)), word, "<br>"
+                score += points
+                numwords += 1
+                if word in allPlayerWords:
+                    print "</span>"
+            print "Word Count:  " + str(numwords) + "<br>"
+            print "Total Score: " + str(score) + "<br>"
+            percent = int(found*100.0/total+0.5)
+            print str(percent) + "% of all these words were found."
+
+        footer()
+        #  print html.endPage()
+    if action == JOIN_GAME:
+        myGame = []
+        myGameID = 0
+        size = ""
+        if "gameID" in form:
+            myGameID = int(form["gameID"])
+            for game in games:
+            gameID = game[0]
+            if myGameID == gameID:
+                myGame = game
+                size = myGame[2]
+                break
+        else:
+            size = form["size"]
+            myGameID = 0;
+            while any(myGameID == game[0] for game in games):
+                myGameID += 1
+            myGame = [myGameID, [username], size, 0]
+            games.append(myGame)
+
+            #file = ROOT_DIR + "/saved_games/" + str(myGameID)
+            size2 = int(size[0])
+            if len(myGame) < 6:
+                minWordLength = 4
+                if size == "4x4":
+                    minWordLength = 3
+                game = create(size2)
+#                os.system("/home/johanadmin/boggle/create.py " + str(size2) + " " + file)
+    #            os.system("(/home/johanadmin/boggle/solve.py " + file + " &) > /dev/null")
+                game = solve(game, minWordLength)
+#                os.system("/home/johanadmin/boggle/solve.py " + file + " " + str(minWordLength))
+                #file_contents = json.load(open(file, 'r'))
+                #os.system("rm " + file)
+                myGame.append(-1)
+                myGame.extend(game)
+                #for item in file_contents:
+                    #myGame.append(item)
+                myGame.append([])
+                myGame.append([])
+                json.dump(games, open(GAMES_FILE, 'w'))
+
+        if myGame == []:
+            action = LOBBY
+    #        lobby()
+
+        players = myGame[1]
+        host = players[0]
+        if not myGame[3] == 0:
+            if username in players:
+                play()
+            else:
+                action = LOBBY
+    #            lobby()
+
+        if not username in players:
+            players.append(username)
+            json.dump(games, open(GAMES_FILE, 'w'))
+
+        minWordLength = "Four"
+        if size == "4x4":
+            minWordLength = "Three"
+        header()
+    #    print " ""Content-type: text/html
+    #
+    #<!DOCTYPE html>
+    #<html>
+    #<head>
+    #<title>
+    #New Game
+    #</title>
+    #<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
+    #</head>
+    #<body>
+        print """<h1>Boggle</h1><h4>New Game hosted by """ + rq(host) + ".<br><br>" + rq(size) + " Board, " + rq(minWordLength) + """ letter
+    words or more.</h4>
+    <p>Waiting for players...</p>
+    <form action="">
+    <input type="hidden" name="username" value='""" + username + """'>
+    <input type="hidden" name="size" value='""" + size + """'>
+    <input type="hidden" name="gameID" value='""" + str(myGameID) + """'>
+    <input type="hidden" name="action" value='""" + str(JOIN_GAME) + """'>
+    <input type="submit" value="Refresh">
+    </form>
+    <br>
+    <table border=1 cellpadding=7>
+    <tr><td>Players:</td></tr>"""
+
+        for player in players:
+            print '<tr><td>' + player + '</td></tr>'
+        print "</table><br>"
+        if username == host:
+            print """<form action="">
+    <input type="hidden" name="username" value='""" + username + """'>
+    <input type="hidden" name="action" value='""" + str(PLAY_GAME) + """'>
+    <input type="hidden" name="size" value='""" + size + """'>
+    <input type="hidden" name="gameID" value='""" + str(myGameID) + """'>
+    <input value="Start Game" type="submit">
+    </form>"""
+        else:
+            print """<script>
+    setTimeout(function(){
+        window.location.reload(1);
+    }, 3000);
+    </script>"""
+        footer()
+    #    print "</body></html>"
+
+    if action == PLAY_GAME:
+        size = form["size"]
+        myGameID = int(form["gameID"])
+
+        myGame = []
+        for game in games:
+            gameID = game[0]
+            if myGameID == gameID:
+                break
+        myGame = game
+
+        if myGame[3] == 2:
+            header()
+            print """Content-type: text/html
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <script>
+    window.location = '/boggle?username=""" + username + """';
+    </script>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
+    </head>
+    </html>"""
+            quit()
+
+        myGame[3] = 1
+
+        players = myGame[1]
+        host = players[0]
+
+        if username == host and myGame[4] == -1:
+            myGame[4] = time.time() * 1000
+
+        json.dump(games, open(GAMES_FILE, 'w'))
+
+        minWordLength = "Four"
+        if size == "4x4":
+            minWordLength = "Three"
+        header()
+    #    print " ""Content-type: text/html
+    #
+    #<!DOCTYPE html>
+    #<html>
+    #<head>
+    #<title>
+    #Boggle Game
+    #</title>
+    #<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
+    #</head>
+    #<body>
+        print """<h1>Boggle</h1><h4>Game hosted by """ + rq(host) + ".<br><br>" + size + " Board, " + minWordLength + """ letter
+    words or more.</h4>
+    <p>The game has started! Good luck, """ + rq(username) + '!</p><h4><p id="time"></p></h4>'
+    #"""
+
+        board = myGame[5]
+        display(board, 1)
+
+    #<a style="text-decoration:none;color:#000000" href="javascript:type(' ')">Space</a><br>
+    #<a style="text-decoration:none;color:#000000" href="javascript:backspace()">Backpace</a><br>
+
+        print """<form action="" id="words" name="words">
+    <input type="hidden" name="action" value='""" + str(GAME_OVER) + """'>
+    <input type="hidden" name="username" value='""" + username + """'>
+    <input type="hidden" name="size" value='""" + size + """'>
+    <input type="hidden" name="gameID" value='""" + str(myGameID) + """'>
+
+    <h1><table cellpadding=13 cellspacing=3>
+    <tr><td background="/static/boggle_img/space.bmp">
+    <a style="text-decoration:none;color:#000000" href="javascript:type(' ')">
+    Space</a></td>
+    <td background="/static/boggle_img/backspace.bmp">
+    <a style="text-decoration:none;color:#000000" href="javascript:backspace()">
+    Backspace</a></td></tr></table></h1>
+
+    <textarea rows="20" cols="75" name="words" id="wordBox">
+    </textarea>
+    </form>
+    <script>
+    var startTime = """ + str(myGame[4]) + """;
+    var endTime = startTime + """ + str(GAME_DURATION) + """;
+
+    countDown();
+
+    function type(letter){
+        document.getElementById("wordBox").value += letter;
+    }
+
+    function backspace(){
+        var box = document.getElementById("wordBox").value.slice(0, -1);
+    //    box = box.slice(0, -1);
+        document.getElementById("wordBox").value = box;
+    }
+
+    function countDown(){
+        time = new Date().getTime();
+        timeLeft = Math.ceil((endTime - time) / 1000);
+        millis = timeLeft;
+        minutes = Math.floor(millis / 60);
+        seconds = millis % 60;
+        if(minutes < 10){
+            minutes = "0" + minutes;
+        }
+        if(seconds < 10){
+            seconds = "0" + seconds;
+        }
+        document.getElementById("time").innerHTML = minutes + ":" + seconds;
+        if(millis <= 0){
+            clearTimeout(timer);
+            document.getElementById("time").innerHTML = "Time's up!";
+            document.forms.words.submit();
+        }
+        var timer = setTimeout("countDown()", 1000);
+    }
+    </script>"""
+        footer()
+    #</body>
+    #</html>"" "
+
+    if action == GAME_OVER:
+        size = form["size"]
+        myGameID = int(form["gameID"])
+        if "words" in form:
+            wordBox = form["words"].lower()
+            words = re.split("\s|\n|,", wordBox)
+        else:
+            words = []
+
+        myGame = []
+        for game in games:
+            gameID = game[0]
+            if myGameID == gameID:
+                break
+        myGame = game
+
+        myGame[3] = 2
+
+        #file = ROOT_DIR + "/saved_games/" + str(gameID)
+        size2 = int(size[0])
+
+        players = myGame[1]
+        host = players[0]
+
+        if not username in myGame[7]:
+            allWords = myGame[6]
+            validWords = []
+            for word in words:
+                if word in allWords and not word in validWords:
+                    validWords.append(word)
+            myGame[7].append(username)
+            myGame[8].append(validWords)
+        json.dump(games, open(GAMES_FILE, 'w'))
+
+        header()
+    #    print " ""Content-type: text/html
+    #
+    #<!DOCTYPE html>
+    #<html>
+    #<head>
+    #<title>
+    #Game Over
+    #</title>
+    #<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
+    #</head>
+    #<body>
+        print """<script>
+    function redirect() {
+        window.location = '/boggle?action=""" + str(VIEW_GAME) + "&gameID=" + str(gameID) + "&username=" + username + """';
+    }
+    setTimeout(redirect, 5000);
+    </script>
+    <h2>
+    Redirect in 5 seconds...
+    </h2>"""
+        footer()
+    #<body>
+    #</html>"" "
+
+    if action == LOBBY:
+        lobbyStartTime = time.time()
+        header()
+    #    print html.startPage("Boggle Lobby",
+    #    '<script type="text/javascript" src="sorttable.js"></script>')
+        print '<script type="text/javascript" src="/static/sorttable.js"></script>'
+
+        print '<h1>Boggle Lobby</h1>'
+        print '<p>Welcome, ' + username + '!'
+        print '<form method="' + formMethod + '">'
+        print '<input type="hidden" name="username" value="'+username+'">'
+        print '<input type="hidden" name="action" value="'+str(LOBBY)+'">'
+        print '<input type="hidden" name="skip" value="'+str(True)+'">'
+        print '<input type="submit" value="Refresh" required>'
+        print '</form><br/>'
+
+        print '<p>You can join one of these games:</p>'
+        print '<form method="' + formMethod + '">'
+        print '<input type="hidden" name="action" value="'+str(JOIN_GAME)+'">'
+        print '<input type="hidden" name="username" value="'+username+'">'
+
+        rows = []
+
+        disabled = "disabled "
+        checked = "checked "
+        for game in games:
+            state = game[3]
+            if state == 0:
+                gameID = game[0]
+                host = game[1][0]
+                size = game[2]
+                players = len(game[1])
+                if checked == "checked ":
+                    rows.append(["Select", "Host", "Size", "Players"])
+                rows.append(['<input type="radio" ' + checked    + 'name="gameID" value="' + str(gameID) + '">',
+                                                                    host, size, str(players)])
+                checked = ""
+                disabled = ""
+        if disabled == "disabled ":
+            print '<p><b>No games are waiting for players.</b></p>'
+        else:
+            print table(rows, 'border=1 cellpadding=7 id="waiting" class="sortable"')
+            #[["border", 1], ["cellpadding", 7],["id", "waiting"], ["class", "sortable"]])
+
+        print '<br/>'
+        print '<input value="Join Game" type="submit" ' + disabled + '>'
+        print '</form><br/><br/>'
+        print '<p>Or you can create a new game:</p>'
+        print '<form method="' + formMethod + '">'
+        print '<input type="hidden" name="action" value="'+str(JOIN_GAME)+'">'
+        print '<input type="hidden" name="username" value="'+username+'">'
+        print """<select name="size">
+    <option>5x5</option>
+    <option>4x4</option>
+    </select>"""
+        print '<input value="Create Game" type="submit" id="create">'
+        print '</form><br/>'
+        print '<p>Games in progress:</p>'
+
+        any = 0
+        for game in games:
+            state = game[3]
+            startTime = game[4]
+            if state == 1 and time.time() * 1000 > startTime + GAME_DURATION:
+                game[3] = 2
+                any = 1
+        if any == 1:
+            json.dump(games, open(GAMES_FILE, 'w'))
+
+        rows = []
+
+        any = 0
+        for game in games:
+            state = game[3]
+            if state == 1:
+                gameID = game[0]
+                host = game[1][0]
+                size = game[2]
+                players = len(game[1])
+                if any == 0:
+                    rows.append(["Host", "Size", "Players"])
+                rows.append([host, size, str(players)])
+                any = 1
+        if any == 0:
+            print '<p><b>No games are in progress.</b></p>'
+        else:
+            print table(rows, 'border=1 cellpadding=7 id="playing" class="sortable"')
+                             #[["border", 1], ["cellpadding", 7],["id", "playing"], ["class", "sortable"]])
+        print '<br/><br/>'
+        print '<p>Games that are over:</p>'
+        print '<p>Click on a column to sort by that column</p>'
+
+        rows = []
+        rows.append(["Game #", "Host", "Size", "Players", "Total # of Words", "# of Words Found", "% of Words Found"])
+
+        length = len(games)
+        for i in range(length-1, -1, -1):
+            game = games[i]
+            state = game[3]
+            if state == 2:
+                gameID = game[0]
+                host = game[1][0]
+                size = game[2]
+                players = len(game[1])
+                allWords = game[6]
+                allPlayerWords = []
+                allPlayerWordLists = game[8]
+                found = 0
+                for playerWords in allPlayerWordLists:
+                    for word in playerWords:
+                        if not word in allPlayerWords:
+                            allPlayerWords.append(word)
+                            found += 1
+                percent = int(found*10000.0/len(allWords)+0.5)/100.0
+                percentStr = str(decimal.Decimal(percent).quantize(decimal.Decimal('0.01')))+"%"
+                rows.append(['<a href="/boggle?gameID=' + str(gameID) + '&username=' + username + '&action=' + str(VIEW_GAME) + '">' + str(gameID) + '</a>', host,
+                                        size, str(players), str(len(allWords)), str(found), percentStr])
+        print table(rows, 'border=1 cellpadding=7 id="over" class="sortable"')
+#                         [["border", 1], ["cellpadding", 7],["id", "over"], ["class", "sortable"]])
+        print '<p>It took ' + str(time.time() - lobbyStartTime) + ' seconds to load the lobby.</p>'
+        footer()
+    #    print html.endPage()
+
+
+
+def display(board, buttons):
+  size = len(board)
+
+  print '<h1><font color="black"><table style="background-color:black" bgcolor="black">'
+  for i in range(size):
+    print "<tr>"
+    for j in range(size):
+      letter = board[i][j]
+      if letter == "Qu":
+        space = ""
+      else:
+        space = "&nbsp;"
+      if buttons == 1:
+        #letter = '<a style="text-decoration : none; color : #000000;" href="javascript:type("' + letter.lower() + '")">' + letter + '</a>'
+        letter = '<a style="text-decoration:none;color:#000000" href="javascript:type(\'' + letter.lower() + '\')">' + letter + '</a>'
+      print '<td width="62" height="62" background="/static/boggle_img/letter.bmp">&thinsp;' + space + letter + "</td>"
+    print "</tr>"
+  print "</table></font></h1>"
+
+
+def calculatePoints(word):
+  length = len(word)
+  if length < 7:
+    points = length - 3
+  elif length == 7:
+    points = 5
+  else:
+    points = 11
+  if points < 1:
+    points = 1;
+  return points
+
+
+
+
+
+def lobby():
+  print """Content-type: text/html
+
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+window.location = '/boggle?username=""" + username + """';
+</script>
+<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
+</head>
+</html>"""
+  quit()
+
+def play():
+  print """Content-type: text/html
+
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+window.location = '/boggle?username=""" + username + "&action=" + JOIN_GAME + "&size=" + size + "&gameID=" + str(myGameID) + """';
+</script>
+<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
+</head>
+</html>"""
+  quit()
+
+

@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, url_for
-import CARL
+import CARL, boggle
 
 #from flask_wtf import FlaskForm
 #from wtforms import StringField, PasswordField, BooleanField, SubmitField
@@ -19,6 +19,12 @@ app = Flask(__name__)
 @app.route("/", methods=["GET", "POST"])
 def main():
     return render_template("index.html", nav=nav, active="Games")
+
+#START BOGGLE
+@app.route("/boggle", methods=['GET', 'POST'])
+def boggle_page():
+    boggle.page(request.args)
+#END BOGGLE
 
 #START CARL
 @app.route("/carl_raw", methods=["GET", "POST"])

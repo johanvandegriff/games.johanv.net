@@ -1,6 +1,6 @@
 import json, os, sys, random, re
 
-ROOT_DIR = "/srv"
+ROOT_DIR = "/srv/CARL"
 
 def getLeastUsed(links, excludeIdx):
     least = []
@@ -47,7 +47,7 @@ def spellcheckPhrase(p, phrases):
 
 def answer(carlAsked, userAnswered, channelID):
     channels=("default", "E2", "movies")
-    storageFile=ROOT_DIR+"/CARL/channels/"+channels[channelID]+".json"
+    storageFile=ROOT_DIR+"/channels/"+channels[channelID]+".json"
 
     if os.path.isfile(storageFile):
         storage = json.load(open(storageFile, 'r'))
