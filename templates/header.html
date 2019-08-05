@@ -7,7 +7,10 @@
 <body>
 
 <nav><ul>
-<li style="width:16.666666666667%"><a href="https://johanv.xyz">Home</a></li>
+{% for item in [["Home!", "https://johanv.xyz"]] %}
+<li><a style="width:16.666666666667%" href="{{ item[1] }}">{{ item[0] }}</a></li>
+{% endfor %}
+<!--<li style="width:16.666666666667%"><a href="https://johanv.xyz">Home</a></li>-->
 <li{% if active == "Games" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/">Games</a></li>
 <li{% if active == "CARL" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/carl">CARL</a></li>
 <li{% if active == "Boggle" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/boggle">Boggle</a></li>
