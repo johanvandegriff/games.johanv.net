@@ -12,7 +12,9 @@ app = Flask(__name__)
 def main():
     form = request.form
 #    return form.get('name') + '''
-    return str(form) + '''
+    tmp = "no items"
+    if 'name' in form: tmp = form['name']
+    return str(tmp) + '''
 <h1>Games<h1>
 <h2>A work in progress!</h2>
 <ul>
