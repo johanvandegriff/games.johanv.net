@@ -282,7 +282,7 @@ def page(form):
         text += '<a href="/boggle?username=' + rq(username) + '">Back to Lobby</a>'
         text += "<h4>Game hosted by " + rq(host)  + ".</h4>"
         text += "<table cellpadding=10><tr><td>"
-        display(board, 0)
+        text += display(board, 0)
         text += "</td><td>"
 
         text += """<table border=1 cellpadding=7>
