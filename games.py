@@ -11,8 +11,8 @@ app = Flask(__name__)
 @app.route("/")
 def main():
     form = request.form
-#    return '''
-    return form.get('name') + '''
+#    return form.get('name') + '''
+    return '''
 <h1>Games<h1>
 <h2>A work in progress!</h2>
 <ul>
