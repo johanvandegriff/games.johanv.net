@@ -1,0 +1,13 @@
+<div style="font-size:50px"><form method="GET">
+<select name="channelID">
+<option value="0"{{ selected0 }}>default (profanity filter)</option>
+<option value="1"{{ selected1 }}>E2 (no filter)</option>
+<option value="2"{{ selected2 }}>movies (no memory of what you said)</option>
+</select>
+<br/>CARL: {{ carl }}
+<br/>YOU: {{ user }}
+<br/>CARL: {{ carl2 }}
+<br/>YOU: <input type="text" name="user" autocomplete="off" style="height:75px">
+<input type="hidden" name="carl" value="{{ carl2 }}"><br/>
+<input type="submit" value="Talk">
+</form></div>
