@@ -259,7 +259,7 @@ def page(form):
         for game in games:
             gameID = game[0]
             if myGameID == gameID:
-            break
+                break
         myGame = game
 
         board = myGame[5]
@@ -337,11 +337,11 @@ def page(form):
         if "gameID" in form:
             myGameID = int(form["gameID"])
             for game in games:
-            gameID = game[0]
-            if myGameID == gameID:
-                myGame = game
-                size = myGame[2]
-                break
+                gameID = game[0]
+                if myGameID == gameID:
+                    myGame = game
+                    size = myGame[2]
+                    break
         else:
             size = form["size"]
             myGameID = 0;
