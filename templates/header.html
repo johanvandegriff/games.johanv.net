@@ -7,8 +7,7 @@
 <body>
 
 <nav><ul>
-{% nav = [["Home", "https://johanv.xyz"], ["Games", "/"], ["CARL", "/carl"], ["Boggle", "/boggle"], ["Maze", "/maze"], ["Whack", "/whack"]] %}
 {% for item in nav %}
-<li{% if active == item[0] %} class="active"{% endif %} style="width:{% 100.0/len(nav) %}%"><a href="{{ item[1] }}">{{ item[0] }}</a></li>
+<li{% if active == item[0] %} class="active"{% endif %} style="width:{{ 100.0/nav|length() }}%"><a href="{{ item[1] }}">{{ item[0] }}</a></li>
 {% endfor %}
 </ul></nav>

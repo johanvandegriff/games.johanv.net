@@ -5,11 +5,20 @@ import CARL
 #from wtforms import StringField, PasswordField, BooleanField, SubmitField
 #from wtforms.validators import DataRequired, NumberRange
 
+nav = [
+    ["Home", "https://johanv.xyz"],
+    ["Games", "/"],
+    ["CARL", "/carl"],
+    ["Boggle", "/boggle"],
+    ["Maze", "/maze"],
+    ["Whack", "/whack"]
+]
+
 app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def main():
-    return render_template("index.html", active="Games")
+    return render_template("index.html", nav=nav, active="Games")
 
 #START CARL
 @app.route("/carl_raw", methods=["GET", "POST"])
@@ -36,6 +45,7 @@ def carl_interface():
 
     return render_template(
         "carl.html",
+        nav=nav,
         active="CARL",
         selected0=selected[0],
         selected1=selected[1],
