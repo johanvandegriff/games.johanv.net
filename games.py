@@ -132,11 +132,11 @@ def answer(carlAsked, userAnswered, channelID):
     json.dump(storage, open(storageFile, 'w'))
     return phrases[futureAskIdx]
 
-class CarlForm(FlaskForm):
-    carl = StringField('carl', validators=[DataRequired()])
-    user = PasswordField('user', validators=[DataRequired()])
-    channelID = PasswordField('channelID', validators=[NumberRange(min=0, max=2)])
-    submit = SubmitField('Talk')
+#class CarlForm(FlaskForm):
+#    carl = StringField('carl', validators=[DataRequired()])
+#    user = PasswordField('user', validators=[DataRequired()])
+#    channelID = PasswordField('channelID', validators=[NumberRange(min=0, max=2)])
+#    submit = SubmitField('Talk')
 
 @app.route("/carl_raw", methods=["GET", "POST"])
 def carl_raw():
