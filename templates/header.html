@@ -7,13 +7,8 @@
 <body>
 
 <nav><ul>
-{% for item in [["Home!", "https://johanv.xyz"]] %}
-<li><a style="width:16.666666666667%" href="{{ item[1] }}">{{ item[0] }}</a></li>
+{% nav = [["Home", "https://johanv.xyz"], ["Games", "/"], ["CARL", "/carl"], ["Boggle", "/boggle"], ["Maze", "/maze"], ["Whack", "/whack"]] %}
+{% for item in nav %}
+<li{% if active == item[0] %} class="active"{% endif %} style="width:{% 100.0/len(nav) %}%"><a href="{{ item[1] }}">{{ item[0] }}</a></li>
 {% endfor %}
-<!--<li style="width:16.666666666667%"><a href="https://johanv.xyz">Home</a></li>-->
-<li{% if active == "Games" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/">Games</a></li>
-<li{% if active == "CARL" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/carl">CARL</a></li>
-<li{% if active == "Boggle" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/boggle">Boggle</a></li>
-<li{% if active == "Maze" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/maze">Maze</a></li>
-<li{% if active == "Whack-A-Mole" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/whack">Whack-A-Mole</a></li>
 </ul></nav>
