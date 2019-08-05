@@ -23,7 +23,7 @@ def main():
 #START BOGGLE
 @app.route("/boggle", methods=['GET', 'POST'])
 def boggle_page():
-    boggle.page(request.args)
+    return boggle.page(request.args)
 #END BOGGLE
 
 #START CARL
