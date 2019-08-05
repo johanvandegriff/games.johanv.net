@@ -387,7 +387,7 @@ def page(form):
         host = players[0]
         if not myGame[3] == 0:
             if username in players:
-                text += play()
+                text += play(username, size, myGameID)
             else:
                 action = LOBBY
     #            lobby()
@@ -806,7 +806,7 @@ def play(username, size, myGameID):
 <html>
 <head>
 <script>
-window.location = '/boggle?username=""" + username + "&action=" + JOIN_GAME + "&size=" + size + "&gameID=" + str(myGameID) + """';
+window.location = '/boggle?username=""" + str(username) + "&action=" + str(PLAY_GAME) + "&size=" + str(size) + "&gameID=" + str(myGameID) + """';
 </script>
 <link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
 </head>
