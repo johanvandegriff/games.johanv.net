@@ -149,7 +149,7 @@ def merge_get_post(request):
 
 @app.route("/carl_raw", methods=["GET", "POST"])
 def carl_raw():
-    form = merge_get_post(request)
+    form = request.args #merge_get_post(request)
     if "carl" in form:
         carl = form["carl"].value
     else:
@@ -164,11 +164,11 @@ def carl_raw():
         channelID = form["channelID"].value
     else:
         channelID = "0"
-    return CARL_CORE.answer(carl, user, int(channelID))
+    return answer(carl, user, int(channelID))
 
 @app.route("/carl")
 def carl_interface():
-    form = merge_get_post(request)
+    form = request.args #merge_get_post(request)
     if "carl" in form:
         carl = form["carl"].value
     else:
@@ -190,7 +190,7 @@ def carl_interface():
     if channelID == "0": selected0=" selected"
     if channelID == "1": selected1=" selected"
     if channelID == "2": selected2=" selected"
-    carl2 = CARL_CORE.answer(carl, user, int(channelID))
+    carl2 = answer(carl, user, int(channelID))
 
     return '''<div style="font-size:50px"><form method="GET">
 <select name="channelID">
