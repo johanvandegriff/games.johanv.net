@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def main():
     form = request.form
 #    return form.get('name') + '''
