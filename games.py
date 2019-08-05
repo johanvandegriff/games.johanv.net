@@ -14,7 +14,7 @@ def main():
 #    return form.get('name') + '''
     tmp = "no items"
     if 'name' in form: tmp = form['name']
-    return str(tmp) + '''
+    return str(tmp) + str(request.form) + str(request.args) + '''
 <h1>Games<h1>
 <h2>A work in progress!</h2>
 <ul>
