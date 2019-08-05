@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 import carl
 
 #from flask_wtf import FlaskForm
