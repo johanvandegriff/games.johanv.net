@@ -7,11 +7,10 @@
 <body>
 
 <nav><ul>
-<li class="active" style="width:16.666666666667%"><a href="https://johanv.xyz">Home</a></li>
-<li style="width:16.666666666667%"><a href="/">Games</a></li>
-<li style="width:16.666666666667%"><a href="/carl">CARL</a></li>
-<li style="width:16.666666666667%"><a href="/boggle">Boggle</a></li>
-<li style="width:16.666666666667%"><a href="/maze">Maze</a></li>
-<li style="width:16.666666666667%"><a href="/whack">Whack-A-Mole</a></li>
+<li style="width:16.666666666667%"><a href="https://johanv.xyz">Home</a></li>
+<li{% if active == "Games" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/">Games</a></li>
+<li{% if active == "CARL" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/carl">CARL</a></li>
+<li{% if active == "Boggle" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/boggle">Boggle</a></li>
+<li{% if active == "Maze" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/maze">Maze</a></li>
+<li{% if active == "Whack-A-Mole" %} class="active"{% endif %} style="width:16.666666666667%"><a href="/whack">Whack-A-Mole</a></li>
 </ul></nav>
-

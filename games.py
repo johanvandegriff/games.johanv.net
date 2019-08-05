@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def main():
-    return url_for("static", filename="style.css") +"<br/>"+ render_template("index.html")
+    return render_template("index.html", active="Games")
 
 #START CARL
 @app.route("/carl_raw", methods=["GET", "POST"])
@@ -36,6 +36,7 @@ def carl_interface():
 
     return render_template(
         "carl.html",
+        active="CARL",
         selected0=selected[0],
         selected1=selected[1],
         selected2=selected[2],
