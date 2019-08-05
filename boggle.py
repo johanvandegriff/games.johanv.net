@@ -13,7 +13,7 @@ GAMES_FILE = os.path.join(ROOT_DIR, "games.json")
 GAME_DURATION = 3 * 60 * 1000 #3 minutes in milliseconds
 formMethod = "get"
 
-nav = ["Boggle", "/boggle"]
+nav = [["Boggle", "/boggle"]]
 
 def header():
     return render_template("header.html", nav=nav, active="Boggle")
@@ -679,19 +679,19 @@ Redirect in 5 seconds...
         text += '</form><br/>'
         text += '<p>Games in progress:</p>'
 
-        any = 0
+        any1 = 0
         for game in games:
             state = game[3]
             startTime = game[4]
             if state == 1 and time.time() * 1000 > startTime + GAME_DURATION:
                 game[3] = 2
-                any = 1
-        if any == 1:
+                any1 = 1
+        if any1 == 1:
             json.dump(games, open(GAMES_FILE, 'w'))
 
         rows = []
 
-        any = 0
+        any1 = 0
         for game in games:
             state = game[3]
             if state == 1:
@@ -699,11 +699,11 @@ Redirect in 5 seconds...
                 host = game[1][0]
                 size = game[2]
                 players = len(game[1])
-                if any == 0:
+                if any1 == 0:
                     rows.append(["Host", "Size", "Players"])
                 rows.append([host, size, str(players)])
-                any = 1
-        if any == 0:
+                any1 = 1
+        if any1 == 0:
             text += '<p><b>No games are in progress.</b></p>'
         else:
             text += table(rows, 'border=1 cellpadding=7 id="playing" class="sortable"')
