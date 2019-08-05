@@ -751,6 +751,7 @@ Redirect in 5 seconds...
 
 
 def display(board, buttons):
+    text = ""
     size = len(board)
 
     text += '<h1><font color="black"><table style="background-color:black" bgcolor="black">'
