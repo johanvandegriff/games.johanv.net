@@ -1,3 +1,4 @@
+from flask import render_template
 import sys, cgi, json, datetime, re, os, time, decimal, subprocess, random
 
 LOGIN = 0
@@ -13,10 +14,10 @@ GAME_DURATION = 3 * 60 * 1000 #3 minutes in milliseconds
 formMethod = "get"
 
 def header():
-    print('TODO: header')
+    return render_template("header.html", nav=nav, active="Boggle")
 
 def footer():
-    print('TODO: footer')
+    return render_template("footer.html")
 
 def create(size=5):
     #all the dice found in boggle deluxe
@@ -69,7 +70,7 @@ def create(size=5):
         #for i in range(size):
             #for j in range(size): #for each board spot
                 #sys.stdout.write("%-2s" %(board[i][j])) #write the letter padded with spaces
-            #print() #write a new row
+            #text += #write a new row
 
     #file = []
     #file.append(board)
@@ -89,7 +90,7 @@ def solve_aux(x, y, word, used):
     myused.append([x,y]); #use the current spot
     myword = word + board[x][y].lower() #add on to the word
 
-#    print(myword)
+#    text += myword
 #    time.sleep(0.25)
     if myword in words: #if the word is in the list of possible words
         add(myword)
@@ -171,7 +172,7 @@ def solve(game, minWordLength):
     #        points = 11
     #    if points < 1:
     #        points = 1;
-    #    print(("%2d" %(points)), word)
+    #    text += ("%2d" %(points)), word
     #    global score
     #    score += points
     #    global numwords
@@ -183,8 +184,8 @@ def solve(game, minWordLength):
             word = ""
             solve_aux(x, y, word, used)
 
-    #print("Word Count:    " + str(numwords))
-    #print("Total Score: " + str(score))
+    #text += "Word Count:    " + str(numwords)
+    #text += "Total Score: " + str(score)
 
     #outfile = []
     #outfile.append(board)
@@ -193,25 +194,26 @@ def solve(game, minWordLength):
     return [board, found]
 
 def tableRow(row, tableItem='td'):
-  text = ''
-  for item in row:
-    text += '<'+tableItem+'>' + item + '</'+tableItem+'>'
-  return '<tr>' + text + '</tr>'
+    text = ''
+    for item in row:
+        text += '<'+tableItem+'>' + item + '</'+tableItem+'>'
+    return '<tr>' + text + '</tr>'
 
 def table(rows, properties, head=True):
-  text = '<table '+properties+'>\n'
-  if head:
-    text += '<thead>'
-    text += tableRow(rows[0], 'th') + '\n'
-    text += '<thead>'
-    rows = rows[1:]
-  text += '<tbody>'
-  for row in rows:
-    text += tableRow(row) + '\n'
-  text += '<tbody>'
-  return text + '</table>'
+    text = '<table '+properties+'>\n'
+    if head:
+        text += '<thead>'
+        text += tableRow(rows[0], 'th') + '\n'
+        text += '<thead>'
+        rows = rows[1:]
+    text += '<tbody>'
+    for row in rows:
+        text += tableRow(row) + '\n'
+    text += '<tbody>'
+    return text + '</table>'
 
 def page(form):
+    text = ""
     games = json.load(open(GAMES_FILE, 'r'))
 
     #form = cgi.FieldStorage()
@@ -221,30 +223,30 @@ def page(form):
     else:
         action = LOBBY
 
-    #print(html.startPage("Action"))
-    #print(action)
+    #text += html.startPage("Action")
+    #text += action
 
     if not "username" in form:
-        header()
-        #  print(html.startPage("Boggle"))
-        print('<h1>Boggle</h1>')
-        print('<p>Boggle is a word game with a grid of random letters. The goal is to find letters next to each other that form words. The game lasts 3 minutes and the person with the highest score (longer words are worth more) at the end wins.</p>')
-        print('<h3>Enter your nickname</h3>')
-        print('<form method="' + formMethod + '">')
-        print('<input type="text" name="username" required>')
-        print('<input type="submit" value="Enter" required>')
-        print('<input type="hidden" name="action" value="'+str(LOBBY)+'">')
-        print('</form>')
-        footer()
-        #  print(html.endPage())
-        quit()
+        text += header()
+        #  text += html.startPage("Boggle")
+        text += '<h1>Boggle</h1>'
+        text += '<p>Boggle is a word game with a grid of random letters. The goal is to find letters next to each other that form words. The game lasts 3 minutes and the person with the highest score (longer words are worth more) at the end wins.</p>'
+        text += '<h3>Enter your nickname</h3>'
+        text += '<form method="' + formMethod + '">'
+        text += '<input type="text" name="username" required>'
+        text += '<input type="submit" value="Enter" required>'
+        text += '<input type="hidden" name="action" value="'+str(LOBBY)+'">'
+        text += '</form>'
+        text += footer()
+        #  text += html.endPage()
+        return text
 
     username = form["username"]
     if action == VIEW_GAME:
-        header()
-        #  print(html.startPage("Boggle Past Game"))
-        print('<h1>Boggle</h1>')
-        print('<h3>Past Game</h3>')
+        text += header()
+        #  text += html.startPage("Boggle Past Game")
+        text += '<h1>Boggle</h1>'
+        text += '<h3>Past Game</h3>'
 
         myGameID = 0
         username = ""
@@ -271,40 +273,40 @@ def page(form):
         playerWords = myGame[8]
         host = myGame[1][0]
 
-        print('<a href="/boggle?username=' + rq(username) + '">Back to Lobby</a>')
-        print("<h4>Game hosted by " + rq(host)  + ".</h4>")
-        print("<table cellpadding=10><tr><td>")
+        text += '<a href="/boggle?username=' + rq(username) + '">Back to Lobby</a>'
+        text += "<h4>Game hosted by " + rq(host)  + ".</h4>"
+        text += "<table cellpadding=10><tr><td>"
         display(board, 0)
-        print("</td><td>")
+        text += "</td><td>"
 
-        print("""<table border=1 cellpadding=7>
-        <tr><td>Players:</td>""")
+        text += """<table border=1 cellpadding=7>
+        <tr><td>Players:</td>"""
 
         for player in players:
-            print('<td>' + rq(player) + '</td>')
-        print('</tr><tr><td valign="top" style="vertical-align:top">Words:</td>')
+            text += '<td>' + rq(player) + '</td>'
+        text += '</tr><tr><td valign="top" style="vertical-align:top">Words:</td>'
 
         allPlayerWords = []
         for words in playerWords:
-            print('<td valign="top" style="vertical-align:top">')
+            text += '<td valign="top" style="vertical-align:top">'
             words.sort()
             score = 0
             numwords = 0
             for word in words:
                 allPlayerWords.append(word)
                 points = calculatePoints(word)
-                print(("%2d" %(points)), word, "<br>")
+                text += ("%2d" %(points)), word, "<br>"
                 score += points
                 numwords += 1
-            print("Word Count:  " + str(numwords) + "<br>")
-            print("Total Score: " + str(score) + "<br>")
-            print('</td>')
+            text += "Word Count:  " + str(numwords) + "<br>"
+            text += "Total Score: " + str(score) + "<br>"
+            text += '</td>'
 
 
-        print("</tr></table></td></tr></table>")
+        text += "</tr></table></td></tr></table>"
 
 
-        print("<br>All possible words for this board:<br><br>")
+        text += "<br>All possible words for this board:<br><br>"
 
         if(len(myGame) > 6):
             words = myGame[6]
@@ -315,21 +317,21 @@ def page(form):
             numwords = 0
             for word in words:
                 if word in allPlayerWords:
-                    print('<span style="color:green; font-weight:bold">')
+                    text += '<span style="color:green; font-weight:bold">'
                     found += 1
                 points = calculatePoints(word)
-                print(("%2d" %(points)), word, "<br>")
+                text += ("%2d" %(points)), word, "<br>"
                 score += points
                 numwords += 1
                 if word in allPlayerWords:
-                    print("</span>")
-            print("Word Count:  " + str(numwords) + "<br>")
-            print("Total Score: " + str(score) + "<br>")
+                    text += "</span>"
+            text += "Word Count:  " + str(numwords) + "<br>"
+            text += "Total Score: " + str(score) + "<br>"
             percent = int(found*100.0/total+0.5)
-            print(str(percent) + "% of all these words were found.")
+            text += str(percent) + "% of all these words were found."
 
-        footer()
-        #  print(html.endPage())
+        text += footer()
+        #  text += html.endPage()
     if action == JOIN_GAME:
         myGame = []
         myGameID = 0
@@ -379,7 +381,7 @@ def page(form):
         host = players[0]
         if not myGame[3] == 0:
             if username in players:
-                play()
+                text += play()
             else:
                 action = LOBBY
     #            lobby()
@@ -391,8 +393,8 @@ def page(form):
         minWordLength = "Four"
         if size == "4x4":
             minWordLength = "Three"
-        header()
-    #    print(" ""Content-type: text/html
+        text += header()
+    #    text += " ""Content-type: text/html
     #
     #<!DOCTYPE html>
     #<html>
@@ -403,7 +405,7 @@ def page(form):
     #<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
     #</head>
     #<body>
-        print("""<h1>Boggle</h1><h4>New Game hosted by """ + rq(host) + ".<br><br>" + rq(size) + " Board, " + rq(minWordLength) + """ letter
+        text += """<h1>Boggle</h1><h4>New Game hosted by """ + rq(host) + ".<br><br>" + rq(size) + " Board, " + rq(minWordLength) + """ letter
     words or more.</h4>
     <p>Waiting for players...</p>
     <form action="">
@@ -415,27 +417,27 @@ def page(form):
     </form>
     <br>
     <table border=1 cellpadding=7>
-    <tr><td>Players:</td></tr>""")
+    <tr><td>Players:</td></tr>"""
 
         for player in players:
-            print('<tr><td>' + player + '</td></tr>')
-        print("</table><br>")
+            text += '<tr><td>' + player + '</td></tr>'
+        text += "</table><br>"
         if username == host:
-            print("""<form action="">
+            text += """<form action="">
     <input type="hidden" name="username" value='""" + username + """'>
     <input type="hidden" name="action" value='""" + str(PLAY_GAME) + """'>
     <input type="hidden" name="size" value='""" + size + """'>
     <input type="hidden" name="gameID" value='""" + str(myGameID) + """'>
     <input value="Start Game" type="submit">
-    </form>""")
+    </form>"""
         else:
-            print("""<script>
+            text += """<script>
     setTimeout(function(){
         window.location.reload(1);
     }, 3000);
-    </script>""")
-        footer()
-    #    print("</body></html>")
+    </script>"""
+        text += footer()
+    #    text += "</body></html>"
 
     if action == PLAY_GAME:
         size = form["size"]
@@ -449,8 +451,8 @@ def page(form):
         myGame = game
 
         if myGame[3] == 2:
-            header()
-            print("""Content-type: text/html
+            text += header()
+            text += """Content-type: text/html
 
     <!DOCTYPE html>
     <html>
@@ -460,8 +462,8 @@ def page(form):
     </script>
     <link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
     </head>
-    </html>""")
-            quit()
+    </html>"""
+            return text
 
         myGame[3] = 1
 
@@ -476,8 +478,8 @@ def page(form):
         minWordLength = "Four"
         if size == "4x4":
             minWordLength = "Three"
-        header()
-    #    print(" ""Content-type: text/html
+        text += header()
+    #    text += " ""Content-type: text/html
     #
     #<!DOCTYPE html>
     #<html>
@@ -488,9 +490,9 @@ def page(form):
     #<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
     #</head>
     #<body>
-        print("""<h1>Boggle</h1><h4>Game hosted by """ + rq(host) + ".<br><br>" + size + " Board, " + minWordLength + """ letter
+        text += """<h1>Boggle</h1><h4>Game hosted by """ + rq(host) + ".<br><br>" + size + " Board, " + minWordLength + """ letter
     words or more.</h4>
-    <p>The game has started! Good luck, """ + rq(username) + '!</p><h4><p id="time"></p></h4>')
+    <p>The game has started! Good luck, """ + rq(username) + '!</p><h4><p id="time"></p></h4>'
     #"""
 
         board = myGame[5]
@@ -499,61 +501,61 @@ def page(form):
     #<a style="text-decoration:none;color:#000000" href="javascript:type(' ')">Space</a><br>
     #<a style="text-decoration:none;color:#000000" href="javascript:backspace()">Backpace</a><br>
 
-        print("""<form action="" id="words" name="words">
-    <input type="hidden" name="action" value='""" + str(GAME_OVER) + """'>
-    <input type="hidden" name="username" value='""" + username + """'>
-    <input type="hidden" name="size" value='""" + size + """'>
-    <input type="hidden" name="gameID" value='""" + str(myGameID) + """'>
+        text += """<form action="" id="words" name="words">
+<input type="hidden" name="action" value='""" + str(GAME_OVER) + """'>
+<input type="hidden" name="username" value='""" + username + """'>
+<input type="hidden" name="size" value='""" + size + """'>
+<input type="hidden" name="gameID" value='""" + str(myGameID) + """'>
 
-    <h1><table cellpadding=13 cellspacing=3>
-    <tr><td background="/static/boggle_img/space.bmp">
-    <a style="text-decoration:none;color:#000000" href="javascript:type(' ')">
-    Space</a></td>
-    <td background="/static/boggle_img/backspace.bmp">
-    <a style="text-decoration:none;color:#000000" href="javascript:backspace()">
-    Backspace</a></td></tr></table></h1>
+<h1><table cellpadding=13 cellspacing=3>
+<tr><td background="/static/boggle_img/space.bmp">
+<a style="text-decoration:none;color:#000000" href="javascript:type(' ')">
+Space</a></td>
+<td background="/static/boggle_img/backspace.bmp">
+<a style="text-decoration:none;color:#000000" href="javascript:backspace()">
+Backspace</a></td></tr></table></h1>
 
-    <textarea rows="20" cols="75" name="words" id="wordBox">
-    </textarea>
-    </form>
-    <script>
-    var startTime = """ + str(myGame[4]) + """;
-    var endTime = startTime + """ + str(GAME_DURATION) + """;
+<textarea rows="20" cols="75" name="words" id="wordBox">
+</textarea>
+</form>
+<script>
+var startTime = """ + str(myGame[4]) + """;
+var endTime = startTime + """ + str(GAME_DURATION) + """;
 
-    countDown();
+countDown();
 
-    function type(letter){
-        document.getElementById("wordBox").value += letter;
+function type(letter){
+    document.getElementById("wordBox").value += letter;
+}
+
+function backspace(){
+    var box = document.getElementById("wordBox").value.slice(0, -1);
+//    box = box.slice(0, -1);
+    document.getElementById("wordBox").value = box;
+}
+
+function countDown(){
+    time = new Date().getTime();
+    timeLeft = Math.ceil((endTime - time) / 1000);
+    millis = timeLeft;
+    minutes = Math.floor(millis / 60);
+    seconds = millis % 60;
+    if(minutes < 10){
+        minutes = "0" + minutes;
     }
-
-    function backspace(){
-        var box = document.getElementById("wordBox").value.slice(0, -1);
-    //    box = box.slice(0, -1);
-        document.getElementById("wordBox").value = box;
+    if(seconds < 10){
+        seconds = "0" + seconds;
     }
-
-    function countDown(){
-        time = new Date().getTime();
-        timeLeft = Math.ceil((endTime - time) / 1000);
-        millis = timeLeft;
-        minutes = Math.floor(millis / 60);
-        seconds = millis % 60;
-        if(minutes < 10){
-            minutes = "0" + minutes;
-        }
-        if(seconds < 10){
-            seconds = "0" + seconds;
-        }
-        document.getElementById("time").innerHTML = minutes + ":" + seconds;
-        if(millis <= 0){
-            clearTimeout(timer);
-            document.getElementById("time").innerHTML = "Time's up!";
-            document.forms.words.submit();
-        }
-        var timer = setTimeout("countDown()", 1000);
+    document.getElementById("time").innerHTML = minutes + ":" + seconds;
+    if(millis <= 0){
+        clearTimeout(timer);
+        document.getElementById("time").innerHTML = "Time's up!";
+        document.forms.words.submit();
     }
-    </script>""")
-        footer()
+    var timer = setTimeout("countDown()", 1000);
+}
+</script>"""
+        text += footer()
     #</body>
     #</html>"" "
 
@@ -591,8 +593,8 @@ def page(form):
             myGame[8].append(validWords)
         json.dump(games, open(GAMES_FILE, 'w'))
 
-        header()
-    #    print(" ""Content-type: text/html
+        text += header()
+    #    text += " ""Content-type: text/html
     #
     #<!DOCTYPE html>
     #<html>
@@ -603,39 +605,39 @@ def page(form):
     #<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
     #</head>
     #<body>
-        print("""<script>
-    function redirect() {
-        window.location = '/boggle?action=""" + str(VIEW_GAME) + "&gameID=" + str(gameID) + "&username=" + username + """';
-    }
-    setTimeout(redirect, 5000);
-    </script>
-    <h2>
-    Redirect in 5 seconds...
-    </h2>""")
-        footer()
+        text += """<script>
+function redirect() {
+    window.location = '/boggle?action=""" + str(VIEW_GAME) + "&gameID=" + str(gameID) + "&username=" + username + """';
+}
+setTimeout(redirect, 5000);
+</script>
+<h2>
+Redirect in 5 seconds...
+</h2>"""
+        text += footer()
     #<body>
     #</html>"" "
 
     if action == LOBBY:
         lobbyStartTime = time.time()
-        header()
-    #    print(html.startPage("Boggle Lobby",
-    #    '<script type="text/javascript" src="sorttable.js"></script>'))
-        print('<script type="text/javascript" src="/static/sorttable.js"></script>')
+        text += header()
+    #    text += html.startPage("Boggle Lobby",
+    #    '<script type="text/javascript" src="sorttable.js"></script>')
+        text += '<script type="text/javascript" src="/static/sorttable.js"></script>'
 
-        print('<h1>Boggle Lobby</h1>')
-        print('<p>Welcome, ' + username + '!')
-        print('<form method="' + formMethod + '">')
-        print('<input type="hidden" name="username" value="'+username+'">')
-        print('<input type="hidden" name="action" value="'+str(LOBBY)+'">')
-        print('<input type="hidden" name="skip" value="'+str(True)+'">')
-        print('<input type="submit" value="Refresh" required>')
-        print('</form><br/>')
+        text += '<h1>Boggle Lobby</h1>'
+        text += '<p>Welcome, ' + username + '!'
+        text += '<form method="' + formMethod + '">'
+        text += '<input type="hidden" name="username" value="'+username+'">'
+        text += '<input type="hidden" name="action" value="'+str(LOBBY)+'">'
+        text += '<input type="hidden" name="skip" value="'+str(True)+'">'
+        text += '<input type="submit" value="Refresh" required>'
+        text += '</form><br/>'
 
-        print('<p>You can join one of these games:</p>')
-        print('<form method="' + formMethod + '">')
-        print('<input type="hidden" name="action" value="'+str(JOIN_GAME)+'">')
-        print('<input type="hidden" name="username" value="'+username+'">')
+        text += '<p>You can join one of these games:</p>'
+        text += '<form method="' + formMethod + '">'
+        text += '<input type="hidden" name="action" value="'+str(JOIN_GAME)+'">'
+        text += '<input type="hidden" name="username" value="'+username+'">'
 
         rows = []
 
@@ -655,25 +657,25 @@ def page(form):
                 checked = ""
                 disabled = ""
         if disabled == "disabled ":
-            print('<p><b>No games are waiting for players.</b></p>')
+            text += '<p><b>No games are waiting for players.</b></p>'
         else:
-            print(table(rows, 'border=1 cellpadding=7 id="waiting" class="sortable"'))
+            text += table(rows, 'border=1 cellpadding=7 id="waiting" class="sortable"')
             #[["border", 1], ["cellpadding", 7],["id", "waiting"], ["class", "sortable"]])
 
-        print('<br/>')
-        print('<input value="Join Game" type="submit" ' + disabled + '>')
-        print('</form><br/><br/>')
-        print('<p>Or you can create a new game:</p>')
-        print('<form method="' + formMethod + '">')
-        print('<input type="hidden" name="action" value="'+str(JOIN_GAME)+'">')
-        print('<input type="hidden" name="username" value="'+username+'">')
-        print("""<select name="size">
+        text += '<br/>'
+        text += '<input value="Join Game" type="submit" ' + disabled + '>'
+        text += '</form><br/><br/>'
+        text += '<p>Or you can create a new game:</p>'
+        text += '<form method="' + formMethod + '">'
+        text += '<input type="hidden" name="action" value="'+str(JOIN_GAME)+'">'
+        text += '<input type="hidden" name="username" value="'+username+'">'
+        text += """<select name="size">
     <option>5x5</option>
     <option>4x4</option>
-    </select>""")
-        print('<input value="Create Game" type="submit" id="create">')
-        print('</form><br/>')
-        print('<p>Games in progress:</p>')
+    </select>"""
+        text += '<input value="Create Game" type="submit" id="create">'
+        text += '</form><br/>'
+        text += '<p>Games in progress:</p>'
 
         any = 0
         for game in games:
@@ -700,13 +702,13 @@ def page(form):
                 rows.append([host, size, str(players)])
                 any = 1
         if any == 0:
-            print('<p><b>No games are in progress.</b></p>')
+            text += '<p><b>No games are in progress.</b></p>'
         else:
-            print(table(rows, 'border=1 cellpadding=7 id="playing" class="sortable"'))
+            text += table(rows, 'border=1 cellpadding=7 id="playing" class="sortable"')
                              #[["border", 1], ["cellpadding", 7],["id", "playing"], ["class", "sortable"]])
-        print('<br/><br/>')
-        print('<p>Games that are over:</p>')
-        print('<p>Click on a column to sort by that column</p>')
+        text += '<br/><br/>'
+        text += '<p>Games that are over:</p>'
+        text += '<p>Click on a column to sort by that column</p>'
 
         rows = []
         rows.append(["Game #", "Host", "Size", "Players", "Total # of Words", "# of Words Found", "% of Words Found"])
@@ -733,52 +735,52 @@ def page(form):
                 percentStr = str(decimal.Decimal(percent).quantize(decimal.Decimal('0.01')))+"%"
                 rows.append(['<a href="/boggle?gameID=' + str(gameID) + '&username=' + username + '&action=' + str(VIEW_GAME) + '">' + str(gameID) + '</a>', host,
                                         size, str(players), str(len(allWords)), str(found), percentStr])
-        print(table(rows, 'border=1 cellpadding=7 id="over" class="sortable"'))
+        text += table(rows, 'border=1 cellpadding=7 id="over" class="sortable"')
 #                         [["border", 1], ["cellpadding", 7],["id", "over"], ["class", "sortable"]])
-        print('<p>It took ' + str(time.time() - lobbyStartTime) + ' seconds to load the lobby.</p>')
-        footer()
-    #    print(html.endPage())
+        text += '<p>It took ' + str(time.time() - lobbyStartTime) + ' seconds to load the lobby.</p>'
+        text += footer()
+    #    text += html.endPage()
+    return text
 
 
 
 def display(board, buttons):
-  size = len(board)
+    size = len(board)
 
-  print('<h1><font color="black"><table style="background-color:black" bgcolor="black">')
-  for i in range(size):
-    print("<tr>")
-    for j in range(size):
-      letter = board[i][j]
-      if letter == "Qu":
-        space = ""
-      else:
-        space = "&nbsp;"
-      if buttons == 1:
-        #letter = '<a style="text-decoration : none; color : #000000;" href="javascript:type("' + letter.lower() + '")">' + letter + '</a>'
-        letter = '<a style="text-decoration:none;color:#000000" href="javascript:type(\'' + letter.lower() + '\')">' + letter + '</a>'
-      print('<td width="62" height="62" background="/static/boggle_img/letter.bmp">&thinsp;' + space + letter + "</td>")
-    print("</tr>")
-  print("</table></font></h1>")
+    text += '<h1><font color="black"><table style="background-color:black" bgcolor="black">'
+    for i in range(size):
+        text += "<tr>"
+        for j in range(size):
+            letter = board[i][j]
+            if letter == "Qu":
+                space = ""
+            else:
+                space = "&nbsp;"
+            if buttons == 1:
+                #letter = '<a style="text-decoration : none; color : #000000;" href="javascript:type("' + letter.lower() + '")">' + letter + '</a>'
+                letter = '<a style="text-decoration:none;color:#000000" href="javascript:type(\'' + letter.lower() + '\')">' + letter + '</a>'
+            text += '<td width="62" height="62" background="/static/boggle_img/letter.bmp">&thinsp;' + space + letter + "</td>"
+        text += "</tr>"
+    text += "</table></font></h1>"
+    return text
 
 
 def calculatePoints(word):
-  length = len(word)
-  if length < 7:
-    points = length - 3
-  elif length == 7:
-    points = 5
-  else:
-    points = 11
-  if points < 1:
-    points = 1;
-  return points
+    length = len(word)
+    if length < 7:
+        points = length - 3
+    elif length == 7:
+        points = 5
+    else:
+        points = 11
+    if points < 1:
+        points = 1;
+    return points
 
 
 
-
-
-def lobby():
-  print("""Content-type: text/html
+def lobby(username):
+    return """Content-type: text/html
 
 <!DOCTYPE html>
 <html>
@@ -788,11 +790,10 @@ window.location = '/boggle?username=""" + username + """';
 </script>
 <link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
 </head>
-</html>""")
-  quit()
+</html>"""
 
-def play():
-  print("""Content-type: text/html
+def play(username, size, myGameID):
+    return """Content-type: text/html
 
 <!DOCTYPE html>
 <html>
@@ -802,7 +803,6 @@ window.location = '/boggle?username=""" + username + "&action=" + JOIN_GAME + "&
 </script>
 <link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
 </head>
-</html>""")
-  quit()
+</html>"""
 
 
