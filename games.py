@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-import carl
+import CARL
 
 #from flask_wtf import FlaskForm
 #from wtforms import StringField, PasswordField, BooleanField, SubmitField
@@ -18,7 +18,7 @@ def carl_raw():
     carl = form.get("carl", "")
     user = form.get("user", "")
     channelID = int(form.get("channelID", "0"))
-    return carl.answer(carl, user, channelID)
+    return CARL.answer(carl, user, channelID)
 
 @app.route("/carl")
 def carl_interface():
@@ -32,7 +32,7 @@ def carl_interface():
     
     selected = ["", "", ""]
     selected[channelID] = " selected"
-    carl2 = carl.answer(carl, user, channelID)
+    carl2 = CARL.answer(carl, user, channelID)
 
     return render_template(
         "carl.html",
