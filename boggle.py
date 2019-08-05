@@ -1,6 +1,8 @@
 from flask import render_template
 import sys, cgi, json, datetime, re, os, time, decimal, subprocess, random
 
+from nav import nav #file in same dir
+
 LOGIN = 0
 LOBBY = 1
 JOIN_GAME = 2
@@ -12,8 +14,6 @@ ROOT_DIR = "/srv/Boggle"
 GAMES_FILE = os.path.join(ROOT_DIR, "games.json")
 GAME_DURATION = 3 * 60 * 1000 #3 minutes in milliseconds
 formMethod = "get"
-
-nav = [["Boggle", "/boggle"]]
 
 def header():
     return render_template("header.html", nav=nav, active="Boggle")

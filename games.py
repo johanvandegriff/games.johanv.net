@@ -1,18 +1,12 @@
 from flask import Flask, request, render_template, url_for
-import CARL, boggle
 
 #from flask_wtf import FlaskForm
 #from wtforms import StringField, PasswordField, BooleanField, SubmitField
 #from wtforms.validators import DataRequired, NumberRange
 
-nav = [
-    ["Home", "https://johanv.xyz"],
-    ["Games", "/"],
-    ["CARL", "/carl"],
-    ["Boggle", "/boggle"],
-    ["Maze", "/maze"],
-    ["Whack", "/whack"]
-]
+import CARL, boggle
+
+from nav import nav
 
 app = Flask(__name__)
 
