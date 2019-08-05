@@ -26,7 +26,7 @@ def main():
 
 <h6><a href="https://johanv.xyz/">Back to main site</a></h6>
 '''
-"""
+
 
 ROOT_DIR = "/srv"
 
@@ -141,9 +141,15 @@ def answer(carlAsked, userAnswered, channelID):
 #    channelID = PasswordField('channelID', validators=[NumberRange(min=0, max=2)])
 #    submit = SubmitField('Talk')
 
+#https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression
+def merge_get_post(request):
+    merged = request.form.copy()
+    merged.update(request.args)
+    return merged
+
 @app.route("/carl_raw", methods=["GET", "POST"])
 def carl_raw():
-    form = request.form
+    form = merge_get_post(request)
     if "carl" in form:
         carl = form["carl"].value
     else:
@@ -162,7 +168,7 @@ def carl_raw():
 
 @app.route("/carl")
 def carl_interface():
-    form = request.form
+    form = merge_get_post(request)
     if "carl" in form:
         carl = form["carl"].value
     else:
@@ -199,6 +205,6 @@ YOU: <input type="text" name="user" autocomplete="off" style="height:75px">
 <input type="submit" value="Talk">
 </form></div>'''
 #END CARL
-"""
+#"""
 if __name__ == "__main__":
   app.run()
