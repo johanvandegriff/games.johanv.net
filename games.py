@@ -39,8 +39,8 @@ def boggle_page():
 #END BOGGLE
 
 #START CARL
-@app.route("/carl_raw", methods=["GET", "POST"])
-def carl_raw():
+@app.route("/carl_api", methods=["GET", "POST"])
+def carl_api():
     carl = request.args.get("carl", "")
     user = request.args.get("user", "")
     try:
@@ -50,7 +50,7 @@ def carl_raw():
     return CARL.answer(carl, user, channelID)
 
 @app.route("/carl")
-def carl_interface():
+def carl_page():
     carl = request.args.get("carl", "")
     user = request.args.get("user", "")
     try:
