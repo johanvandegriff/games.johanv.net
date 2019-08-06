@@ -1,14 +1,20 @@
 #!/usr/bin/perl
 use warnings;
 use strict;
-use CGI qw(:standard);
+# use CGI qw(:standard);
 
 {
-  my $doors = param("doors");
-  my $rooms = param("rooms");
-  my $current_room = param("current_room");
-  my $door_choice = param("door_choice");
-  my $offset = param("users");
+  my $doors = @ARGV[1];
+  my $rooms = @ARGV[2];
+  my $current_room = @ARGV[3];
+  my $door_choice = @ARGV[4];
+  my $offset = @ARGV[5];
+  
+#   my $doors = param("doors");
+#   my $rooms = param("rooms");
+#   my $current_room = param("current_room");
+#   my $door_choice = param("door_choice");
+#   my $offset = param("users");
   my @real_doors = decode_doors($offset);
 
 
