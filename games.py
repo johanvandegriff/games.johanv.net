@@ -12,16 +12,28 @@ from nav import nav
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
 def main():
     return render_template("index.html", nav=nav, active="Games")
+
+#START WHACK
+@app.route("/whack.pl", methods=["GET", "POST"])
+def whack_page():
+    cgi_var_names = ["start", "score", "last"]
+    cgi_vars = ""
+    for v in cgi_var_names:
+        if v in request.args:
+            cgi_vars += " " + v + "=" + request.args[v]
+    page = os.popen("perl whack.pl" + cgi_vars).read()
+    return render_template("header.html", nav=nav, active="Whack") + page + render_template("footer.html")
+#END WHACK
 
 #START MAZE
 @app.route("/maze")
 def maze_page():
     return render_template("maze.html", nav=nav, active="Maze")
 
-@app.route("/showmaze.pl", methods=['GET', 'POST'])
+@app.route("/showmaze.pl", methods=["GET", "POST"])
 def showmaze_page():
     cgi_var_names = ["doors", "rooms", "current_room", "door_choice", "users"]
     cgi_vars = ""
@@ -33,7 +45,7 @@ def showmaze_page():
 #END MAZE
 
 #START BOGGLE
-@app.route("/boggle", methods=['GET', 'POST'])
+@app.route("/boggle", methods=["GET", "POST"])
 def boggle_page():
     return boggle.page(request.args)
 #END BOGGLE
@@ -49,7 +61,7 @@ def carl_api():
         channelID = 0
     return CARL.answer(carl, user, channelID)
 
-@app.route("/carl")
+@app.route("/carl", methods=["GET", "POST"])
 def carl_page():
     carl = request.args.get("carl", "")
     user = request.args.get("user", "")
