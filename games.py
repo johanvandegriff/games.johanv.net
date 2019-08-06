@@ -26,7 +26,8 @@ def showmaze_page():
     cgi_var_names = ["doors", "rooms", "current_room", "door_choice", "users"]
     cgi_vars = ""
     for v in cgi_var_names:
-        cgi_vars += " " + v + "=" + request.args.get(v, "")
+        if v in request.args:
+            cgi_vars += " " + v + "=" + request.args[v]
     page = os.popen("perl showmaze.pl" + cgi_vars).read()
     return render_template("header.html", nav=nav, active="Maze") + page + render_template("footer.html")
 #END MAZE
