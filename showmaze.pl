@@ -134,7 +134,7 @@ sub show_page {
   print "<td>\n";
     if ($i==$door_choice and $door_choice!=$good_door) {
       # The door has been chosen and it is the wrong one
-      print img {src=>"/static/blocked_door.jpg"}, p($i + 1);
+      print img {src=>"/static/maze_img/blocked_door.jpg"}, p($i + 1);
     } else {
       # The door has not been chosen or it is the right one
       print a({-href=>"showmaze.pl?".
@@ -146,7 +146,7 @@ sub show_page {
       "books=".
         join(",",encode_doors($offset,@real_doors))
       }),
-      img {src=>"/static/door.jpg"}, p($i + 1);
+      img {src=>"/static/maze_img/door.jpg"}, p($i + 1);
     }
     print "</td>\n";
   }
@@ -163,7 +163,7 @@ sub show_page {
 sub show_end {
   start();
   print br, h2("The End");
-  print img {src=>"/static/open_door.jpg"},"<br>";
+  print img {src=>"/static/maze_img/open_door.jpg"},"<br>";
   print a({-href=>"the_maze.php"},"Play agian?");
   print "<br>";
   print a({-href=>"../index.php"},"Quit");
