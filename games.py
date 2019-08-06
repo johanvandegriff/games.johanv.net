@@ -4,6 +4,8 @@ from flask import Flask, request, render_template, url_for
 #from wtforms import StringField, PasswordField, BooleanField, SubmitField
 #from wtforms.validators import DataRequired, NumberRange
 
+import os
+
 import CARL, boggle
 
 from nav import nav
@@ -14,6 +16,21 @@ app = Flask(__name__)
 def main():
     return render_template("index.html", nav=nav, active="Games")
 
+#START MAZE
+@app.route("/maze")
+def maze_page():
+    return render_template("maze.html", nav=nav, active="Maze")
+
+@app.route("/showmaze.pl", methods=['GET', 'POST'])
+def showmaze_page():
+    cgi_var_names = ["doors", "rooms", "current_room", "door_choice", "users"]
+    cgi_vars = ""
+    for v in cgi_var_names:
+        cgi_vars += " " + v + "=" + request.args.get(v, "")
+    page = os.popen("perl showmaze.pl" + cgi_vars).read
+    return render_template("content.html", nav=nav, active="Maze", content=page)
+#END MAZE
+
 #START BOGGLE
 @app.route("/boggle", methods=['GET', 'POST'])
 def boggle_page():
@@ -23,19 +40,20 @@ def boggle_page():
 #START CARL
 @app.route("/carl_raw", methods=["GET", "POST"])
 def carl_raw():
-    form = request.args
-    carl = form.get("carl", "")
-    user = form.get("user", "")
-    channelID = int(form.get("channelID", "0"))
+    carl = request.args.get("carl", "")
+    user = request.args.get("user", "")
+    try:
+        channelID = int(request.args.get("channelID", "0"))
+    except ValueError:
+        channelID = 0
     return CARL.answer(carl, user, channelID)
 
 @app.route("/carl")
 def carl_interface():
-    form = request.args
-    carl = form.get("carl", "")
-    user = form.get("user", "")
+    carl = request.args.get("carl", "")
+    user = request.args.get("user", "")
     try:
-        channelID = int(form.get("channelID", "0"))
+        channelID = int(request.args.get("channelID", "0"))
     except ValueError:
         channelID = 0
     
