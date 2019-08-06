@@ -166,9 +166,9 @@ sub show_end {
   start();
   print br, h2("The End");
   print img {src=>"/static/maze_img/open_door.jpg"},"<br>";
-  print a({-href=>"the_maze.php"},"Play agian?");
+  print a({-href=>"/maze"},"Play again?");
   print "<br>";
-  print a({-href=>"../index.php"},"Quit");
+  print a({-href=>"/"},"Quit");
   end();
 }
 #################################
