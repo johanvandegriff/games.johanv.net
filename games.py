@@ -30,7 +30,7 @@ def showmaze_page():
         #cgi_vars += " " + request.args.get(v, '""')
     page = os.popen("perl showmaze.pl" + cgi_vars).read()
     print(page)
-    return render_template("content.html", nav=nav, active="Maze", content=page)
+    return render_template("header.html", nav=nav, active="Maze") + page + render_template("footer.html")
 #END MAZE
 
 #START BOGGLE
