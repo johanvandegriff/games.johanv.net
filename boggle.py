@@ -71,17 +71,6 @@ def create(size=5):
             letter = dice[numbers[i*size+j]][random.randint(0,size)] #roll the dice
             row.append(letter) #set the letter on the board
         board.append(row)
-
-    #if filename == "":
-        #for i in range(size):
-            #for j in range(size): #for each board spot
-                #sys.stdout.write("%-2s" %(board[i][j])) #write the letter padded with spaces
-            #text += #write a new row
-
-    #file = []
-    #file.append(board)
-    #if len(sys.argv) > 1:
-        #json.dump(file, open(filename,'w'))
     return [board]
 
 
@@ -96,8 +85,6 @@ def solve_aux(x, y, word, used, board, words, found, size):
     myused.append([x,y]); #use the current spot
     myword = word + board[x][y].lower() #add on to the word
 
-#    text += myword
-#    time.sleep(0.25)
     if myword in words: #if the word is in the list of possible words
         found.append(myword)
         words.remove(myword)
@@ -109,7 +96,6 @@ def solve_aux(x, y, word, used, board, words, found, size):
                 solve_aux(newx, newy, myword, myused, board, words, found, size)
 
 def solve(game, minWordLength):
-    #game = json.load(open(filename,'r'))
     board = game[0]
     size = len(board)
 
@@ -167,36 +153,12 @@ def solve(game, minWordLength):
     score = 0
     numwords = 0
     found = []
-#    def add(word):
-#        found.append(word)
-    #    length = len(word)
-    #    if length < 7:
-    #        points = length - 3
-    #    elif length == 7:
-    #        points = 5
-    #    else:
-    #        points = 11
-    #    if points < 1:
-    #        points = 1;
-    #    text += ("%2d" %(points)) + " " + word
-    #    global score
-    #    score += points
-    #    global numwords
-    #    numwords += 1
 
     for x in range(size):
         for y in range(size):
             used = []
             word = ""
             solve_aux(x, y, word, used, board, words, found, size)
-
-    #text += "Word Count:    " + str(numwords)
-    #text += "Total Score: " + str(score)
-
-    #outfile = []
-    #outfile.append(board)
-    #outfile.append(found)
-    #json.dump(outfile, open(filename,'w'))
     return [board, found]
 
 def tableRow(row, tableItem='td'):
@@ -229,12 +191,8 @@ def page(form):
     else:
         action = LOBBY
 
-    #text += html.startPage("Action")
-    #text += action
-
     if not "username" in form:
         text += header()
-        #  text += html.startPage("Boggle")
         text += '<h1>Boggle</h1>'
         text += '<p>Boggle is a word game with a grid of random letters. The goal is to find letters next to each other that form words. The game lasts 3 minutes and the person with the highest score (longer words are worth more) at the end wins.</p>'
         text += '<h3>Enter your nickname</h3>'
@@ -244,13 +202,11 @@ def page(form):
         text += '<input type="hidden" name="action" value="'+str(LOBBY)+'">'
         text += '</form>'
         text += footer()
-        #  text += html.endPage()
         return text
 
     username = form["username"]
     if action == VIEW_GAME:
         text += header()
-        #  text += html.startPage("Boggle Past Game")
         text += '<h1>Boggle</h1>'
         text += '<h3>Past Game</h3>'
 
@@ -337,7 +293,6 @@ def page(form):
             text += str(percent) + "% of all these words were found."
 
         text += footer()
-        #  text += html.endPage()
     if action == JOIN_GAME:
         myGame = []
         myGameID = 0
@@ -358,30 +313,21 @@ def page(form):
             myGame = [myGameID, [username], size, 0]
             games.append(myGame)
 
-            #file = ROOT_DIR + "/saved_games/" + str(myGameID)
             size2 = int(size[0])
             if len(myGame) < 6:
                 minWordLength = 4
                 if size == "4x4":
                     minWordLength = 3
                 game = create(size2)
-#                os.system("/home/johanadmin/boggle/create.py " + str(size2) + " " + file)
-    #            os.system("(/home/johanadmin/boggle/solve.py " + file + " &) > /dev/null")
                 game = solve(game, minWordLength)
-#                os.system("/home/johanadmin/boggle/solve.py " + file + " " + str(minWordLength))
-                #file_contents = json.load(open(file, 'r'))
-                #os.system("rm " + file)
                 myGame.append(-1)
                 myGame.extend(game)
-                #for item in file_contents:
-                    #myGame.append(item)
                 myGame.append([])
                 myGame.append([])
                 json.dump(games, open(GAMES_FILE, 'w'))
 
         if myGame == []:
             action = LOBBY
-    #        lobby()
 
         players = myGame[1]
         host = players[0]
@@ -390,7 +336,6 @@ def page(form):
                 text += play(username, size, myGameID)
             else:
                 action = LOBBY
-    #            lobby()
 
         if not username in players:
             players.append(username)
@@ -400,17 +345,6 @@ def page(form):
         if size == "4x4":
             minWordLength = "Three"
         text += header()
-    #    text += " ""Content-type: text/html
-    #
-    #<!DOCTYPE html>
-    #<html>
-    #<head>
-    #<title>
-    #New Game
-    #</title>
-    #<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
-    #</head>
-    #<body>
         text += """<h1>Boggle</h1><h4>New Game hosted by """ + rq(host) + ".<br><br>" + rq(size) + " Board, " + rq(minWordLength) + """ letter
     words or more.</h4>
     <p>Waiting for players...</p>
@@ -443,7 +377,6 @@ def page(form):
     }, 3000);
     </script>"""
         text += footer()
-    #    text += "</body></html>"
 
     if action == PLAY_GAME:
         size = form["size"]
@@ -485,17 +418,6 @@ def page(form):
         if size == "4x4":
             minWordLength = "Three"
         text += header()
-    #    text += " ""Content-type: text/html
-    #
-    #<!DOCTYPE html>
-    #<html>
-    #<head>
-    #<title>
-    #Boggle Game
-    #</title>
-    #<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
-    #</head>
-    #<body>
         text += """<h1>Boggle</h1><h4>Game hosted by """ + rq(host) + ".<br><br>" + size + " Board, " + minWordLength + """ letter
     words or more.</h4>
     <p>The game has started! Good luck, """ + rq(username) + '!</p><h4><p id="time"></p></h4>'
@@ -503,10 +425,6 @@ def page(form):
 
         board = myGame[5]
         text += display(board, 1)
-
-    #<a style="text-decoration:none;color:#000000" href="javascript:type(' ')">Space</a><br>
-    #<a style="text-decoration:none;color:#000000" href="javascript:backspace()">Backpace</a><br>
-
         text += """<form action="" id="words" name="words">
 <input type="hidden" name="action" value='""" + str(GAME_OVER) + """'>
 <input type="hidden" name="username" value='""" + username + """'>
@@ -536,7 +454,6 @@ function type(letter){
 
 function backspace(){
     var box = document.getElementById("wordBox").value.slice(0, -1);
-//    box = box.slice(0, -1);
     document.getElementById("wordBox").value = box;
 }
 
@@ -562,8 +479,6 @@ function countDown(){
 }
 </script>"""
         text += footer()
-    #</body>
-    #</html>"" "
 
     if action == GAME_OVER:
         size = form["size"]
@@ -583,7 +498,6 @@ function countDown(){
 
         myGame[3] = 2
 
-        #file = ROOT_DIR + "/saved_games/" + str(gameID)
         size2 = int(size[0])
 
         players = myGame[1]
@@ -600,17 +514,6 @@ function countDown(){
         json.dump(games, open(GAMES_FILE, 'w'))
 
         text += header()
-    #    text += " ""Content-type: text/html
-    #
-    #<!DOCTYPE html>
-    #<html>
-    #<head>
-    #<title>
-    #Game Over
-    #</title>
-    #<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
-    #</head>
-    #<body>
         text += """<script>
 function redirect() {
     window.location = '/boggle?action=""" + str(VIEW_GAME) + "&gameID=" + str(gameID) + "&username=" + username + """';
@@ -621,14 +524,10 @@ setTimeout(redirect, 5000);
 Redirect in 5 seconds...
 </h2>"""
         text += footer()
-    #<body>
-    #</html>"" "
 
     if action == LOBBY:
         lobbyStartTime = time.time()
         text += header()
-    #    text += html.startPage("Boggle Lobby",
-    #    '<script type="text/javascript" src="sorttable.js"></script>')
         text += '<script type="text/javascript" src="/static/sorttable.js"></script>'
 
         text += '<h1>Boggle Lobby</h1>'
@@ -666,7 +565,6 @@ Redirect in 5 seconds...
             text += '<p><b>No games are waiting for players.</b></p>'
         else:
             text += table(rows, 'border=1 cellpadding=7 id="waiting" class="sortable"')
-            #[["border", 1], ["cellpadding", 7],["id", "waiting"], ["class", "sortable"]])
 
         text += '<br/>'
         text += '<input value="Join Game" type="submit" ' + disabled + '>'
@@ -711,7 +609,6 @@ Redirect in 5 seconds...
             text += '<p><b>No games are in progress.</b></p>'
         else:
             text += table(rows, 'border=1 cellpadding=7 id="playing" class="sortable"')
-                             #[["border", 1], ["cellpadding", 7],["id", "playing"], ["class", "sortable"]])
         text += '<br/><br/>'
         text += '<p>Games that are over:</p>'
         text += '<p>Click on a column to sort by that column</p>'
@@ -742,10 +639,8 @@ Redirect in 5 seconds...
                 rows.append(['<a href="/boggle?gameID=' + str(gameID) + '&username=' + username + '&action=' + str(VIEW_GAME) + '">' + str(gameID) + '</a>', host,
                                         size, str(players), str(len(allWords)), str(found), percentStr])
         text += table(rows, 'border=1 cellpadding=7 id="over" class="sortable"')
-#                         [["border", 1], ["cellpadding", 7],["id", "over"], ["class", "sortable"]])
         text += '<p>It took ' + str(time.time() - lobbyStartTime) + ' seconds to load the lobby.</p>'
         text += footer()
-    #    text += html.endPage()
     return text
 
 
@@ -764,7 +659,6 @@ def display(board, buttons):
             else:
                 space = "&nbsp;"
             if buttons == 1:
-                #letter = '<a style="text-decoration : none; color : #000000;" href="javascript:type("' + letter.lower() + '")">' + letter + '</a>'
                 letter = '<a style="text-decoration:none;color:#000000" href="javascript:type(\'' + letter.lower() + '\')">' + letter + '</a>'
             text += '<td width="62" height="62" background="/static/boggle_img/letter.bmp">&thinsp;' + space + letter + "</td>"
         text += "</tr>"
