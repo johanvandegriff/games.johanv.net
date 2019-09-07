@@ -16,6 +16,12 @@ app = Flask(__name__)
 def main():
     return render_template("index.html", nav=nav, active="Games")
 
+#START check
+@app.route("/check.txt")
+def check():
+    return "success"
+#END check
+
 #START WHACK
 @app.route("/whack.pl", methods=["GET", "POST"])
 def whack_page():
