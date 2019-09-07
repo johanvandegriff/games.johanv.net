@@ -1,3 +1,9 @@
+/*
+This CSS source code is licensed under the GNU Affero General Public License 3.0. (https://www.gnu.org/licenses/agpl-3.0.html)
+
+The full source code is available at: https://gitlab.com/johanvandegriff/games.johanv.xyz
+*/
+
 nav ul {
     list-style-type: none;
     margin: 0;
@@ -26,4 +32,8 @@ nav ul li a:hover:not(.active) {
 
 .active {
     background-color: #631fa3;
+}
+
+footer {
+    padding: 10px;
 }
