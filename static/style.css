@@ -4,36 +4,172 @@ This CSS source code is licensed under the GNU Affero General Public License 3.0
 The full source code is available at: https://gitlab.com/johanvandegriff/games.johanv.xyz
 */
 
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+}
+
+p {
+  font-size: medium;
+}
+
+div.img {
+  border: 1px solid #ccc;
+  float: left;
+  margin: 5px;
+  width: 180px;
+}
+
+div.img:hover {
+  border: 1px solid #777;
+}
+
+div.img img {
+  height: auto;
+  width: 100%;
+}
+
+.desc {
+  padding: 15px;
+  text-align: center;
+}
+
+a.svg {
+  display: inline-block;
+  position: relative;
+}
+
+.svg:after {
+  bottom: 0;
+  content: "";
+  left:0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.ribbon {
+  background-color: #000000;
+  clear: both;
+  height: 155px;
+  margin: 0;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  width:100%;
+}
+
+.main {
+  margin: 0;
+  margin-top: 185px;
+  padding: 0;
+}
+
+section {
+  padding: 10px;
+}
+
+aside {
+  font-family: 'Monospace', sans-serif;
+  background-color: #000000;
+  margin: 0;
+  max-width: 200px;
+  padding: 4px;
+  width: 25%;
+  z-index: -1;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+#middle section {
+  margin: 5px;
+  margin-left: 210px;
+  margin-right: 210px;
+  overflow: hidden;
+}
+
 nav ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
-    border-top: 1px solid #0f0;
-    font-weight: bold;
+  background-color: #333;
+  border-top: 1px solid #0f0;
+  font-weight: bold;
+  list-style-type: none;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
 }
 
 nav ul li {
-    float: left;
+  float: left;
 }
 
 nav ul li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 10px 12px;
-    text-decoration: none;
+  color: white;
+  display: block;
+  padding: 10px 12px;
+  text-align: center;
+  text-decoration: none;
 }
 
 nav ul li a:hover:not(.active) {
-    background-color: #111;
+  background-color: #111;
 }
 
 .active {
-    background-color: #631fa3;
+  background-color: #631fa3;
+}
+
+.box {
+  border: 1px solid gray;
+  margin: auto;
+  width: 75%;
+}
+
+.title {
+  background: #0f0;
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
 }
 
 footer {
     padding: 10px;
+}
+
+.green {
+  color: #0f0;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.blue {
+  color: #1018ee;
+}
+
+.orange {
+  color: #eb7f36;
+}
+
+.purple {
+  color: #631fa3;
+}
+
+.terminal {
+    font-family: 'Monospace', sans-serif;
+    background-color: black;
+    color: white;
+    padding: 10px;
+    display: inline-block;
+}
+
+.img65 {
+    width:65%;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
 }
