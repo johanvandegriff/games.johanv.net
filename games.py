@@ -1,16 +1,22 @@
 from flask import Flask, request, render_template, url_for
-
-#from flask_wtf import FlaskForm
-#from wtforms import StringField, PasswordField, BooleanField, SubmitField
-#from wtforms.validators import DataRequired, NumberRange
-
 import os
 
 import CARL, boggle
-
 from nav import nav
 
 app = Flask(__name__)
+
+def run_perl(request, perl_program):
+    args = request.args.to_dict()
+    cgi_vars = ""
+    for v in args:
+        cgi_vars += " " + '"' + v + "=" + args[v].replace('+', '%2B') + '"'
+    #return '<pre>'+cgi_vars+'</pre>' + os.popen("perl " + perl_program + cgi_vars).read()
+    return os.popen("perl " + perl_program + cgi_vars).read()
+
+def run_perl_page(request, perl_program, title):
+    page = run_perl(request, perl_program)
+    return render_template("header.html", nav=nav, active=title) + page + render_template("footer.html")
 
 @app.route("/")
 def main():
@@ -22,16 +28,24 @@ def check():
     return "success"
 #END check
 
+#START MATH
+@app.route("/math")
+def math_page():
+    return render_template("math.html", nav=nav, active="Math")
+
+@app.route("/math_game.pl", methods=["GET", "POST"])
+def math_game():
+    return run_perl_page(request, "math_game.pl", "Math")
+
+@app.route("/math_score.pl", methods=["GET", "POST"])
+def math_score():
+    return run_perl_page(request, "math_score.pl", "Math")
+#END MATH
+
 #START WHACK
 @app.route("/whack.pl", methods=["GET", "POST"])
 def whack_page():
-    cgi_var_names = ["start", "score", "last"]
-    cgi_vars = ""
-    for v in cgi_var_names:
-        if v in request.args:
-            cgi_vars += " " + v + "=" + request.args[v]
-    page = os.popen("perl whack.pl" + cgi_vars).read()
-    return render_template("header.html", nav=nav, active="Whack") + page + render_template("footer.html")
+    return run_perl_page(request, "whack.pl", "Whack")
 #END WHACK
 
 #START MAZE
@@ -41,13 +55,7 @@ def maze_page():
 
 @app.route("/showmaze.pl", methods=["GET", "POST"])
 def showmaze_page():
-    cgi_var_names = ["doors", "rooms", "current_room", "door_choice", "users"]
-    cgi_vars = ""
-    for v in cgi_var_names:
-        if v in request.args:
-            cgi_vars += " " + v + "=" + request.args[v]
-    page = os.popen("perl showmaze.pl" + cgi_vars).read()
-    return render_template("header.html", nav=nav, active="Maze") + page + render_template("footer.html")
+    return run_perl_page(request, "showmaze.pl", "Maze")
 #END MAZE
 
 #START BOGGLE
@@ -94,4 +102,4 @@ def carl_page():
 #END CARL
 
 if __name__ == "__main__":
-  app.run()
+    app.run()
