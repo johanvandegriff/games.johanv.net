@@ -6,3 +6,7 @@ gunicorn==19.9.0
 itsdangerous==1.1.0
 #wsgiref==0.1.2
 #flask-wtf==0.14.2
+profanity-filter==1.1.14
+git+git://github.com/rominf/hunspell_serializable.git
+git+git://github.com/kmike/pymorphy2.git
+spacy==2.1.8

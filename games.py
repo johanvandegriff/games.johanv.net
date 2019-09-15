@@ -3,6 +3,7 @@ import os
 
 import CARL, boggle
 from nav import nav
+import profanity_test
 
 app = Flask(__name__)
 
@@ -21,6 +22,10 @@ def run_perl_page(request, perl_program, title):
 @app.route("/")
 def main():
     return render_template("index.html", nav=nav, active="Games")
+
+@app.route("/profanity-test")
+def profanitytest():
+    return profanity_test.test()
 
 #START check
 @app.route("/check.txt")
