@@ -22,7 +22,7 @@ The source code is available at: https://gitlab.com/johanvandegriff/games.johanv
 </a></header>
 <nav><ul>
 {% for item in nav %}
-<li{% if active == item[0] %} class="active"{% endif %} style="width:{{ 100.0/nav|length() }}%"><a href="{{ item[1] }}">{{ item[0] }}</a></li>
+<li{% if active == item[0] %} class="active"{% endif %} style="width:{{ 100.0/nav|length() }}%"><a href="{% if active == item[0] %}#{% else %}{{ item[1] }}{% endif %}">{{ item[0] }}</a></li>
 {% endfor %}
 </ul></nav></div>
 <div class="main">
