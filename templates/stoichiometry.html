@@ -1,0 +1,63 @@
+{% include 'header.html' %}
+<h2>Stoichiometry</h2>
+<p>Chemical Equation Balancer!</p>
+
+<form action="/chem">
+Enter the chemical equation to be balanced:
+<input required type="text" name="equation" value="{{ equation }}" style="width:400px;">
+<br>
+
+<br>
+<input value="Balance It!" type="submit">
+<h3>Optional Info</h3>
+Enter a compound within the equation to set its grams or moles:
+<input type="text" name="compound" value="{{ compound }}">
+<br>
+
+Enter the quantity and unit of this compound:
+<input type="text" name="grams_or_moles_value" value="{{ grams_or_moles_value }}">
+<select name="grams_or_moles">
+<option{% if grams_or_moles == "grams" %} selected{% endif %}>grams</option>
+<option{% if grams_or_moles == "moles" %} selected{% endif %}>moles</option>
+</select>
+
+<br>
+<input value="Balance It!" type="submit">
+</form>
+
+{% if result %}
+<h3>Result</h3>
+<pre>{{ result }}</pre>
+{% else %}
+<h3>Samples</h3>
+<p>Try out some of these sample equations. It balances charge, too!</p>
+<pre>H2+O2=>H2O
+Fe(l) + H2O(l) => Fe(2+)(aq) + OH(-)(aq) + H2(g)
+C3H6(OH)2 + O2 -> CO2 + H2O
+Al + I2 -> AlI3
+NH3 + CO2 => (NH2)2CO + H2O
+Zn + HCl → ZnCl2 + H2
+TiCl4 + Mg → Ti + MgCl2
+NaHCO3 ↔ Na2CO3 + CO2+H2O
+Na2CO3(aq) + HCl(aq) →   CO2(g) +   NaCl(aq) +   H2O(l)
+LiBr(aq) + AgNO3(aq) →  LiNO3(aq) + AgBr 		 (s)
+NaOH (aq) +  Cu(NO3)2 (aq) →  Cu(OH)2 (s) +  NaNO3 (aq)
+CaI2(aq) + K3PO4(aq) →  Ca3(PO4)2 (s) +  KI (aq)
+Ag(+) (aq) + CrO4(2-) (aq) → Ag2CrO4 (s)
+Pb(NO3)2(s) + NaI(aq) → PbI2(aq) + NaNO3(aq)
+NaN3(s) + Fe2O3(s) → Na2O(s) + Fe(s) +  N2(g)
+LiOH(s) + CO2(g) → Li2CO3(s) + H2O(l)
+KOH(s) + CO2(g) → K2CO3(s) + H2O(l)
+H2SO4(aq) + Na2CO3(aq) → CO2(g) + H2O(l) + Na2SO4(aq)
+HCl(aq) + Na2CO3(aq) → CO2(g) + H2O(l) + NaCl(aq)
+C3H5(NO3)3(s) = CO2(g) + H2O(g) + N2(g) + O2(g)
+C2H5OH(l) +   O2(g) →  		 CO2(g) +  		 H2O(g)
+CO2(g) + H2O(l) ⇆ H3O(+)(aq) + HCO3(-)(aq)
+</pre>
+{% endif %}
+
+<h3>Source Code</h3>
+<p>This app is open source! You can see, modify, and distribute the source code.</p>
+<p>You can see the source code for the actual solver (under the <a target="_blank" href="https://tldrlegal.com/license/mit-license">MIT license</a>) on <a target="_blank" href="https://gitlab.com/johanvandegriff/Stoichiometry">gitlab</a> or <a target="_blank" href="https://github.com/johanvandegriff/Stoichiometry">github</a>. The source code for this web page (under the <a target="_blank" href="https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0)">AGPLv3 license</a>) is also on <a target="_blank" href="https://gitlab.com/johanvandegriff/games.johanv.xyz/blob/master/games.py">gitlab</a> or <a target="_blank" href="https://github.com/johanvandegriff/games.johanv.xyz/blob/master/games.py">github</a>.</p>
+
+{% include 'footer.html' %}

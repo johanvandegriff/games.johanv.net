@@ -33,6 +33,28 @@ def check():
     return "success"
 #END check
 
+#START STOICHIOMETRY
+@app.route("/chem", methods=["GET", "POST"])
+def stoichiometry():
+    args = request.args.to_dict()
+    result = ""
+    equation = ""
+    compound = ""
+    grams_or_moles = ""
+    grams_or_moles_value = ""
+    
+    if "equation" in args:
+        equation = args["equation"]
+        optional_args = ""
+        if "compound" in args and "grams_or_moles" in args and "grams_or_moles_value" in args:
+            compound = args["compound"]
+            grams_or_moles = args["grams_or_moles"]
+            grams_or_moles_value = args["grams_or_moles_value"]
+            optional_args = " '" + compound + "' " + grams_or_moles_value + " " + grams_or_moles
+        result = os.popen("java -jar Stoichiometry.jar '" + equation + "'" + optional_args).read()
+    return render_template("stoichiometry.html", nav=nav, active="Chem", result=result, equation=equation, compound=compound, grams_or_moles_value=grams_or_moles_value, grams_or_moles=grams_or_moles)
+#END STOICHIOMETRY
+
 #START MATH
 @app.route("/math")
 def math_page():
