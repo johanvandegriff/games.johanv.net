@@ -5,5 +5,6 @@ nav = [
     ["Boggle", "/boggle"],
     ["Maze", "/maze"],
     ["Whack", "/whack.pl"],
-    ["Math", "/math"]
+    ["Math", "/math"],
+    ["Chem", "/chem"]
 ]
