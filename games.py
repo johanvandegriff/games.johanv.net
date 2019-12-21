@@ -23,9 +23,19 @@ def run_perl_page(request, perl_program, title):
 def main():
     return render_template("index.html", nav=nav, active="Games")
 
+#START profanity-tests
 @app.route("/profanity-test")
 def profanitytest():
     return profanity_test.test()
+
+@app.route("/profanity-test2")
+def profanitytest2():
+    try:
+        channel = request.args.get("channel", "")
+    except ValueError:
+        channel = ""
+    return profanity_test.test2(channel)
+#END profanity-tests
 
 #START check
 @app.route("/check.txt")
@@ -96,32 +106,23 @@ def boggle_page():
 def carl_api():
     carl = request.args.get("carl", "")
     user = request.args.get("user", "")
-    try:
-        channelID = int(request.args.get("channelID", "0"))
-    except ValueError:
-        channelID = 0
-    return CARL.answer(carl, user, channelID)
+    allowProfanity = request.args.get("profanity", "") == "true"
+
+    return CARL.answer(carl, user, allowProfanity)
 
 @app.route("/carl", methods=["GET", "POST"])
 def carl_page():
     carl = request.args.get("carl", "")
     user = request.args.get("user", "")
-    try:
-        channelID = int(request.args.get("channelID", "0"))
-    except ValueError:
-        channelID = 0
+    allowProfanity = request.args.get("profanity", "") == "true"
     
-    selected = ["", "", ""]
-    selected[channelID] = " selected"
-    carl2 = CARL.answer(carl, user, channelID)
+    carl2 = CARL.answer(carl, user, allowProfanity)
 
     return render_template(
         "carl.html",
         nav=nav,
         active="CARL",
-        selected0=selected[0],
-        selected1=selected[1],
-        selected2=selected[2],
+        allowProfanity=allowProfanity,
         carl=carl,
         user=user,
         carl2=carl2

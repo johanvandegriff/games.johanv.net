@@ -45,9 +45,15 @@ def spellcheckPhrase(p, phrases):
 
     return bestIdx, best
 
-def answer(carlAsked, userAnswered, channelID):
-    channels=("default", "E2", "movies")
-    storageFile=ROOT_DIR+"/channels/"+channels[channelID]+".json"
+def answer(carlAsked, userAnswered, allowProfanity):
+    if allowProfanity:
+        channel = "E2"
+    else:
+        channel = "default"
+        from profanity_filter import ProfanityFilter
+        pf = ProfanityFilter()
+
+    storageFile=ROOT_DIR+"/channels/"+channel+".json"
 
     if os.path.isfile(storageFile):
         storage = json.load(open(storageFile, 'r'))
@@ -97,9 +103,10 @@ def answer(carlAsked, userAnswered, channelID):
                 links[askIdx].append(bestIdx)
         else:
             futureAskIdx = getLeastUsed(links, bestIdx) #exclude answerIdx
-        if askIdx != -1:
-            links[askIdx].append(len(phrases))
-        links.append([])
-        phrases.append(userAnswered)
+        if allowProfanity or pf.is_clean(userAnswered):
+            if askIdx != -1:
+                links[askIdx].append(len(phrases))
+            links.append([])
+            phrases.append(userAnswered)
     json.dump(storage, open(storageFile, 'w'))
     return phrases[futureAskIdx]
