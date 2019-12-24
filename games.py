@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, url_for
-import os
+import os, re
 
 import CARL, boggle
 from nav import nav
@@ -7,11 +7,16 @@ import profanity_test
 
 app = Flask(__name__)
 
+def run_perl_blacklist(s):
+    singlequote = "'"
+    return re.sub('[";'+singlequote+']', '', s)
+
+
 def run_perl(request, perl_program):
     args = request.args.to_dict()
     cgi_vars = ""
     for v in args:
-        cgi_vars += " " + '"' + v + "=" + args[v].replace('+', '%2B') + '"'
+        cgi_vars += " " + '"' + v + "=" + run_perl_blacklist(args[v]).replace('+', '%2B') + '"'
     #return '<pre>'+cgi_vars+'</pre>' + os.popen("perl " + perl_program + cgi_vars).read()
     return os.popen("perl " + perl_program + cgi_vars).read()
 
@@ -44,6 +49,9 @@ def check():
 #END check
 
 #START STOICHIOMETRY
+def chem_whitelist(s):
+    return re.sub('[^a-zA-Z\d\w.()+-=>→↔⇆]', '', s)
+
 @app.route("/chem", methods=["GET", "POST"])
 def stoichiometry():
     args = request.args.to_dict()
@@ -52,14 +60,14 @@ def stoichiometry():
     compound = ""
     grams_or_moles = ""
     grams_or_moles_value = ""
-    
+
     if "equation" in args:
-        equation = args["equation"]
+        equation = chem_whitelist(args["equation"])
         optional_args = ""
         if "compound" in args and "grams_or_moles" in args and "grams_or_moles_value" in args:
-            compound = args["compound"]
+            compound = chem_whitelist(args["compound"])
             grams_or_moles = args["grams_or_moles"]
-            grams_or_moles_value = args["grams_or_moles_value"]
+            grams_or_moles_value = chem_whitelist(args["grams_or_moles_value"])
             optional_args = " '" + compound + "' " + grams_or_moles_value + " " + grams_or_moles
         result = os.popen("java -jar Stoichiometry.jar '" + equation + "'" + optional_args).read()
     return render_template("stoichiometry.html", nav=nav, active="Chem", result=result, equation=equation, compound=compound, grams_or_moles_value=grams_or_moles_value, grams_or_moles=grams_or_moles)
@@ -115,7 +123,7 @@ def carl_page():
     carl = request.args.get("carl", "")
     user = request.args.get("user", "")
     allowProfanity = request.args.get("profanity", "") == "true"
-    
+
     carl2 = CARL.answer(carl, user, allowProfanity)
 
     return render_template(
