@@ -25,9 +25,6 @@
             Note: only standard boards are considered for highscores (4x4, 3 letters, 3 min OR 5x5, 4 letters, 3 min).<br/>
         </p>
         <h2>Charts</h2>
-        <!-- <canvas id="piechart"></canvas>
-        <div id="piechartLegend" class="compactText" style="text-align: left;"></div> -->
-
         <div class="ct-chart ct-perfect-fourth" id="scoreChart"></div>
         <div class="ct-chart ct-perfect-fourth" id="possibleScoreChart"></div>
         <div class="ct-chart ct-perfect-fourth" id="wordsFoundChart"></div>
@@ -45,7 +42,6 @@
     </div>
     <div class="rightCol gamesTable">
         <h2>Past Games</h2>
-        <!-- <p class="scale"><span style="background-color: #0c0; padding:3px; border-radius: 5px;">monarchofmany</span> wins!</p> -->
         <div class="compactText" style="margin: 10px;">
             <input type="checkbox" checked>5x5
             <input type="checkbox" checked>4x4
@@ -243,16 +239,17 @@
 </form></div>
 
 <script type="text/javascript" src="/static/sorttable.js"></script>
-<script type="text/javascript" src="/static/piechart.js"></script>
 
 <link rel="stylesheet" href="/static/chartist.min.css">
 <script src="/static/chartist.min.js"></script>
 <script src="/static/chartist-plugin-axistitle.min.js"></script>
 
 <script type="text/javascript">
+//have to wait for the page to load to access the footer
+window.onload = function() {
 // hide the footer since it gets in the way
-var footers = document.getElementsByTagName('footer');
-footers[0].style.display = "none";
+    document.getElementsByTagName('footer')[0].style.display = "none";
+}
 
 function settings (xlabel, ylabel) {
     return {
@@ -331,94 +328,6 @@ new Chartist.Bar('#numPlayersChart', {
     series: [[1, 2, 40, 60, 8, 4]]
 }, settings("# of players", "# of games"));
 
-
-
-
-
-
-
-// var piechartCanvas = document.getElementById("piechart");
-// var piechartLegend = document.getElementById("piechartLegend");
-
-// piechartCanvas.width = 200;
-// piechartCanvas.height = 200;
- 
-// // var ctx = piechartCanvas.getContext("2d");
-
-// var piechartData = {
-//     "5x5": 60,
-//     "4x4": 40,
-//     "> 5x5": 8,
-//     "< 4x4": 2
-// };
-
-// var piechart = new Piechart(
-//     {
-//         canvas: piechartCanvas,
-//         data:   piechartData,
-//         colors: ["#fde23e","#f16e23", "#57d9ff","#937e88"],
-//         legend: piechartLegend,
-//         doughnutHoleSize:0.3
-
-//     }
-// );
-// piechart.draw();
-
-
-// var data = {
-//   // A labels array that can contain any sort of values
-//   labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-//   // Our series array that contains series objects or in this case series data arrays
-//   series: [
-//     [5, 2, 4, 2, 0]
-//   ]
-// };
-
-// // Create a new line chart object where as first parameter we pass in a selector
-// // that is resolving to our chart container element. The Second parameter
-// // is the actual data object.
-// new Chartist.Line('.ct-chart', data);
-
-
-
-
-  // Initialize a Line chart in the container with the ID chart1
-//   new Chartist.Line('#chart1', {
-//     labels: [1, 2, 3, 4],
-//     series: [[100, 120, 180, 200]]
-//   });
-
-  // Initialize a Line chart in the container with the ID chart2
-
-
-// var data = {
-//   labels: ['5x5', '4x4', '> 5x5', '< 4x4'],
-//   series: [60, 40, 8, 2]
-// };
-
-// var options = {
-//   labelInterpolationFnc: function(value) {
-//     return value[0]
-//   }
-// };
-
-// var responsiveOptions = [
-//   ['screen and (min-width: 640px)', {
-//     chartPadding: 30,
-//     labelOffset: 100,
-//     labelDirection: 'explode',
-//     labelInterpolationFnc: function(value) {
-//       return value;
-//     }
-//   }],
-//   ['screen and (min-width: 1024px)', {
-//     labelOffset: 80,
-//     chartPadding: 20
-//   }]
-// ];
-
-// new Chartist.Pie('#chart1', data, options, responsiveOptions);
-  
 </script>
 
 {% include 'boggle/common.html' %}
