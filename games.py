@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, url_for
 import os, re
 
-import CARL, boggle
+import CARL, boggle, boggle_old
 from nav import nav
 import profanity_test
 
@@ -108,6 +108,12 @@ def showmaze_page():
 def boggle_page():
     return boggle.page(request.args)
 #END BOGGLE
+
+#START BOGGLE_OLD
+@app.route("/boggle_old", methods=["GET", "POST"])
+def boggle_old_page():
+    return boggle_old.page(request.args)
+#END BOGGLE_OLD
 
 #START CARL
 @app.route("/carl_api", methods=["GET", "POST"])

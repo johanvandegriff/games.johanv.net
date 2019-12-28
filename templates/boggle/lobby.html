@@ -1,0 +1,119 @@
+{% include 'header.html' %}
+
+<div class="gameArea">
+    <div class="leftCol">
+        <form method="get">
+            <h1 class="scale">Boggle 2.0 Lobby</h1>
+            <p class="scale">Welcome, {{ username }}! Select a game type, or join an existing game.</p>
+            <input class="radioHide" type="radio" name="preset" id="5x5" value="5x5" checked>
+            <label class="leftCol grayBox" for="5x5">
+                5x5, find words with 4 letters or more in 3 minutes<br/>
+                <img class="hideSmall" src="/static/boggle_img/5x5.png" style="width:70%"/>
+            </label>
+
+            <input class="radioHide" type="radio" name="preset" id="4x4" value="4x4">
+            <label class="rightCol grayBox" for="4x4">
+                4x4, find words with 3 letters or more in 3 minutes<br/>
+                <img class="hideSmall" src="/static/boggle_img/4x4.png" style="width:70%"/>
+            </label>
+
+            <input class="radioHide" type="radio" name="preset" id="custom" value="custom">
+            <label class="singleCol grayBox" for="custom">
+                <select class="customSelect" name="size">
+                        <option>2x2</option>
+                        <option>3x3</option>
+                        <option>4x4</option>
+                        <option>5x5</option>
+                        <option selected>6x6</option>
+                        <option>7x7</option>
+                </select>,
+                <select class="customSelect" name="size">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option selected>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                </select> letters,
+                <select class="customSelect" name="size">
+                        <option>0.5</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option selected>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                </select> minutes
+            </label>
+            <input type="hidden" name="username" value="{{ username }}"/>
+            <input type="hidden" name="action" value="pregame"/>
+            <input class="greenButton" type="submit" value="Create Game"/>
+        </form>
+    </div>
+    <div class="rightCol">
+        Loading Current Games...
+
+        <br/>TODO: Load games with JS
+
+        <h2 class="scale" style="margin-bottom: 1em">Current Games</h2>
+
+        <div class="grayBox">
+            <div style="padding: 5px; border-bottom: 2px solid black;">
+            <form method="get">
+                <input type="hidden" name="username" value="{{ username }}"/>
+                <input type="hidden" name="action" value="pregame"/>
+                <input type="hidden" name="gameID" value="1"/>
+                <input class="greenButton" type="submit" value="Join"/> Game #3 (waiting...)
+            </form>
+            </div>
+            <div style="">
+            5x5, 4 letters, 5 min, 3 players:
+            johanv, JonV, monarchofmany</div>
+        </div>
+
+        <div class="grayBox">
+            <div style="padding: 5px; border-bottom: 2px solid black;">
+            <form method="get">
+                <input type="hidden" name="username" value="{{ username }}"/>
+                <input type="hidden" name="action" value="play"/>
+                <input type="hidden" name="gameID" value="1"/>
+                <input class="blueButton" type="submit" value="Spectate"/> Game #2 (time left: 4:20)
+            </form>
+            </div>
+            <div style="">
+            5x5, 4 letters, 5 min, 3 players:
+            johanv, JonV, monarchofmany</div>
+        </div>
+
+        <div class="grayBox">
+            <div style="padding: 5px; border-bottom: 2px solid black;">
+            <form method="get">
+                <input type="hidden" name="username" value="{{ username }}"/>
+                <input type="hidden" name="action" value="view"/>
+                <input type="hidden" name="gameID" value="1"/>
+                <input class="purpleButton" type="submit" value="View"/> Game #1 (time's up!)
+            </form>
+            </div>
+            <div style="">
+            5x5, 4 letters, 5 min, 3 players:
+            johanv, JonV, monarchofmany</div>
+        </div>
+
+
+        <br/>
+        <form method="get">
+            <input type="hidden" name="username" value="{{ username }}"/>
+            <input type="hidden" name="action" value="stats"/>
+            <input class="purpleButton" type="submit" value="Past Games, Records & Stats"/>
+        </form>
+    </div>
+    <div class="singleCol"></div>
+</div>
+
+{% include 'boggle/common.html' %}
+{% include 'footer.html' %}

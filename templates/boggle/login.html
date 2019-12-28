@@ -1,0 +1,26 @@
+{% include 'header.html' %}
+
+<div class="gameArea"><form method="get" action="/boggle_old">
+<!-- <div class="gameArea"><form method="get"> -->
+    <div class="singleCol">
+        <h1 class="scale" style="margin-bottom: 1em">Boggle 2.0</h1>
+    </div>
+    <div class="leftCol">
+        <img src="/static/boggle_img/5x5.png" style="width: 70%">
+    </div>
+    <div class="rightCol">
+        <input type="text" class="underlineText" id="name" name="username" placeholder="Your Nickname" required autofocus/>
+        <br/>
+        <input class="greenButton" type="submit" value="Enter Lobby"/>
+    </div>
+    <div class="singleCol">
+        <input type="hidden" name="action" value="1"/>
+        <!-- <input type="hidden" name="action" value="lobby"/> -->
+        <p class="scale">Boggle is a word game with a grid of random letters. The goal is to find letters next to each other that form words. The game lasts 3 minutes and the person with the highest score (longer words are worth more) at the end wins.</p>
+        <p class="scale"><a href="/boggle?username=user&action=lobby">Look at the new interface (not done yet) >></a></p>
+        <!-- <p class="scale"><a href="/boggle_old">Visit the old Boggle game >></a></p> -->
+    </div>
+</form></div>
+
+{% include 'boggle/common.html' %}
+{% include 'footer.html' %}

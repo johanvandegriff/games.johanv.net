@@ -181,75 +181,7 @@ def table(rows, properties, head=True):
     text += '<tbody>'
     return text + '</table>'
 
-"""
-This method doesn't return html, but JSON data for JS to digest.
-It is called with AJAX requests, and the data will be formatted
-to update part of the page without reloading the whole thing.
-"""
-def data_request(form):
-    return ""
-
-"""
-This method processes all requests coming in, passing it off to
-data_request if need be, and displaying a page otherwise
-"""
 def page(form):
-    if "request" in form:
-        return data_request(form)
-
-    if not "username" in form:
-        action = "login"
-    else:
-        username = form["username"]
-        if "action" in form:
-            action = form["action"]
-        else:
-            action = "lobby"
-
-    if action == "login":
-        return render_template("boggle/login.html", action=action, nav=nav, active="Boggle")
-
-    if action == "pregame":
-        if "gameID" in form:
-            gameID = form["gameID"]
-            host = "hostman"
-        else:
-            gameID = 1
-            host = username
-        return render_template("boggle/pregame.html", host=host, gameID=gameID, username=username, nav=nav, active="Boggle")
-
-    if action == "cancel":
-        #TODO: delete a game if you are the host, otherwise remove the player from it
-        action = "lobby"
-
-    if action == "lobby":
-        return render_template("boggle/lobby.html", username=username, nav=nav, active="Boggle")
-
-    if action == "play":
-        if "gameID" in form:
-            gameID = form["gameID"]
-            host = "hostman"
-        else:
-            gameID = 1
-            host = username
-        return render_template("boggle/play.html", host=host, gameID=gameID, username=username, nav=nav, active="Boggle")
-
-    if action == "view":
-        if "prev" in form:
-            prev = form["prev"]
-        else:
-            prev = "lobby"
-
-        return render_template("boggle/view.html", username=username, prev=prev, nav=nav, active="Boggle")
-
-    if action == "stats":
-        return render_template("boggle/stats.html", username=username, nav=nav, active="Boggle")
-
-
-
-    return "404 - '" + str(action) + "' not found"
-
-
     text = ""
     games = json.load(open(GAMES_FILE, 'r'))
 
@@ -304,7 +236,7 @@ def page(form):
         playerWords = myGame[8]
         host = myGame[1][0]
 
-        text += '<a href="/boggle?username=' + rq(username) + '">Back to Lobby</a>'
+        text += '<a href="?username=' + rq(username) + '">Back to Lobby</a>'
         text += "<h4>Game hosted by " + rq(host)  + ".</h4>"
         text += "<table cellpadding=10><tr><td>"
         text += display(board, 0)
@@ -466,7 +398,7 @@ def page(form):
     <html>
     <head>
     <script>
-    window.location = '/boggle?username=""" + username + """';
+    window.location = '?username=""" + username + """';
     </script>
     <link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
     </head>
@@ -585,7 +517,7 @@ function countDown(){
         text += header()
         text += """<script>
 function redirect() {
-    window.location = '/boggle?action=""" + str(VIEW_GAME) + "&gameID=" + str(gameID) + "&username=" + username + """';
+    window.location = '?action=""" + str(VIEW_GAME) + "&gameID=" + str(gameID) + "&username=" + username + """';
 }
 setTimeout(redirect, 5000);
 </script>
@@ -705,7 +637,7 @@ Redirect in 5 seconds...
                             found += 1
                 percent = int(found*10000.0/len(allWords)+0.5)/100.0
                 percentStr = str(decimal.Decimal(percent).quantize(decimal.Decimal('0.01')))+"%"
-                rows.append(['<a href="/boggle?gameID=' + str(gameID) + '&username=' + username + '&action=' + str(VIEW_GAME) + '">' + str(gameID) + '</a>', host,
+                rows.append(['<a href="?gameID=' + str(gameID) + '&username=' + username + '&action=' + str(VIEW_GAME) + '">' + str(gameID) + '</a>', host,
                                         size, str(players), str(len(allWords)), str(found), percentStr])
         text += table(rows, 'border=1 cellpadding=7 id="over" class="sortable"')
         text += '<p>It took ' + str(time.time() - lobbyStartTime) + ' seconds to load the lobby.</p>'
@@ -756,7 +688,7 @@ def lobby(username):
 <html>
 <head>
 <script>
-window.location = '/boggle?username=""" + username + """';
+window.location = '?username=""" + username + """';
 </script>
 <link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
 </head>
@@ -769,7 +701,7 @@ def play(username, size, myGameID):
 <html>
 <head>
 <script>
-window.location = '/boggle?username=""" + str(username) + "&action=" + str(PLAY_GAME) + "&size=" + str(size) + "&gameID=" + str(myGameID) + """';
+window.location = '?username=""" + str(username) + "&action=" + str(PLAY_GAME) + "&size=" + str(size) + "&gameID=" + str(myGameID) + """';
 </script>
 <link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
 </head>

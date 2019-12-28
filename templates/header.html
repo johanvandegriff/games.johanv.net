@@ -10,7 +10,7 @@ The source code is available at: https://gitlab.com/johanvandegriff/games.johanv
 <link rel="icon" href="/static/favicon.ico?" type="image/x-icon">
 </head>
 <body>
-<div class="ribbon"><header><a href="/" class="green"><pre>
+<div class="ribbon"><header><a href="/" class="green"><pre id="titleText">games.johanv.xyz</pre><pre id="asciiArt">
                                                 _         _                                                   
                                                (_)       | |                                                  
    ___ _  ___ _  _________  ____   ___          _  _____ | |___  ___ _  _____ __    __    __  __ _   _  ____  
@@ -20,7 +20,7 @@ The source code is available at: https://gitlab.com/johanvandegriff/games.johanv
    ___| |                                   | || |                                               ___| |       
   (_____)                                   (____)                                              (_____)       </pre>
 </a></header>
-<nav><ul>
+<nav><div id="navDropdown">&#9776;</div><input id="navToggle" type="checkbox" checked><ul>
 {% for item in nav %}
 <li{% if active == item[0] %} class="active"{% endif %} style="width:{{ 100.0/nav|length() }}%"><a href="{% if active == item[0] %}#{% else %}{{ item[1] }}{% endif %}">{{ item[0] }}</a></li>
 {% endfor %}

@@ -1,0 +1,40 @@
+{% include 'header.html' %}
+
+<div class="gameArea"><form method="get">
+    <div class="leftCol">
+        <h1 class="scale" style="margin-bottom: 1em">Boggle 2.0</h1>
+        <p class="scale">
+            5x5 | 4 letters or more | 3 minutes<br/>
+            {% if host == username %}
+            host (you): {{ username }}<br/>
+            {% else %}
+            host: {{ host }}<br/>
+            you: {{ username }}<br/>
+            {% endif %}
+            Waiting for players...<br/>
+        </p>
+        {% if host == username %}
+        <form method="get">
+            <input type="hidden" name="username" value="{{ username }}"/>
+            <input type="hidden" name="action" value="play"/>
+            <input class="greenButton" style="float: left; margin: 10px;" type="submit" value="Begin"/>
+        </form>
+        {% endif %}
+        <form method="get">
+            <input type="hidden" name="username" value="{{ username }}"/>
+            <input type="hidden" name="action" value="cancel"/>
+            <input class="redButton" style="float: left; margin: 10px;" type="submit" value="{% if host == username %}Cancel{% else %}Leave Game{% endif %}"/>
+        </form>
+        <br/><br/>
+    </div>
+    <div class="rightCol">
+        <h2>3 players total</h2>
+        <p class="scale">
+            johanv, JonV, monarchofmany
+        </p>
+    </div>
+    <div class="singleCol"></div>
+</form></div>
+
+{% include 'boggle/common.html' %}
+{% include 'footer.html' %}

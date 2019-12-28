@@ -1,0 +1,54 @@
+{% include 'header.html' %}
+
+<div class="gameArea extraSpace"><form method="get">
+    <!-- <div class="leftCol" style="position: fixed; left: 0"> -->
+    <div class="leftCol leftCol2">
+        <h1 class="scale hideSmall">Boggle 2.0
+            <!-- <span class="hideLarge"> Time's Up!</span> -->
+        </h1>
+        <img src="/static/boggle_img/5x5.png" id="postGameBoard"><br/>
+        <form method="get">
+            <input type="hidden" name="username" value="{{ username }}"/>
+            {% if prev == "stats" %}
+            <input type="hidden" name="action" value="stats"/>
+            <input class="purpleButton" type="submit" value="Back to Stats"/>
+            {% else %}
+            <input type="hidden" name="action" value="lobby"/>
+            <input class="greenButton" type="submit" value="Back to Lobby"/>
+            {% endif %}
+        </form>
+    </div>
+    <div class="rightCol scoreTable">
+        <h1 class="scale hideSmall">Time's Up!</h1>
+        <p class="scale"><span style="background-color: #0c0; padding:3px; border-radius: 5px;">monarchofmany</span> wins!</p>
+        <div class="compactText">
+            187 words, 368 points possible. 3.14% of words found<br/>
+            <table border=1 cellpadding=7>
+                <thead><tr><td>johanv</td><td>Jonv</td><td style="background-color: #0c0;">monarchofmany</td><td>verylongusername1</td><td>verylongusername2</td><td>verylongusername3</td><td>verylongusername4</td></tr></thead>
+                <tbody><tr><td>7 points<br/>5 words</td><td>8<span style="visibility: hidden">|</span>points<br/>7 words</td><td style="background-color: #0c0;">12 points<br/>7 words</td></tr></tbody>
+                <tbody><tr><td style="vertical-align:top">0 <span style="color: #a00">aced</span><br/>2 adorn<br/>0 <span style="color: #a00">arson</span><br/>0<span style="visibility: hidden">|</span><span style="color: #a00">ascend</span><br/>5<span style="visibility: hidden">|</span>ascends</td><td style="vertical-align:top">0 <span style="color: #a00">arson</span><br/>1 care<br/>2 cares<br/>2 cars<br/>0<span style="visibility: hidden">|</span><span style="color: #a00">cedar</span><br/>3<span style="visibility: hidden">|</span>cedars<br/>0 <span style="color: #a00">aced</span></td><td style="vertical-align:top; background-color: #0c0;">0 <span style="color: #a00">arson</span><br/>0 <span style="color: #a00">ascend</span><br/>1 dare<br/>2 dares<br/>1 done<br/>3 extent<br/>5 extents</td></tr></tbody>
+                <!-- text-decoration: line-through -->
+            </table>
+        </div>
+        <div class="compactText" style="padding-left: 20px">
+            <br/>
+            All possible words for this board:<br/><br/>
+            1 aced<br/>
+            2 adorn<br/>
+            1 ados<br/>
+
+             3 aerate<br> 5 aerated<br> 1 aero<br> 2 alder<br> 1 alee<br> 1 alef<br> 2 alter<br> 5 altered<br> 1 aper<br> 1 area<br> 2 areae<br> 2 areal<br> 2 arete<br> 1 deal<br> 2 dealt<br> 1 dear<br><span style="color:green; font-weight:bold"> 1 deep<br></span><span style="color:green; font-weight:bold"> 1 deer<br></span> 3 defeat<br>11 defeater<br> 2 defer<br> 3 delate<br> 2 delta<br> 2 derat<br> 3 derate<br> 1 dere<br> 2 deter<br> 2 eared<br> 2 eater<br> 1 edge<br> 2 edger<br> 1 eger<br>11 eglatere<br> 2 elate<br> 3 elater<br> 2 etape<br> 1 feal<br><span style="color:green; font-weight:bold"> 1 fear<br></span> 3 feared<br><span style="color:green; font-weight:bold"> 1 feat<br></span> 3 feater<br> 1 feed<br><span style="color:green; font-weight:bold"> 1 feel<br></span> 1 feet<br><span style="color:green; font-weight:bold"> 1 felt<br></span> 2 feral<br> 1 fere<br> 1 feta<br> 2 fetal<br> 1 fete<br><span style="color:green; font-weight:bold"> 1 gear<br></span>
+        </div>
+    </div>
+    <div class="singleCol"></div>
+
+</form></div>
+
+<script type="text/babel">
+// hide the footer since it gets in the way
+var footers = document.getElementsByTagName('footer');
+footers[0].style.display = "none";
+</script>
+
+{% include 'boggle/common.html' %}
+{% include 'footer.html' %}

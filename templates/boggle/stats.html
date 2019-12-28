@@ -1,0 +1,425 @@
+{% include 'header.html' %}
+
+<div class="gameArea extraSpace"><form method="get">
+    <div class="singleCol">
+        <form method="get">
+            <input type="hidden" name="username" value="{{ username }}"/>
+            <input type="hidden" name="action" value="lobby"/>
+            <input style="position: relative; top: 0; left: 0; float: left;" class="greenButton" type="submit" value="Lobby"/>
+        </form>
+        <h1 class="scale">Boggle 2.0 - Stats</h1>
+    </div>
+    <div class="leftCol leftCol3">
+        <h2>Highscores</h2>
+        <p class="scale" style="margin: 10px;">
+            <a href="?username={{ username }}&action=view&prev=stats&gameID=30">high score</a>: 53<br/>
+            <a href="?username={{ username }}&action=view&prev=stats&gameID=31">most words found</a>: 38<br/>
+            <a href="?username={{ username }}&action=view&prev=stats&gameID=32">highest % found</a>: 34.87%<br/>
+            <a href="?username={{ username }}&action=view&prev=stats&gameID=33">high possible score</a>: 607<br/>
+            <a href="?username={{ username }}&action=view&prev=stats&gameID=34">most words available</a>: 452<br/>
+            <a href="?username={{ username }}&action=view&prev=stats&gameID=35">low possible score</a>: 83<br/>
+            <a href="?username={{ username }}&action=view&prev=stats&gameID=36">least words available</a>: 20<br/>
+            <a href="?username={{ username }}&action=view&prev=stats&gameID=37">highest # of duplicates</a>: 18<br/>
+        </p>
+        <p class="compactText" style="margin: 10px;">
+            Note: only standard boards are considered for highscores (4x4, 3 letters, 3 min OR 5x5, 4 letters, 3 min).<br/>
+        </p>
+        <h2>Charts</h2>
+        <!-- <canvas id="piechart"></canvas>
+        <div id="piechartLegend" class="compactText" style="text-align: left;"></div> -->
+
+        <div class="ct-chart ct-perfect-fourth" id="scoreChart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="possibleScoreChart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="wordsFoundChart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="wordsPossibleChart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="percentFoundChart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="duplicatesChart"></div>
+        <!-- <div class="ct-chart ct-perfect-fourth" id="Chart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="Chart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="Chart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="Chart"></div> -->
+        <div class="ct-chart ct-perfect-fourth" id="boardSizeChart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="numPlayersChart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="hostChart"></div>
+        <div class="ct-chart ct-perfect-fourth" id="winnerChart"></div>
+    </div>
+    <div class="rightCol gamesTable">
+        <h2>Past Games</h2>
+        <!-- <p class="scale"><span style="background-color: #0c0; padding:3px; border-radius: 5px;">monarchofmany</span> wins!</p> -->
+        <div class="compactText" style="margin: 10px;">
+            <input type="checkbox" checked>5x5
+            <input type="checkbox" checked>4x4
+            <input type="checkbox" checked>&gt; 5x5
+            <input type="checkbox" checked>&lt; 4x4<br/>
+            <input type="checkbox" checked>4 letters
+            <input type="checkbox" checked>3 letters
+            <input type="checkbox" checked>&gt; 4 letters
+            <input type="checkbox" checked>&lt; 3 letters<br/>
+            <input type="checkbox" checked>3 min
+            <input type="checkbox" checked>&gt; 3 min
+            <input type="checkbox" checked>&lt; 3 min<br/>
+            <br/>
+            Click on columns headers to sort the table.<br/>
+            real cols: Game #, host, # players, size, letters, time, total # words, # words found, % words found, max score, winner, score<br/>
+            <table border=1 cellpadding=7 id="over" class="sortable">
+                <thead><tr><th>Game #</th><th>Host</th><th>Size</th><th>Players</th><th>Total # of Words</th><th># of Words Found</th><th>% of Words Found</th></tr>
+                </thead><tbody>
+                <tr><td><a href="/boggle?gameID=169&username=johanv&action=view&prev=stats">169</a></td><td>johanv</td><td>5x5</td><td>1</td><td>187</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=168&username=johanv&action=view&prev=stats">168</a></td><td>monarchofmany</td><td>4x4</td><td>3</td><td>161</td><td>30</td><td>18.63%</td></tr>
+                <tr><td><a href="/boggle?gameID=167&username=johanv&action=view&prev=stats">167</a></td><td>monarchofmany</td><td>4x4</td><td>2</td><td>83</td><td>16</td><td>19.28%</td></tr>
+                <tr><td><a href="/boggle?gameID=166&username=johanv&action=view&prev=stats">166</a></td><td>monarchofmany</td><td>4x4</td><td>3</td><td>87</td><td>28</td><td>32.18%</td></tr>
+                <tr><td><a href="/boggle?gameID=165&username=johanv&action=view&prev=stats">165</a></td><td>johanv</td><td>4x4</td><td>3</td><td>173</td><td>30</td><td>17.34%</td></tr>
+                <tr><td><a href="/boggle?gameID=164&username=johanv&action=view&prev=stats">164</a></td><td>monarchofmany</td><td>5x5</td><td>2</td><td>94</td><td>12</td><td>12.77%</td></tr>
+                <tr><td><a href="/boggle?gameID=163&username=johanv&action=view&prev=stats">163</a></td><td>JonV</td><td>5x5</td><td>3</td><td>264</td><td>33</td><td>12.50%</td></tr>
+                <tr><td><a href="/boggle?gameID=162&username=johanv&action=view&prev=stats">162</a></td><td>johanv</td><td>5x5</td><td>3</td><td>176</td><td>28</td><td>15.91%</td></tr>
+                <tr><td><a href="/boggle?gameID=161&username=johanv&action=view&prev=stats">161</a></td><td>monarchofmany</td><td>5x5</td><td>3</td><td>268</td><td>45</td><td>16.79%</td></tr>
+                <tr><td><a href="/boggle?gameID=160&username=johanv&action=view&prev=stats">160</a></td><td>monarchofmany</td><td>5x5</td><td>1</td><td>157</td><td>15</td><td>9.55%</td></tr>
+                <tr><td><a href="/boggle?gameID=159&username=johanv&action=view&prev=stats">159</a></td><td>monarchofmany</td><td>5x5</td><td>1</td><td>131</td><td>6</td><td>4.58%</td></tr>
+                <tr><td><a href="/boggle?gameID=158&username=johanv&action=view&prev=stats">158</a></td><td>monarchofmany</td><td>5x5</td><td>1</td><td>317</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=157&username=johanv&action=view&prev=stats">157</a></td><td>johanv</td><td>5x5</td><td>1</td><td>153</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=156&username=johanv&action=view&prev=stats">156</a></td><td>johanv</td><td>5x5</td><td>3</td><td>142</td><td>25</td><td>17.61%</td></tr>
+                <tr><td><a href="/boggle?gameID=155&username=johanv&action=view&prev=stats">155</a></td><td>JonV</td><td>5x5</td><td>3</td><td>416</td><td>38</td><td>9.13%</td></tr>
+                <tr><td><a href="/boggle?gameID=154&username=johanv&action=view&prev=stats">154</a></td><td>monarchofmany</td><td>5x5</td><td>3</td><td>145</td><td>29</td><td>20.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=153&username=johanv&action=view&prev=stats">153</a></td><td>monarchofmany</td><td>5x5</td><td>3</td><td>277</td><td>38</td><td>13.72%</td></tr>
+                <tr><td><a href="/boggle?gameID=152&username=johanv&action=view&prev=stats">152</a></td><td>johanv</td><td>5x5</td><td>3</td><td>162</td><td>22</td><td>13.58%</td></tr>
+                <tr><td><a href="/boggle?gameID=151&username=johanv&action=view&prev=stats">151</a></td><td>JonV</td><td>5x5</td><td>3</td><td>134</td><td>23</td><td>17.16%</td></tr>
+                <tr><td><a href="/boggle?gameID=150&username=johanv&action=view&prev=stats">150</a></td><td>monarchofmany</td><td>5x5</td><td>3</td><td>171</td><td>21</td><td>12.28%</td></tr>
+                <tr><td><a href="/boggle?gameID=149&username=johanv&action=view&prev=stats">149</a></td><td>Wat</td><td>5x5</td><td>1</td><td>99</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=148&username=johanv&action=view&prev=stats">148</a></td><td>WaitingForWindoze</td><td>5x5</td><td>1</td><td>234</td><td>20</td><td>8.55%</td></tr>
+                <tr><td><a href="/boggle?gameID=147&username=johanv&action=view&prev=stats">147</a></td><td>Papa</td><td>4x4</td><td>2</td><td>140</td><td>18</td><td>12.86%</td></tr>
+                <tr><td><a href="/boggle?gameID=146&username=johanv&action=view&prev=stats">146</a></td><td>Papa</td><td>5x5</td><td>2</td><td>114</td><td>114</td><td>100.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=145&username=johanv&action=view&prev=stats">145</a></td><td>Papa</td><td>5x5</td><td>2</td><td>320</td><td>25</td><td>7.81%</td></tr>
+                <tr><td><a href="/boggle?gameID=144&username=johanv&action=view&prev=stats">144</a></td><td>Papa</td><td>5x5</td><td>2</td><td>172</td><td>27</td><td>15.70%</td></tr>
+                <tr><td><a href="/boggle?gameID=143&username=johanv&action=view&prev=stats">143</a></td><td>astrovan14</td><td>5x5</td><td>3</td><td>363</td><td>4</td><td>1.10%</td></tr>
+                <tr><td><a href="/boggle?gameID=142&username=johanv&action=view&prev=stats">142</a></td><td>astrovan14</td><td>4x4</td><td>4</td><td>47</td><td>47</td><td>100.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=141&username=johanv&action=view&prev=stats">141</a></td><td>Adam Fresher</td><td>5x5</td><td>3</td><td>94</td><td>17</td><td>18.09%</td></tr>
+                <tr><td><a href="/boggle?gameID=140&username=johanv&action=view&prev=stats">140</a></td><td>johanv</td><td>5x5</td><td>1</td><td>270</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=139&username=johanv&action=view&prev=stats">139</a></td><td>johanv</td><td>5x5</td><td>1</td><td>186</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=138&username=johanv&action=view&prev=stats">138</a></td><td>johanv</td><td>5x5</td><td>3</td><td>89</td><td>3</td><td>3.37%</td></tr>
+                <tr><td><a href="/boggle?gameID=137&username=johanv&action=view&prev=stats">137</a></td><td>johanv</td><td>5x5</td><td>2</td><td>208</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=136&username=johanv&action=view&prev=stats">136</a></td><td>johanv</td><td>5x5</td><td>2</td><td>357</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=135&username=johanv&action=view&prev=stats">135</a></td><td>johanv</td><td>5x5</td><td>1</td><td>164</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=134&username=johanv&action=view&prev=stats">134</a></td><td>johanv</td><td>5x5</td><td>1</td><td>123</td><td>6</td><td>4.88%</td></tr>
+                <tr><td><a href="/boggle?gameID=133&username=johanv&action=view&prev=stats">133</a></td><td>astrovan14</td><td>5x5</td><td>2</td><td>241</td><td>1</td><td>0.41%</td></tr>
+                <tr><td><a href="/boggle?gameID=132&username=johanv&action=view&prev=stats">132</a></td><td>gey</td><td>5x5</td><td>2</td><td>254</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=131&username=johanv&action=view&prev=stats">131</a></td><td>astrovan14</td><td>5x5</td><td>2</td><td>115</td><td>3</td><td>2.61%</td></tr>
+                <tr><td><a href="/boggle?gameID=130&username=johanv&action=view&prev=stats">130</a></td><td>s</td><td>4x4</td><td>1</td><td>118</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=129&username=johanv&action=view&prev=stats">129</a></td><td>s</td><td>4x4</td><td>2</td><td>253</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=128&username=johanv&action=view&prev=stats">128</a></td><td>admin</td><td>4x4</td><td>1</td><td>307</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=127&username=johanv&action=view&prev=stats">127</a></td><td>gay</td><td>5x5</td><td>6</td><td>275</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=126&username=johanv&action=view&prev=stats">126</a></td><td>test</td><td>5x5</td><td>1</td><td>77</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=125&username=johanv&action=view&prev=stats">125</a></td><td>johan</td><td>5x5</td><td>1</td><td>224</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=124&username=johanv&action=view&prev=stats">124</a></td><td>johan</td><td>5x5</td><td>3</td><td>254</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=123&username=johanv&action=view&prev=stats">123</a></td><td>johan</td><td>5x5</td><td>1</td><td>89</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=122&username=johanv&action=view&prev=stats">122</a></td><td>test</td><td>5x5</td><td>1</td><td>334</td><td>22</td><td>6.59%</td></tr>
+                <tr><td><a href="/boggle?gameID=121&username=johanv&action=view&prev=stats">121</a></td><td>Batty</td><td>5x5</td><td>1</td><td>170</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=120&username=johanv&action=view&prev=stats">120</a></td><td>meme</td><td>5x5</td><td>1</td><td>148</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=119&username=johanv&action=view&prev=stats">119</a></td><td>Nick</td><td>5x5</td><td>1</td><td>291</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=118&username=johanv&action=view&prev=stats">118</a></td><td>Johan</td><td>5x5</td><td>1</td><td>104</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=117&username=johanv&action=view&prev=stats">117</a></td><td>astrovan14</td><td>4x4</td><td>1</td><td>54</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=116&username=johanv&action=view&prev=stats">116</a></td><td>johan</td><td>5x5</td><td>1</td><td>194</td><td>13</td><td>6.70%</td></tr>
+                <tr><td><a href="/boggle?gameID=115&username=johanv&action=view&prev=stats">115</a></td><td>Johan</td><td>5x5</td><td>1</td><td>165</td><td>11</td><td>6.67%</td></tr>
+                <tr><td><a href="/boggle?gameID=114&username=johanv&action=view&prev=stats">114</a></td><td>awesomebot</td><td>5x5</td><td>1</td><td>36</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=113&username=johanv&action=view&prev=stats">113</a></td><td>Lol-mate</td><td>5x5</td><td>1</td><td>183</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=112&username=johanv&action=view&prev=stats">112</a></td><td>lolololhacker</td><td>4x4</td><td>1</td><td>118</td><td>2</td><td>1.69%</td></tr>
+                <tr><td><a href="/boggle?gameID=111&username=johanv&action=view&prev=stats">111</a></td><td>boggle bagel</td><td>5x5</td><td>1</td><td>173</td><td>14</td><td>8.09%</td></tr>
+                <tr><td><a href="/boggle?gameID=110&username=johanv&action=view&prev=stats">110</a></td><td> </td><td>5x5</td><td>1</td><td>112</td><td>11</td><td>9.82%</td></tr>
+                <tr><td><a href="/boggle?gameID=109&username=johanv&action=view&prev=stats">109</a></td><td>johan</td><td>5x5</td><td>1</td><td>127</td><td>21</td><td>16.54%</td></tr>
+                <tr><td><a href="/boggle?gameID=108&username=johanv&action=view&prev=stats">108</a></td><td>johan</td><td>5x5</td><td>1</td><td>37</td><td>11</td><td>29.73%</td></tr>
+                <tr><td><a href="/boggle?gameID=107&username=johanv&action=view&prev=stats">107</a></td><td>johan</td><td>5x5</td><td>1</td><td>96</td><td>12</td><td>12.50%</td></tr>
+                <tr><td><a href="/boggle?gameID=106&username=johanv&action=view&prev=stats">106</a></td><td>johan</td><td>5x5</td><td>1</td><td>383</td><td>27</td><td>7.05%</td></tr>
+                <tr><td><a href="/boggle?gameID=105&username=johanv&action=view&prev=stats">105</a></td><td>me not is hacker</td><td>5x5</td><td>1</td><td>117</td><td>117</td><td>100.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=104&username=johanv&action=view&prev=stats">104</a></td><td>Robert'); DROP TABLE students;--');</td><td>5x5</td><td>1</td><td>213</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=103&username=johanv&action=view&prev=stats">103</a></td><td>person</td><td>5x5</td><td>1</td><td>196</td><td>14</td><td>7.14%</td></tr>
+                <tr><td><a href="/boggle?gameID=102&username=johanv&action=view&prev=stats">102</a></td><td>Robert'); DROP TABLE students;--');</td><td>5x5</td><td>1</td><td>77</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=101&username=johanv&action=view&prev=stats">101</a></td><td>Robert'); DROP TABLE students;--');</td><td>5x5</td><td>1</td><td>156</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=100&username=johanv&action=view&prev=stats">100</a></td><td>johan</td><td>5x5</td><td>1</td><td>113</td><td>8</td><td>7.08%</td></tr>
+                <tr><td><a href="/boggle?gameID=99&username=johanv&action=view&prev=stats">99</a></td><td>johan</td><td>5x5</td><td>1</td><td>119</td><td>2</td><td>1.68%</td></tr>
+                <tr><td><a href="/boggle?gameID=98&username=johanv&action=view&prev=stats">98</a></td><td>johan</td><td>5x5</td><td>1</td><td>105</td><td>11</td><td>10.48%</td></tr>
+                <tr><td><a href="/boggle?gameID=97&username=johanv&action=view&prev=stats">97</a></td><td>papa</td><td>5x5</td><td>1</td><td>236</td><td>24</td><td>10.17%</td></tr>
+                <tr><td><a href="/boggle?gameID=96&username=johanv&action=view&prev=stats">96</a></td><td>denial</td><td>5x5</td><td>1</td><td>164</td><td>16</td><td>9.76%</td></tr>
+                <tr><td><a href="/boggle?gameID=95&username=johanv&action=view&prev=stats">95</a></td><td>johan</td><td>5x5</td><td>1</td><td>287</td><td>22</td><td>7.67%</td></tr>
+                <tr><td><a href="/boggle?gameID=94&username=johanv&action=view&prev=stats">94</a></td><td>johan</td><td>5x5</td><td>1</td><td>205</td><td>16</td><td>7.80%</td></tr>
+                <tr><td><a href="/boggle?gameID=93&username=johanv&action=view&prev=stats">93</a></td><td>johan</td><td>5x5</td><td>1</td><td>60</td><td>16</td><td>26.67%</td></tr>
+                <tr><td><a href="/boggle?gameID=92&username=johanv&action=view&prev=stats">92</a></td><td>johan</td><td>5x5</td><td>1</td><td>117</td><td>10</td><td>8.55%</td></tr>
+                <tr><td><a href="/boggle?gameID=91&username=johanv&action=view&prev=stats">91</a></td><td>johan</td><td>5x5</td><td>1</td><td>57</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=90&username=johanv&action=view&prev=stats">90</a></td><td>johan</td><td>5x5</td><td>1</td><td>297</td><td>12</td><td>4.04%</td></tr>
+                <tr><td><a href="/boggle?gameID=89&username=johanv&action=view&prev=stats">89</a></td><td>Guest</td><td>5x5</td><td>1</td><td>320</td><td>4</td><td>1.25%</td></tr>
+                <tr><td><a href="/boggle?gameID=88&username=johanv&action=view&prev=stats">88</a></td><td>alackner</td><td>5x5</td><td>1</td><td>147</td><td>1</td><td>0.68%</td></tr>
+                <tr><td><a href="/boggle?gameID=87&username=johanv&action=view&prev=stats">87</a></td><td>Guest</td><td>5x5</td><td>1</td><td>106</td><td>5</td><td>4.72%</td></tr>
+                <tr><td><a href="/boggle?gameID=86&username=johanv&action=view&prev=stats">86</a></td><td>Astrovan14</td><td>5x5</td><td>7</td><td>132</td><td>16</td><td>12.12%</td></tr>
+                <tr><td><a href="/boggle?gameID=85&username=johanv&action=view&prev=stats">85</a></td><td>Astrovan14</td><td>5x5</td><td>5</td><td>132</td><td>2</td><td>1.52%</td></tr>
+                <tr><td><a href="/boggle?gameID=84&username=johanv&action=view&prev=stats">84</a></td><td>Johan</td><td>5x5</td><td>1</td><td>67</td><td>4</td><td>5.97%</td></tr>
+                <tr><td><a href="/boggle?gameID=83&username=johanv&action=view&prev=stats">83</a></td><td>Landegriffs</td><td>5x5</td><td>1</td><td>135</td><td>20</td><td>14.81%</td></tr>
+                <tr><td><a href="/boggle?gameID=82&username=johanv&action=view&prev=stats">82</a></td><td>Landegriffs</td><td>5x5</td><td>1</td><td>164</td><td>15</td><td>9.15%</td></tr>
+                <tr><td><a href="/boggle?gameID=81&username=johanv&action=view&prev=stats">81</a></td><td>Landegriffs</td><td>5x5</td><td>1</td><td>251</td><td>25</td><td>9.96%</td></tr>
+                <tr><td><a href="/boggle?gameID=80&username=johanv&action=view&prev=stats">80</a></td><td>Landegriffs</td><td>5x5</td><td>1</td><td>179</td><td>22</td><td>12.29%</td></tr>
+                <tr><td><a href="/boggle?gameID=79&username=johanv&action=view&prev=stats">79</a></td><td>me not is hacker</td><td>5x5</td><td>1</td><td>150</td><td>149</td><td>99.33%</td></tr>
+                <tr><td><a href="/boggle?gameID=78&username=johanv&action=view&prev=stats">78</a></td><td>me not is hacker</td><td>5x5</td><td>1</td><td>276</td><td>6</td><td>2.17%</td></tr>
+                <tr><td><a href="/boggle?gameID=77&username=johanv&action=view&prev=stats">77</a></td><td>me not is hacker</td><td>5x5</td><td>1</td><td>137</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=76&username=johanv&action=view&prev=stats">76</a></td><td>Kmanisdaboss</td><td>5x5</td><td>1</td><td>131</td><td>4</td><td>3.05%</td></tr>
+                <tr><td><a href="/boggle?gameID=75&username=johanv&action=view&prev=stats">75</a></td><td>PJMO</td><td>5x5</td><td>1</td><td>93</td><td>2</td><td>2.15%</td></tr>
+                <tr><td><a href="/boggle?gameID=74&username=johanv&action=view&prev=stats">74</a></td><td>astrovan14</td><td>5x5</td><td>3</td><td>219</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=73&username=johanv&action=view&prev=stats">73</a></td><td>astrovan14</td><td>5x5</td><td>1</td><td>155</td><td>5</td><td>3.23%</td></tr>
+                <tr><td><a href="/boggle?gameID=72&username=johanv&action=view&prev=stats">72</a></td><td>Pink Fluffy Unicorns Dancing on Rainbows</td><td>4x4</td><td>1</td><td>185</td><td>1</td><td>0.54%</td></tr>
+                <tr><td><a href="/boggle?gameID=71&username=johanv&action=view&prev=stats">71</a></td><td>Hehehehehehehe</td><td>5x5</td><td>1</td><td>125</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=70&username=johanv&action=view&prev=stats">70</a></td><td>astrovan14</td><td>5x5</td><td>1</td><td>235</td><td>5</td><td>2.13%</td></tr>
+                <tr><td><a href="/boggle?gameID=69&username=johanv&action=view&prev=stats">69</a></td><td>astrovan14</td><td>5x5</td><td>1</td><td>172</td><td>4</td><td>2.33%</td></tr>
+                <tr><td><a href="/boggle?gameID=68&username=johanv&action=view&prev=stats">68</a></td><td>johan</td><td>5x5</td><td>1</td><td>175</td><td>10</td><td>5.71%</td></tr>
+                <tr><td><a href="/boggle?gameID=67&username=johanv&action=view&prev=stats">67</a></td><td>Papa</td><td>5x5</td><td>1</td><td>106</td><td>8</td><td>7.55%</td></tr>
+                <tr><td><a href="/boggle?gameID=66&username=johanv&action=view&prev=stats">66</a></td><td>5x5</td><td>5x5</td><td>1</td><td>247</td><td>9</td><td>3.64%</td></tr>
+                <tr><td><a href="/boggle?gameID=65&username=johanv&action=view&prev=stats">65</a></td><td>Papa</td><td>5x5</td><td>1</td><td>238</td><td>9</td><td>3.78%</td></tr>
+                <tr><td><a href="/boggle?gameID=63&username=johanv&action=view&prev=stats">63</a></td><td>johan</td><td>5x5</td><td>1</td><td>178</td><td>9</td><td>5.06%</td></tr>
+                <tr><td><a href="/boggle?gameID=62&username=johanv&action=view&prev=stats">62</a></td><td>astrovan14</td><td>5x5</td><td>1</td><td>150</td><td>1</td><td>0.67%</td></tr>
+                <tr><td><a href="/boggle?gameID=64&username=johanv&action=view&prev=stats">64</a></td><td>johan</td><td>5x5</td><td>1</td><td>160</td><td>16</td><td>10.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=61&username=johanv&action=view&prev=stats">61</a></td><td>Celeste</td><td>5x5</td><td>2</td><td>355</td><td>23</td><td>6.48%</td></tr>
+                <tr><td><a href="/boggle?gameID=60&username=johanv&action=view&prev=stats">60</a></td><td>Celeste</td><td>5x5</td><td>1</td><td>123</td><td>1</td><td>0.81%</td></tr>
+                <tr><td><a href="/boggle?gameID=59&username=johanv&action=view&prev=stats">59</a></td><td>Papa</td><td>5x5</td><td>2</td><td>94</td><td>12</td><td>12.77%</td></tr>
+                <tr><td><a href="/boggle?gameID=58&username=johanv&action=view&prev=stats">58</a></td><td>Papa</td><td>5x5</td><td>1</td><td>159</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=57&username=johanv&action=view&prev=stats">57</a></td><td>Papa</td><td>5x5</td><td>3</td><td>194</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=56&username=johanv&action=view&prev=stats">56</a></td><td>johan</td><td>5x5</td><td>2</td><td>93</td><td>11</td><td>11.83%</td></tr>
+                <tr><td><a href="/boggle?gameID=55&username=johanv&action=view&prev=stats">55</a></td><td>Papa</td><td>5x5</td><td>2</td><td>129</td><td>17</td><td>13.18%</td></tr>
+                <tr><td><a href="/boggle?gameID=54&username=johanv&action=view&prev=stats">54</a></td><td>astrovan14</td><td>5x5</td><td>1</td><td>283</td><td>5</td><td>1.77%</td></tr>
+                <tr><td><a href="/boggle?gameID=53&username=johanv&action=view&prev=stats">53</a></td><td>astrovan14</td><td>4x4</td><td>1</td><td>18</td><td>7</td><td>38.89%</td></tr>
+                <tr><td><a href="/boggle?gameID=52&username=johanv&action=view&prev=stats">52</a></td><td>astrovan14</td><td>5x5</td><td>1</td><td>153</td><td>6</td><td>3.92%</td></tr>
+                <tr><td><a href="/boggle?gameID=51&username=johanv&action=view&prev=stats">51</a></td><td>johan</td><td>5x5</td><td>2</td><td>117</td><td>9</td><td>7.69%</td></tr>
+                <tr><td><a href="/boggle?gameID=50&username=johanv&action=view&prev=stats">50</a></td><td>astrovan14</td><td>4x4</td><td>1</td><td>49</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=49&username=johanv&action=view&prev=stats">49</a></td><td>johan</td><td>5x5</td><td>1</td><td>80</td><td>7</td><td>8.75%</td></tr>
+                <tr><td><a href="/boggle?gameID=48&username=johanv&action=view&prev=stats">48</a></td><td>ellievader</td><td>5x5</td><td>1</td><td>139</td><td>4</td><td>2.88%</td></tr>
+                <tr><td><a href="/boggle?gameID=47&username=johanv&action=view&prev=stats">47</a></td><td>johan</td><td>5x5</td><td>1</td><td>279</td><td>12</td><td>4.30%</td></tr>
+                <tr><td><a href="/boggle?gameID=46&username=johanv&action=view&prev=stats">46</a></td><td>100</td><td>5x5</td><td>1</td><td>271</td><td>1</td><td>0.37%</td></tr>
+                <tr><td><a href="/boggle?gameID=45&username=johanv&action=view&prev=stats">45</a></td><td>johan</td><td>5x5</td><td>1</td><td>242</td><td>15</td><td>6.20%</td></tr>
+                <tr><td><a href="/boggle?gameID=44&username=johanv&action=view&prev=stats">44</a></td><td>johan</td><td>5x5</td><td>1</td><td>225</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=43&username=johanv&action=view&prev=stats">43</a></td><td>johan</td><td>5x5</td><td>1</td><td>156</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=42&username=johanv&action=view&prev=stats">42</a></td><td>PapaV</td><td>5x5</td><td>1</td><td>120</td><td>5</td><td>4.17%</td></tr>
+                <tr><td><a href="/boggle?gameID=41&username=johanv&action=view&prev=stats">41</a></td><td>johan</td><td>5x5</td><td>2</td><td>165</td><td>17</td><td>10.30%</td></tr>
+                <tr><td><a href="/boggle?gameID=40&username=johanv&action=view&prev=stats">40</a></td><td>PapaV</td><td>5x5</td><td>2</td><td>103</td><td>11</td><td>10.68%</td></tr>
+                <tr><td><a href="/boggle?gameID=39&username=johanv&action=view&prev=stats">39</a></td><td>johan</td><td>5x5</td><td>1</td><td>197</td><td>9</td><td>4.57%</td></tr>
+                <tr><td><a href="/boggle?gameID=38&username=johanv&action=view&prev=stats">38</a></td><td>johan</td><td>5x5</td><td>2</td><td>214</td><td>19</td><td>8.88%</td></tr>
+                <tr><td><a href="/boggle?gameID=37&username=johanv&action=view&prev=stats">37</a></td><td>michael</td><td>5x5</td><td>2</td><td>93</td><td>9</td><td>9.68%</td></tr>
+                <tr><td><a href="/boggle?gameID=36&username=johanv&action=view&prev=stats">36</a></td><td>michael</td><td>5x5</td><td>2</td><td>134</td><td>13</td><td>9.70%</td></tr>
+                <tr><td><a href="/boggle?gameID=35&username=johanv&action=view&prev=stats">35</a></td><td>johan</td><td>5x5</td><td>2</td><td>107</td><td>7</td><td>6.54%</td></tr>
+                <tr><td><a href="/boggle?gameID=34&username=johanv&action=view&prev=stats">34</a></td><td>johan</td><td>5x5</td><td>2</td><td>84</td><td>4</td><td>4.76%</td></tr>
+                <tr><td><a href="/boggle?gameID=33&username=johanv&action=view&prev=stats">33</a></td><td>xstaticgrey</td><td>5x5</td><td>1</td><td>75</td><td>1</td><td>1.33%</td></tr>
+                <tr><td><a href="/boggle?gameID=32&username=johanv&action=view&prev=stats">32</a></td><td>xstaticgrey</td><td>5x5</td><td>2</td><td>75</td><td>1</td><td>1.33%</td></tr>
+                <tr><td><a href="/boggle?gameID=31&username=johanv&action=view&prev=stats">31</a></td><td>William</td><td>5x5</td><td>2</td><td>199</td><td>3</td><td>1.51%</td></tr>
+                <tr><td><a href="/boggle?gameID=30&username=johanv&action=view&prev=stats">30</a></td><td>JonV</td><td>5x5</td><td>1</td><td>63</td><td>8</td><td>12.70%</td></tr>
+                <tr><td><a href="/boggle?gameID=29&username=johanv&action=view&prev=stats">29</a></td><td>johan</td><td>5x5</td><td>1</td><td>121</td><td>2</td><td>1.65%</td></tr>
+                <tr><td><a href="/boggle?gameID=28&username=johanv&action=view&prev=stats">28</a></td><td>johan</td><td>5x5</td><td>1</td><td>146</td><td>10</td><td>6.85%</td></tr>
+                <tr><td><a href="/boggle?gameID=27&username=johanv&action=view&prev=stats">27</a></td><td>johan</td><td>5x5</td><td>1</td><td>166</td><td>1</td><td>0.60%</td></tr>
+                <tr><td><a href="/boggle?gameID=26&username=johanv&action=view&prev=stats">26</a></td><td>johan</td><td>5x5</td><td>1</td><td>314</td><td>15</td><td>4.78%</td></tr>
+                <tr><td><a href="/boggle?gameID=25&username=johanv&action=view&prev=stats">25</a></td><td>johan</td><td>5x5</td><td>1</td><td>113</td><td>11</td><td>9.73%</td></tr>
+                <tr><td><a href="/boggle?gameID=24&username=johanv&action=view&prev=stats">24</a></td><td>johan</td><td>5x5</td><td>1</td><td>101</td><td>5</td><td>4.95%</td></tr>
+                <tr><td><a href="/boggle?gameID=23&username=johanv&action=view&prev=stats">23</a></td><td>JonV</td><td>5x5</td><td>1</td><td>160</td><td>9</td><td>5.63%</td></tr>
+                <tr><td><a href="/boggle?gameID=22&username=johanv&action=view&prev=stats">22</a></td><td>jjvan</td><td>5x5</td><td>1</td><td>226</td><td>6</td><td>2.65%</td></tr>
+                <tr><td><a href="/boggle?gameID=21&username=johanv&action=view&prev=stats">21</a></td><td>gabe</td><td>5x5</td><td>2</td><td>166</td><td>3</td><td>1.81%</td></tr>
+                <tr><td><a href="/boggle?gameID=20&username=johanv&action=view&prev=stats">20</a></td><td>team watergems</td><td>5x5</td><td>1</td><td>113</td><td>18</td><td>15.93%</td></tr>
+                <tr><td><a href="/boggle?gameID=19&username=johanv&action=view&prev=stats">19</a></td><td>team watergems</td><td>5x5</td><td>1</td><td>238</td><td>22</td><td>9.24%</td></tr>
+                <tr><td><a href="/boggle?gameID=18&username=johanv&action=view&prev=stats">18</a></td><td>team watergems</td><td>5x5</td><td>2</td><td>101</td><td>17</td><td>16.83%</td></tr>
+                <tr><td><a href="/boggle?gameID=17&username=johanv&action=view&prev=stats">17</a></td><td>team watergems</td><td>5x5</td><td>2</td><td>226</td><td>31</td><td>13.72%</td></tr>
+                <tr><td><a href="/boggle?gameID=16&username=johanv&action=view&prev=stats">16</a></td><td>King Arthur</td><td>5x5</td><td>2</td><td>90</td><td>12</td><td>13.33%</td></tr>
+                <tr><td><a href="/boggle?gameID=15&username=johanv&action=view&prev=stats">15</a></td><td>King Arthur</td><td>5x5</td><td>2</td><td>235</td><td>23</td><td>9.79%</td></tr>
+                <tr><td><a href="/boggle?gameID=14&username=johanv&action=view&prev=stats">14</a></td><td>team watergems</td><td>5x5</td><td>2</td><td>232</td><td>26</td><td>11.21%</td></tr>
+                <tr><td><a href="/boggle?gameID=13&username=johanv&action=view&prev=stats">13</a></td><td>team watergems</td><td>5x5</td><td>2</td><td>106</td><td>16</td><td>15.09%</td></tr>
+                <tr><td><a href="/boggle?gameID=12&username=johanv&action=view&prev=stats">12</a></td><td>astrovan14</td><td>5x5</td><td>2</td><td>98</td><td>5</td><td>5.10%</td></tr>
+                <tr><td><a href="/boggle?gameID=11&username=johanv&action=view&prev=stats">11</a></td><td>astrovan14</td><td>5x5</td><td>2</td><td>148</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=10&username=johanv&action=view&prev=stats">10</a></td><td>Tina</td><td>4x4</td><td>1</td><td>87</td><td>6</td><td>6.90%</td></tr>
+                <tr><td><a href="/boggle?gameID=9&username=johanv&action=view&prev=stats">9</a></td><td>Tina</td><td>5x5</td><td>1</td><td>169</td><td>3</td><td>1.78%</td></tr>
+                <tr><td><a href="/boggle?gameID=8&username=johanv&action=view&prev=stats">8</a></td><td>astrovan14</td><td>5x5</td><td>1</td><td>49</td><td>1</td><td>2.04%</td></tr>
+                <tr><td><a href="/boggle?gameID=7&username=johanv&action=view&prev=stats">7</a></td><td>astrovan14</td><td>4x4</td><td>1</td><td>80</td><td>12</td><td>15.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=6&username=johanv&action=view&prev=stats">6</a></td><td>johan</td><td>5x5</td><td>1</td><td>170</td><td>0</td><td>0.00%</td></tr>
+                <tr><td><a href="/boggle?gameID=5&username=johanv&action=view&prev=stats">5</a></td><td>test</td><td>5x5</td><td>2</td><td>176</td><td>4</td><td>2.27%</td></tr>
+                <tr><td><a href="/boggle?gameID=4&username=johanv&action=view&prev=stats">4</a></td><td>johan</td><td>5x5</td><td>2</td><td>179</td><td>13</td><td>7.26%</td></tr>
+                <tr><td><a href="/boggle?gameID=3&username=johanv&action=view&prev=stats">3</a></td><td>astrovan14</td><td>5x5</td><td>2</td><td>101</td><td>7</td><td>6.93%</td></tr>
+                <tr><td><a href="/boggle?gameID=2&username=johanv&action=view&prev=stats">2</a></td><td>monarchofmany</td><td>4x4</td><td>1</td><td>47</td><td>5</td><td>10.64%</td></tr>
+                <tr><td><a href="/boggle?gameID=1&username=johanv&action=view&prev=stats">1</a></td><td>test</td><td>5x5</td><td>2</td><td>165</td><td>2</td><td>1.21%</td></tr>
+                <tr><td><a href="/boggle?gameID=0&username=johanv&action=view&prev=stats">0</a></td><td>monarchofmany</td><td>5x5</td><td>2</td><td>242</td><td>11</td><td>4.55%</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="singleCol"></div>
+
+</form></div>
+
+<script type="text/javascript" src="/static/sorttable.js"></script>
+<script type="text/javascript" src="/static/piechart.js"></script>
+
+<link rel="stylesheet" href="/static/chartist.min.css">
+<script src="/static/chartist.min.js"></script>
+<script src="/static/chartist-plugin-axistitle.min.js"></script>
+
+<script type="text/javascript">
+// hide the footer since it gets in the way
+var footers = document.getElementsByTagName('footer');
+footers[0].style.display = "none";
+
+function settings (xlabel, ylabel) {
+    return {
+        chartPadding: {
+            top: 20,
+            right: 0,
+            bottom: 30,
+            left: 20
+        },
+        axisY: {
+            onlyInteger: true
+        },
+        plugins: [
+            Chartist.plugins.ctAxisTitle({
+            axisX: {
+                axisTitle: xlabel,
+                axisClass: 'ct-axis-title',
+                offset: {
+                x: 0,
+                y: 40
+                },
+                textAnchor: 'middle'
+            },
+            axisY: {
+                axisTitle: ylabel,
+                axisClass: 'ct-axis-title',
+                offset: {
+                x: 0,
+                y: -15
+                },
+                textAnchor: 'middle',
+                flipTitle: false
+            }
+            })
+        ]
+    };
+}
+
+new Chartist.Bar('#scoreChart', {
+    labels: ['0','5','10','15','20','25','30','35','40','45','50'],
+    series: [[20,4,8,3,2,65,7,90,56,42,65]]
+}, settings("winner's score", "# of games"));
+
+new Chartist.Bar('#possibleScoreChart', {
+    labels: ['0','5','10','15','20','25','30','35','40','45','50'],
+    series: [[20,4,8,3,2,65,7,90,56,42,65]]
+}, settings("possible score", "# of games"));
+
+new Chartist.Bar('#wordsFoundChart', {
+    labels: ['0','5','10','15','20','25','30','35','40','45','50'],
+    series: [[20,4,8,3,2,65,7,90,56,42,65]]
+}, settings("# of words found", "# of games"));
+
+new Chartist.Bar('#wordsPossibleChart', {
+    labels: ['0','5','10','15','20','25','30','35','40','45','50'],
+    series: [[20,4,8,3,2,65,7,90,56,42,65]]
+}, settings("# of words possible", "# of games"));
+
+new Chartist.Bar('#percentFoundChart', {
+    labels: ['0','5','10','15','20','25','30','35','40','45','50'],
+    series: [[20,4,8,3,2,65,7,90,56,42,65]]
+}, settings("% of words found", "# of games"));
+
+new Chartist.Bar('#duplicatesChart', {
+    labels: ['0','5','10','15','20','25','30','35','40','45','50'],
+    series: [[20,4,8,3,2,65,7,90,56,42,65]]
+}, settings("# of duplicates", "# of games"));
+
+new Chartist.Bar('#boardSizeChart', {
+    labels: ['2x2', '3x3', '4x4', '5x5', '6x6', '7x7'],
+    series: [[1, 2, 40, 60, 8, 4]]
+}, settings("board size", "# of games"));
+
+new Chartist.Bar('#numPlayersChart', {
+    labels: ['1', '2', '3', '4', '5', '6'],
+    series: [[1, 2, 40, 60, 8, 4]]
+}, settings("# of players", "# of games"));
+
+
+
+
+
+
+
+// var piechartCanvas = document.getElementById("piechart");
+// var piechartLegend = document.getElementById("piechartLegend");
+
+// piechartCanvas.width = 200;
+// piechartCanvas.height = 200;
+ 
+// // var ctx = piechartCanvas.getContext("2d");
+
+// var piechartData = {
+//     "5x5": 60,
+//     "4x4": 40,
+//     "> 5x5": 8,
+//     "< 4x4": 2
+// };
+
+// var piechart = new Piechart(
+//     {
+//         canvas: piechartCanvas,
+//         data:   piechartData,
+//         colors: ["#fde23e","#f16e23", "#57d9ff","#937e88"],
+//         legend: piechartLegend,
+//         doughnutHoleSize:0.3
+
+//     }
+// );
+// piechart.draw();
+
+
+// var data = {
+//   // A labels array that can contain any sort of values
+//   labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+//   // Our series array that contains series objects or in this case series data arrays
+//   series: [
+//     [5, 2, 4, 2, 0]
+//   ]
+// };
+
+// // Create a new line chart object where as first parameter we pass in a selector
+// // that is resolving to our chart container element. The Second parameter
+// // is the actual data object.
+// new Chartist.Line('.ct-chart', data);
+
+
+
+
+  // Initialize a Line chart in the container with the ID chart1
+//   new Chartist.Line('#chart1', {
+//     labels: [1, 2, 3, 4],
+//     series: [[100, 120, 180, 200]]
+//   });
+
+  // Initialize a Line chart in the container with the ID chart2
+
+
+// var data = {
+//   labels: ['5x5', '4x4', '> 5x5', '< 4x4'],
+//   series: [60, 40, 8, 2]
+// };
+
+// var options = {
+//   labelInterpolationFnc: function(value) {
+//     return value[0]
+//   }
+// };
+
+// var responsiveOptions = [
+//   ['screen and (min-width: 640px)', {
+//     chartPadding: 30,
+//     labelOffset: 100,
+//     labelDirection: 'explode',
+//     labelInterpolationFnc: function(value) {
+//       return value;
+//     }
+//   }],
+//   ['screen and (min-width: 1024px)', {
+//     labelOffset: 80,
+//     chartPadding: 20
+//   }]
+// ];
+
+// new Chartist.Pie('#chart1', data, options, responsiveOptions);
+  
+</script>
+
+{% include 'boggle/common.html' %}
+{% include 'footer.html' %}

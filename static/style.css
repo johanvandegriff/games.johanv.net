@@ -118,6 +118,7 @@ nav ul li a {
 
 nav ul li a:hover:not(.active) {
   background-color: #111;
+  transition: all .4s;
 }
 
 .active {
@@ -172,4 +173,361 @@ footer {
     display:block;
     margin-left:auto;
     margin-right:auto;
+}
+
+
+
+
+
+
+
+
+.gameArea {
+  margin:0px auto;
+  max-width:800px;
+  padding:0 10px;
+  text-align: center;
+
+  /* font-size:18px;
+  line-height:1.6; */
+
+  /* https://css-tricks.com/books/volume-i/scale-typography-screen-size/ */
+  font-size: calc(14px + (26 - 14) * ((100vw - 300px) / (1600 - 300)));
+  line-height: calc(1.5em + (1.8 - 1.4) * ((100vw - 300px)/(1600 - 300)));
+}
+
+h1.scale {
+  margin: .3em;
+  font-size: 1.8em;
+  line-height: 1.2em;
+}
+h2.scale {
+  margin: .3em;
+  font-size: 1.5em;
+  line-height: 1em;
+}
+h3.scale {
+  margin: .3em;
+  font-size: 1.2em;
+  line-height: 0.8em;
+}
+
+p.scale {
+  text-align: left;
+  font-size: .9em;
+}
+
+.compactText {
+  text-align: left;
+  font-size: .7em;
+  line-height: 1.2em;
+}
+
+.leftCol {
+    float: left;
+    width: 47%;
+    /* background-color: #0f0; */
+}
+
+.rightCol {
+    float: right;
+    width: 47%;
+    /* background-color: #00f; */
+}
+
+.singleCol {
+  clear: both;
+  /* background-color: #f00; */
+}
+
+
+input[type="submit"].greenButton, input[type="submit"].purpleButton, input[type="submit"].redButton, input[type="submit"].blueButton {
+  font-size: 1em;
+  /* width: 50%; */
+  height: 2em;
+  background: #10ee10;
+  /* text-align: center; */
+  /* margin: 0 auto; */
+  border-radius: 0.3em;
+  border: 2px solid black;
+  /* display: inline-block; */
+}
+
+input[type="submit"].greenButton{
+  background: #10ee10;
+}
+
+input[type="submit"].purpleButton {
+  background: #631fa3;
+  color: white;
+}
+
+input[type="submit"].redButton {
+  background: #f00;
+  /* color: white; */
+}
+
+input[type="submit"].blueButton {
+  background: #9af;
+  /* color: white; */
+}
+
+
+input[type="text"].underlineText {
+  font-size: 0.8em;
+  margin: 1em auto;
+  padding: .5em .6em;
+  width: 35%;
+  display: block;
+  border: none;
+  border-bottom: 2px solid black;
+  outline: 0;
+}
+
+
+
+
+
+
+.radioHide{
+	display: none;
+}
+
+.grayBox{
+/* 	position: relative; */
+	background-color: #ddd;
+/* 	font-size: 26px; */
+	text-align: center;
+	/* height: 150px; */
+	/* line-height: 150px; */
+	display: block;
+/* 	cursor: pointer; */
+	border: 2px solid transparent;
+/* 	-webkit-box-sizing: border-box; */
+/* 	-moz-box-sizing: border-box; */
+/* 	box-sizing: border-box; */
+  border-radius: 0.3em;
+  margin-bottom: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+input:checked + label{
+	border: 2px solid #555;
+	background-color: #9af;
+}
+
+
+.customSelect {
+  /* margin: 0 auto; */
+  padding: 1.5px;
+  border: 1px solid #000;
+  background-color: #fff;
+  border-radius: 0.4em;
+}
+
+
+
+
+
+
+.extraSpace {
+  width: 100%;
+  max-width: 2048px;
+  padding: 0;
+}
+
+.leftCol2 {
+  width: 30%
+}
+
+.leftCol3 {
+  width: 40%;
+  /* max-width: 2048px; */
+  padding: 0;
+  position:absolute;
+  top:260px;
+  bottom:0px;
+  left: 0;
+  overflow-y:scroll;
+}
+
+#postGameBoard {
+  width: 70%;
+  min-width: 170px;
+}
+
+.scoreTable {
+  width: 65%;
+  position:absolute;
+  top:200px;
+  bottom:0px;
+  right: 0;
+  overflow-y:scroll;
+}
+
+
+.gamesTable {
+  width: 60%;
+  position:absolute;
+  top:260px;
+  bottom:0px;
+  right: 0;
+  overflow-y:scroll;
+}
+
+
+
+
+
+
+
+
+
+#navToggle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+  opacity: 0;
+  cursor: pointer;
+  height: 38px;
+  margin: 0;
+  padding: 0;
+}
+
+#navDropdown {
+  color: white;
+  background-color: #333;
+  border-top: 1px solid #0f0;
+  margin: 0;
+  width: 100%;
+  height: 18px;
+
+  padding: 10px 0;
+  text-align: center;
+
+  transition: all .4s;
+}
+
+nav:hover #navDropdown {
+  background-color: #111;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+@media not all and (max-width: 540px) {
+  .hideLarge {
+    display: none;
+  }
+
+
+
+
+
+  #titleText {
+    display: none;
+  }
+  #navDropdown {
+    display: none;
+  }
+}
+
+@media all and (max-width: 540px) {
+  .leftCol, .rightCol {
+      float: none;
+      width: 100%;
+  }
+  .gameArea {
+    font-size: 15px;
+  }
+  .hideSmall {
+    display: none;
+  }
+  .grayBox {
+    width: 75%;
+    margin:0px auto;
+    margin-bottom: 15px;
+  }
+  #postGameBoard {
+    width: 40%;
+  }
+  .scoreTable {
+    top: 290px;
+  }
+  .gamesTable {
+    top: 350px;
+  }
+  .leftCol3 {
+    top:130px;
+    bottom:350px;
+  }
+
+
+
+
+  #asciiArt {
+    display: none;
+  }
+  .ribbon {
+    height: 80px;
+  }
+  .main {
+    margin-top: 80px;
+  }
+
+
+  nav {
+    /*   margin: auto; */
+    /*   margin-top: 40px; */
+      position: relative;
+    /*   width: 50vw; */
+    /*   min-width: 320px; */
+      height: 50px;
+  }
+  #navToggle:checked ~ul {
+    height: 0%;
+  }
+  nav ul {
+    padding-left: 0;
+    padding-top: 0;
+    margin-top: 0;
+    list-style: none;
+    overflow: hidden;
+    text-align: right;
+    margin-bottom: 22px;
+    text-align: center;
+    transition: all .4s ease-out;
+    height: 100%;
+    
+  }
+  nav ul li {
+    border-radius: 2px;
+    position: relative;
+    display: inline-block;
+    margin-left: 35px;
+    line-height: 1.5;
+    width: 100%;
+    margin: 0;
+    margin-bottom: 5px;
+    box-shadow: 2px 2px 10px -2px rgba(0,0,0,.35);
+  }
+  nav ul a {
+    display: block;
+    text-transform: lowercase;
+    font-size: 18px;
+    font-weight: 200;
+    text-decoration: none;
+    transition: color .3s;
+  }
 }
