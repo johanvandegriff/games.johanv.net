@@ -56,56 +56,38 @@
         </form>
     </div>
     <div class="rightCol">
-        Loading Current Games...
-
-        <br/>TODO: Load games with JS
-
         <h2 class="scale" style="margin-bottom: 1em">Current Games</h2>
 
-        <div class="grayBox">
-            <div style="padding: 5px; border-bottom: 2px solid black;">
-            <form method="get">
-                <input type="hidden" name="username" value="{{ username }}"/>
-                <input type="hidden" name="action" value="pregame"/>
-                <input type="hidden" name="gameID" value="1"/>
-                <input class="greenButton" type="submit" value="Join"/> Game #3 (waiting...)
-            </form>
+        <div id="vue">
+            <div v-for="game in games" class="grayBox">
+                <div style="padding: 5px; border-bottom: 2px solid black;">
+                <form method="get">
+                    <span v-if="!game.isStarted">
+                        <input class="greenButton" type="submit" value="Join"/>
+                        Game #[[ game.gameID ]] (waiting...)
+                        <input type="hidden" name="action" value="pregame"/>
+                    </span>
+                    <span v-else-if="!game.isDone">
+                        <input class="blueButton" type="submit" value="Spectate"/>
+                        Game #[[ game.gameID ]] (time left: [[ showTime(game.timeLeft) ]])
+                        <input type="hidden" name="action" value="play"/>
+                    </span>
+                    <span v-else>
+                        <input class="purpleButton" type="submit" value="View"/>
+                        Game #[[ game.gameID ]] (time's up!)
+                        <input type="hidden" name="action" value="view"/>
+                    </span>
+                    <input type="hidden" name="username" value="{{ username }}"/>
+                    <input type="hidden" name="gameID" :value="game.gameID"/>
+                </form>
+                </div>
+                <div>
+                    [[ game.size ]], [[ game.letters ]] letters, [[ game.minutes ]] min, [[ game.players.length ]] players:
+                    <span v-for="(player, i) in game.players"><span v-if="i>0">, </span>[[ player ]]</span>
+                </div>
             </div>
-            <div style="">
-            5x5, 4 letters, 5 min, 3 players:
-            johanv, JonV, monarchofmany</div>
         </div>
 
-        <div class="grayBox">
-            <div style="padding: 5px; border-bottom: 2px solid black;">
-            <form method="get">
-                <input type="hidden" name="username" value="{{ username }}"/>
-                <input type="hidden" name="action" value="play"/>
-                <input type="hidden" name="gameID" value="1"/>
-                <input class="blueButton" type="submit" value="Spectate"/> Game #2 (time left: 4:20)
-            </form>
-            </div>
-            <div style="">
-            5x5, 4 letters, 5 min, 3 players:
-            johanv, JonV, monarchofmany</div>
-        </div>
-
-        <div class="grayBox">
-            <div style="padding: 5px; border-bottom: 2px solid black;">
-            <form method="get">
-                <input type="hidden" name="username" value="{{ username }}"/>
-                <input type="hidden" name="action" value="view"/>
-                <input type="hidden" name="gameID" value="1"/>
-                <input class="purpleButton" type="submit" value="View"/> Game #1 (time's up!)
-            </form>
-            </div>
-            <div style="">
-            5x5, 4 letters, 5 min, 3 players:
-            johanv, JonV, monarchofmany</div>
-        </div>
-
-
-        <br/>
         <form method="get">
             <input type="hidden" name="username" value="{{ username }}"/>
             <input type="hidden" name="action" value="stats"/>
@@ -116,4 +98,54 @@
 </div>
 
 {% include 'boggle/common.html' %}
+
+<script>
+    new Vue ({
+        delimiters: ['[[',']]'],
+        el: "#vue",
+        data: {
+            games: [
+                {
+                    gameID: 13,
+                    isStarted: false,
+                    isDone: false,
+                    timeLeft: 3*60,
+                    size: "5x5",
+                    letters: 4,
+                    minutes: 3,
+                    players: ["johanv", "JonV", "monarchofmany"]
+                },
+                {
+                    gameID: 12,
+                    isStarted: true,
+                    isDone: false,
+                    timeLeft: 4*60+3,
+                    size: "5x5",
+                    letters: 4,
+                    minutes: 5,
+                    players: ["johanv", "JonV", "monarchofmany"]
+                },
+                {
+                    gameID: 11,
+                    isStarted: true,
+                    isDone: true,
+                    timeLeft: 0,
+                    size: "4x4",
+                    letters: 3,
+                    minutes: 3,
+                    players: ["johanv", "JonV", "monarchofmany"]
+                }
+            ]
+        },
+        methods: {
+            //show time in the mm:ss format, with zero-padding on the seconds
+            showTime: function (t) {
+                var minutes = Math.floor(t / 60);
+                var seconds = (t % 60);
+                return minutes + ':' + (minutes < 10 ? '0' : '') + seconds;
+            }
+        }
+    });
+</script>
+
 {% include 'footer.html' %}

@@ -44,10 +44,12 @@
 
 </form></div>
 
-<script type="text/babel">
+<script type="text/javascript">
+//have to wait for the page to load to access the footer
+window.onload = function() {
 // hide the footer since it gets in the way
-var footers = document.getElementsByTagName('footer');
-footers[0].style.display = "none";
+    document.getElementsByTagName('footer')[0].style.display = "none";
+}
 </script>
 
 {% include 'boggle/common.html' %}
