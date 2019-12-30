@@ -3,23 +3,8 @@ import sys, cgi, json, datetime, re, os, time, decimal, subprocess, random
 
 from nav import nav #file in same dir
 
-LOGIN = 0
-LOBBY = 1
-JOIN_GAME = 2
-VIEW_GAME = 3
-PLAY_GAME = 4
-GAME_OVER = 5
-
 ROOT_DIR = "/srv/Boggle"
 GAMES_FILE = os.path.join(ROOT_DIR, "games.json")
-GAME_DURATION = 3 * 60 * 1000 #3 minutes in milliseconds
-formMethod = "get"
-
-def header():
-    return render_template("header.html", nav=nav, active="Boggle")
-
-def footer():
-    return render_template("footer.html")
 
 #replace quotes
 def rq(s):
@@ -173,552 +158,20 @@ def table(rows, properties, head=True):
     if head:
         text += '<thead>'
         text += tableRow(rows[0], 'th') + '\n'
-        text += '<thead>'
+        text += '</thead>'
         rows = rows[1:]
     text += '<tbody>'
     for row in rows:
         text += tableRow(row) + '\n'
-    text += '<tbody>'
+    text += '</tbody>'
     return text + '</table>'
-
-"""
-This method doesn't return html, but JSON data for JS to digest.
-It is called with AJAX requests, and the data will be formatted
-to update part of the page without reloading the whole thing.
-"""
-def data_request(form):
-    return ""
-
-"""
-This method processes all requests coming in, passing it off to
-data_request if need be, and displaying a page otherwise
-"""
-def page(form):
-    if "request" in form:
-        return data_request(form)
-
-    if not "username" in form:
-        action = "login"
-    else:
-        username = form["username"]
-        if "action" in form:
-            action = form["action"]
-        else:
-            action = "lobby"
-
-    if action == "login":
-        return render_template("boggle/login.html", action=action, nav=nav, active="Boggle")
-
-    if action == "pregame":
-        if "gameID" in form:
-            gameID = form["gameID"]
-            host = "hostman"
-        else:
-            gameID = 1
-            host = username
-        return render_template("boggle/pregame.html", host=host, gameID=gameID, username=username, nav=nav, active="Boggle")
-
-    if action == "cancel":
-        #TODO: delete a game if you are the host, otherwise remove the player from it
-        action = "lobby"
-
-    if action == "lobby":
-        return render_template("boggle/lobby.html", username=username, nav=nav, active="Boggle")
-
-    if action == "play":
-        if "gameID" in form:
-            gameID = form["gameID"]
-            host = "hostman"
-        else:
-            gameID = 1
-            host = username
-        return render_template("boggle/play.html", host=host, gameID=gameID, username=username, nav=nav, active="Boggle")
-
-    if action == "view":
-        if "prev" in form:
-            prev = form["prev"]
-        else:
-            prev = "lobby"
-
-        return render_template("boggle/view.html", username=username, prev=prev, nav=nav, active="Boggle")
-
-    if action == "stats":
-        return render_template("boggle/stats.html", username=username, nav=nav, active="Boggle")
-
-
-
-    return "404 - '" + str(action) + "' not found"
-
-
-    text = ""
-    games = json.load(open(GAMES_FILE, 'r'))
-
-    #form = cgi.FieldStorage()
-
-    if "action" in form:
-        action = int(form["action"])
-    else:
-        action = LOBBY
-
-    if not "username" in form:
-        text += header()
-        text += '<h1>Boggle</h1>'
-        text += '<p>Boggle is a word game with a grid of random letters. The goal is to find letters next to each other that form words. The game lasts 3 minutes and the person with the highest score (longer words are worth more) at the end wins.</p>'
-        text += '<h3>Enter your nickname</h3>'
-        text += '<form method="' + formMethod + '">'
-        text += '<input type="text" name="username" required>'
-        text += '<input type="submit" value="Enter" required>'
-        text += '<input type="hidden" name="action" value="'+str(LOBBY)+'">'
-        text += '</form>'
-        text += footer()
-        return text
-
-    username = form["username"]
-    if action == VIEW_GAME:
-        text += header()
-        text += '<h1>Boggle</h1>'
-        text += '<h3>Past Game</h3>'
-
-        myGameID = 0
-        username = ""
-        if len(sys.argv) == 3:
-            myGameID = sys.argv[1]
-            username = sys.argv[2]
-        else:
-            myGameID = int(form["gameID"])
-            username = form["username"]
-
-        myGame = []
-        for game in games:
-            gameID = game[0]
-            if myGameID == gameID:
-                break
-        myGame = game
-
-        board = myGame[5]
-
-        size = myGame[2]
-        size2 = int(size[0])
-
-        players = myGame[7]
-        playerWords = myGame[8]
-        host = myGame[1][0]
-
-        text += '<a href="/boggle?username=' + rq(username) + '">Back to Lobby</a>'
-        text += "<h4>Game hosted by " + rq(host)  + ".</h4>"
-        text += "<table cellpadding=10><tr><td>"
-        text += display(board, 0)
-        text += "</td><td>"
-
-        text += """<table border=1 cellpadding=7>
-        <tr><td>Players:</td>"""
-
-        for player in players:
-            text += '<td>' + rq(player) + '</td>'
-        text += '</tr><tr><td valign="top" style="vertical-align:top">Words:</td>'
-
-        allPlayerWords = []
-        for words in playerWords:
-            text += '<td valign="top" style="vertical-align:top">'
-            words.sort()
-            score = 0
-            numwords = 0
-            for word in words:
-                allPlayerWords.append(word)
-                points = calculatePoints(word)
-                text += ("%2d" %(points)) + " " + word + "<br>"
-                score += points
-                numwords += 1
-            text += "Word Count:  " + str(numwords) + "<br>"
-            text += "Total Score: " + str(score) + "<br>"
-            text += '</td>'
-
-
-        text += "</tr></table></td></tr></table>"
-
-
-        text += "<br>All possible words for this board:<br><br>"
-
-        if(len(myGame) > 6):
-            words = myGame[6]
-            words.sort()
-            found = 0
-            total = len(words)
-            score = 0
-            numwords = 0
-            for word in words:
-                if word in allPlayerWords:
-                    text += '<span style="color:green; font-weight:bold">'
-                    found += 1
-                points = calculatePoints(word)
-                text += ("%2d" %(points)) + " " + word + "<br>"
-                score += points
-                numwords += 1
-                if word in allPlayerWords:
-                    text += "</span>"
-            text += "Word Count:  " + str(numwords) + "<br>"
-            text += "Total Score: " + str(score) + "<br>"
-            percent = int(found*100.0/total+0.5)
-            text += str(percent) + "% of all these words were found."
-
-        text += footer()
-    if action == JOIN_GAME:
-        myGame = []
-        myGameID = 0
-        size = ""
-        if "gameID" in form:
-            myGameID = int(form["gameID"])
-            for game in games:
-                gameID = game[0]
-                if myGameID == gameID:
-                    myGame = game
-                    size = myGame[2]
-                    break
-        else:
-            size = form["size"]
-            myGameID = 0;
-            while any(myGameID == game[0] for game in games):
-                myGameID += 1
-            myGame = [myGameID, [username], size, 0]
-            games.append(myGame)
-
-            size2 = int(size[0])
-            if len(myGame) < 6:
-                minWordLength = 4
-                if size == "4x4":
-                    minWordLength = 3
-                game = create(size2)
-                game = solve(game, minWordLength)
-                myGame.append(-1)
-                myGame.extend(game)
-                myGame.append([])
-                myGame.append([])
-                json.dump(games, open(GAMES_FILE, 'w'))
-
-        if myGame == []:
-            action = LOBBY
-
-        players = myGame[1]
-        host = players[0]
-        if not myGame[3] == 0:
-            if username in players:
-                text += play(username, size, myGameID)
-            else:
-                action = LOBBY
-
-        if not username in players:
-            players.append(username)
-            json.dump(games, open(GAMES_FILE, 'w'))
-
-        minWordLength = "Four"
-        if size == "4x4":
-            minWordLength = "Three"
-        text += header()
-        text += """<h1>Boggle</h1><h4>New Game hosted by """ + rq(host) + ".<br><br>" + rq(size) + " Board, " + rq(minWordLength) + """ letter
-    words or more.</h4>
-    <p>Waiting for players...</p>
-    <form action="">
-    <input type="hidden" name="username" value='""" + username + """'>
-    <input type="hidden" name="size" value='""" + size + """'>
-    <input type="hidden" name="gameID" value='""" + str(myGameID) + """'>
-    <input type="hidden" name="action" value='""" + str(JOIN_GAME) + """'>
-    <input type="submit" value="Refresh">
-    </form>
-    <br>
-    <table border=1 cellpadding=7>
-    <tr><td>Players:</td></tr>"""
-
-        for player in players:
-            text += '<tr><td>' + player + '</td></tr>'
-        text += "</table><br>"
-        if username == host:
-            text += """<form action="">
-    <input type="hidden" name="username" value='""" + username + """'>
-    <input type="hidden" name="action" value='""" + str(PLAY_GAME) + """'>
-    <input type="hidden" name="size" value='""" + size + """'>
-    <input type="hidden" name="gameID" value='""" + str(myGameID) + """'>
-    <input value="Start Game" type="submit">
-    </form>"""
-        else:
-            text += """<script>
-    setTimeout(function(){
-        window.location.reload(1);
-    }, 3000);
-    </script>"""
-        text += footer()
-
-    if action == PLAY_GAME:
-        size = form["size"]
-        myGameID = int(form["gameID"])
-
-        myGame = []
-        for game in games:
-            gameID = game[0]
-            if myGameID == gameID:
-                break
-        myGame = game
-
-        if myGame[3] == 2:
-            text += header()
-            text += """Content-type: text/html
-
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <script>
-    window.location = '/boggle?username=""" + username + """';
-    </script>
-    <link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
-    </head>
-    </html>"""
-            return text
-
-        myGame[3] = 1
-
-        players = myGame[1]
-        host = players[0]
-
-        if username == host and myGame[4] == -1:
-            myGame[4] = time.time() * 1000
-
-        json.dump(games, open(GAMES_FILE, 'w'))
-
-        minWordLength = "Four"
-        if size == "4x4":
-            minWordLength = "Three"
-        text += header()
-        text += """<h1>Boggle</h1><h4>Game hosted by """ + rq(host) + ".<br><br>" + size + " Board, " + minWordLength + """ letter
-    words or more.</h4>
-    <p>The game has started! Good luck, """ + rq(username) + '!</p><h4><p id="time"></p></h4>'
-    #"""
-
-        board = myGame[5]
-        text += display(board, 1)
-        text += """<form action="" id="words" name="words">
-<input type="hidden" name="action" value='""" + str(GAME_OVER) + """'>
-<input type="hidden" name="username" value='""" + username + """'>
-<input type="hidden" name="size" value='""" + size + """'>
-<input type="hidden" name="gameID" value='""" + str(myGameID) + """'>
-
-<h1><table cellpadding=13 cellspacing=3>
-<tr><td background="/static/boggle_img/space.bmp">
-<a style="text-decoration:none;color:#000000" href="javascript:type(' ')">
-Space</a></td>
-<td background="/static/boggle_img/backspace.bmp">
-<a style="text-decoration:none;color:#000000" href="javascript:backspace()">
-Backspace</a></td></tr></table></h1>
-
-<textarea rows="20" cols="75" name="words" id="wordBox">
-</textarea>
-</form>
-<script>
-var startTime = """ + str(myGame[4]) + """;
-var endTime = startTime + """ + str(GAME_DURATION) + """;
-
-countDown();
-
-function type(letter){
-    document.getElementById("wordBox").value += letter;
-}
-
-function backspace(){
-    var box = document.getElementById("wordBox").value.slice(0, -1);
-    document.getElementById("wordBox").value = box;
-}
-
-function countDown(){
-    time = new Date().getTime();
-    timeLeft = Math.ceil((endTime - time) / 1000);
-    millis = timeLeft;
-    minutes = Math.floor(millis / 60);
-    seconds = millis % 60;
-    if(minutes < 10){
-        minutes = "0" + minutes;
-    }
-    if(seconds < 10){
-        seconds = "0" + seconds;
-    }
-    document.getElementById("time").innerHTML = minutes + ":" + seconds;
-    if(millis <= 0){
-        clearTimeout(timer);
-        document.getElementById("time").innerHTML = "Time's up!";
-        document.forms.words.submit();
-    }
-    var timer = setTimeout("countDown()", 1000);
-}
-</script>"""
-        text += footer()
-
-    if action == GAME_OVER:
-        size = form["size"]
-        myGameID = int(form["gameID"])
-        if "words" in form:
-            wordBox = form["words"].lower()
-            words = re.split("\s|\n|,", wordBox)
-        else:
-            words = []
-
-        myGame = []
-        for game in games:
-            gameID = game[0]
-            if myGameID == gameID:
-                break
-        myGame = game
-
-        myGame[3] = 2
-
-        size2 = int(size[0])
-
-        players = myGame[1]
-        host = players[0]
-
-        if not username in myGame[7]:
-            allWords = myGame[6]
-            validWords = []
-            for word in words:
-                if word in allWords and not word in validWords:
-                    validWords.append(word)
-            myGame[7].append(username)
-            myGame[8].append(validWords)
-        json.dump(games, open(GAMES_FILE, 'w'))
-
-        text += header()
-        text += """<script>
-function redirect() {
-    window.location = '/boggle?action=""" + str(VIEW_GAME) + "&gameID=" + str(gameID) + "&username=" + username + """';
-}
-setTimeout(redirect, 5000);
-</script>
-<h2>
-Redirect in 5 seconds...
-</h2>"""
-        text += footer()
-
-    if action == LOBBY:
-        lobbyStartTime = time.time()
-        text += header()
-        text += '<script type="text/javascript" src="/static/sorttable.js"></script>'
-
-        text += '<h1>Boggle Lobby</h1>'
-        text += '<p>Welcome, ' + username + '!'
-        text += '<form method="' + formMethod + '">'
-        text += '<input type="hidden" name="username" value="'+username+'">'
-        text += '<input type="hidden" name="action" value="'+str(LOBBY)+'">'
-        text += '<input type="hidden" name="skip" value="'+str(True)+'">'
-        text += '<input type="submit" value="Refresh" required>'
-        text += '</form><br/>'
-
-        text += '<p>You can join one of these games:</p>'
-        text += '<form method="' + formMethod + '">'
-        text += '<input type="hidden" name="action" value="'+str(JOIN_GAME)+'">'
-        text += '<input type="hidden" name="username" value="'+username+'">'
-
-        rows = []
-
-        disabled = "disabled "
-        checked = "checked "
-        for game in games:
-            state = game[3]
-            if state == 0:
-                gameID = game[0]
-                host = game[1][0]
-                size = game[2]
-                players = len(game[1])
-                if checked == "checked ":
-                    rows.append(["Select", "Host", "Size", "Players"])
-                rows.append(['<input type="radio" ' + checked    + 'name="gameID" value="' + str(gameID) + '">',
-                                                                    host, size, str(players)])
-                checked = ""
-                disabled = ""
-        if disabled == "disabled ":
-            text += '<p><b>No games are waiting for players.</b></p>'
-        else:
-            text += table(rows, 'border=1 cellpadding=7 id="waiting" class="sortable"')
-
-        text += '<br/>'
-        text += '<input value="Join Game" type="submit" ' + disabled + '>'
-        text += '</form><br/><br/>'
-        text += '<p>Or you can create a new game:</p>'
-        text += '<form method="' + formMethod + '">'
-        text += '<input type="hidden" name="action" value="'+str(JOIN_GAME)+'">'
-        text += '<input type="hidden" name="username" value="'+username+'">'
-        text += """<select name="size">
-    <option>5x5</option>
-    <option>4x4</option>
-    </select>"""
-        text += '<input value="Create Game" type="submit" id="create">'
-        text += '</form><br/>'
-        text += '<p>Games in progress:</p>'
-
-        any1 = 0
-        for game in games:
-            state = game[3]
-            startTime = game[4]
-            if state == 1 and time.time() * 1000 > startTime + GAME_DURATION:
-                game[3] = 2
-                any1 = 1
-        if any1 == 1:
-            json.dump(games, open(GAMES_FILE, 'w'))
-
-        rows = []
-
-        any1 = 0
-        for game in games:
-            state = game[3]
-            if state == 1:
-                gameID = game[0]
-                host = game[1][0]
-                size = game[2]
-                players = len(game[1])
-                if any1 == 0:
-                    rows.append(["Host", "Size", "Players"])
-                rows.append([host, size, str(players)])
-                any1 = 1
-        if any1 == 0:
-            text += '<p><b>No games are in progress.</b></p>'
-        else:
-            text += table(rows, 'border=1 cellpadding=7 id="playing" class="sortable"')
-        text += '<br/><br/>'
-        text += '<p>Games that are over:</p>'
-        text += '<p>Click on a column to sort by that column</p>'
-
-        rows = []
-        rows.append(["Game #", "Host", "Size", "Players", "Total # of Words", "# of Words Found", "% of Words Found"])
-
-        length = len(games)
-        for i in range(length-1, -1, -1):
-            game = games[i]
-            state = game[3]
-            if state == 2:
-                gameID = game[0]
-                host = game[1][0]
-                size = game[2]
-                players = len(game[1])
-                allWords = game[6]
-                allPlayerWords = []
-                allPlayerWordLists = game[8]
-                found = 0
-                for playerWords in allPlayerWordLists:
-                    for word in playerWords:
-                        if not word in allPlayerWords:
-                            allPlayerWords.append(word)
-                            found += 1
-                percent = int(found*10000.0/len(allWords)+0.5)/100.0
-                percentStr = str(decimal.Decimal(percent).quantize(decimal.Decimal('0.01')))+"%"
-                rows.append(['<a href="/boggle?gameID=' + str(gameID) + '&username=' + username + '&action=' + str(VIEW_GAME) + '">' + str(gameID) + '</a>', host,
-                                        size, str(players), str(len(allWords)), str(found), percentStr])
-        text += table(rows, 'border=1 cellpadding=7 id="over" class="sortable"')
-        text += '<p>It took ' + str(time.time() - lobbyStartTime) + ' seconds to load the lobby.</p>'
-        text += footer()
-    return text
-
 
 
 def display(board, buttons):
     text = ""
     size = len(board)
 
-    text += '<h1><font color="black"><table style="background-color:black" bgcolor="black">'
+    text += '<h1><font color="black"><table style="background-color:black">'
     for i in range(size):
         text += "<tr>"
         for j in range(size):
@@ -734,7 +187,6 @@ def display(board, buttons):
     text += "</table></font></h1>"
     return text
 
-
 def calculatePoints(word):
     length = len(word)
     if length < 7:
@@ -747,32 +199,126 @@ def calculatePoints(word):
         points = 1;
     return points
 
+"""
+This method doesn't return html, but JSON data for JS to digest.
+It is called with AJAX requests, and the data will be formatted
+to update part of the page without reloading the whole thing.
+"""
+def request_data(form):
+    request = form["request"]
+    if request == "games":
+        return {
+            "games": [
+                {
+                    "gameID": 13,
+                    "isStarted": False,
+                    "isDone": False,
+                    "timeLeft": 180,
+                    "size": "5x5",
+                    "letters": 4,
+                    "minutes": 3,
+                    "players": ["johanv", "JonV", "monarchofmany"]
+                },
+                {
+                    "gameID": 12,
+                    "isStarted": True,
+                    "isDone": False,
+                    "timeLeft": 243,
+                    "size": "5x5",
+                    "letters": 4,
+                    "minutes": 5,
+                    "players": ["johanv", "JonV", "monarchofmany"]
+                },
+                {
+                    "gameID": 11,
+                    "isStarted": True,
+                    "isDone": True,
+                    "timeLeft": 0,
+                    "size": "4x4",
+                    "letters": 3,
+                    "minutes": 3,
+                    "players": ["johanv", "JonV", "monarchofmany"]
+                }
+            ]
+        }
+    return {}
+
+def do_action(form):
+    action = form["action"]
+
+    if action == "cancel":
+        #TODO: delete a game if you are the host, otherwise remove the player from it
+        return
+
+def load_page(form):
+    if not "username" in form:
+        page = "login"
+    elif "page" in form:
+        page = form["page"]
+    else:
+        page = "lobby"
+
+    if page == "login":
+        return render_template("boggle/login.html", page=page, nav=nav, active="Boggle")
+
+    username = form["username"]
+
+    if page == "pregame":
+        if "gameID" in form:
+            gameID = form["gameID"]
+            host = "hostman"
+        else:
+            gameID = 1
+            host = username
+        return render_template("boggle/pregame.html", host=host, gameID=gameID, username=username, nav=nav, active="Boggle")
+
+    if page == "lobby":
+        return render_template("boggle/lobby.html", username=username, nav=nav, active="Boggle")
+
+    if page == "play":
+        if "gameID" in form:
+            gameID = form["gameID"]
+            host = "hostman"
+        else:
+            gameID = 1
+            host = username
+        return render_template("boggle/play.html", host=host, gameID=gameID, username=username, nav=nav, active="Boggle")
+
+    if page == "view":
+        if "prev" in form:
+            prev = form["prev"]
+        else:
+            prev = "lobby"
+
+        return render_template("boggle/view.html", username=username, prev=prev, nav=nav, active="Boggle")
+
+    if page == "stats":
+        return render_template("boggle/stats.html", username=username, nav=nav, active="Boggle")
+
+    return "404 - '" + str(page) + "' not found"
 
 
-def lobby(username):
-    return """Content-type: text/html
+"""
+This method processes all requests coming in, and passes
+them to the correct function.
 
-<!DOCTYPE html>
-<html>
-<head>
-<script>
-window.location = '/boggle?username=""" + username + """';
-</script>
-<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
-</head>
-</html>"""
-
-def play(username, size, myGameID):
-    return """Content-type: text/html
-
-<!DOCTYPE html>
-<html>
-<head>
-<script>
-window.location = '/boggle?username=""" + str(username) + "&action=" + str(PLAY_GAME) + "&size=" + str(size) + "&gameID=" + str(myGameID) + """';
-</script>
-<link rel="stylesheet" type="text/css" href="../stylesheet.css" media="all"/>
-</head>
-</html>"""
-
-
+There are 3 important fields:
+action - an action to be taken before loading the page,
+    such as leaving a game or submitting a list of words
+page - the page to be returned, such as the login, lobby,
+    pregame, play, and stats pages
+request - ask for a certain type of data, such as current
+    games, past games, data on 1 particular game, or word
+    definition. This overrides the page, so if a request,
+    page, and action are all specified, the server will
+    do the action, then return the requested data,
+    ignoring the page variable.
+"""
+def app(form):
+    if "action" in form:
+        do_action(form)
+    
+    if "request" in form:
+        return request_data(form)
+    else:
+        return load_page(form)

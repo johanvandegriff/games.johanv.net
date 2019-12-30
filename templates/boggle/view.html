@@ -10,10 +10,10 @@
         <form method="get">
             <input type="hidden" name="username" value="{{ username }}"/>
             {% if prev == "stats" %}
-            <input type="hidden" name="action" value="stats"/>
+            <input type="hidden" name="page" value="stats"/>
             <input class="purpleButton" type="submit" value="Back to Stats"/>
             {% else %}
-            <input type="hidden" name="action" value="lobby"/>
+            <input type="hidden" name="page" value="lobby"/>
             <input class="greenButton" type="submit" value="Back to Lobby"/>
             {% endif %}
         </form>
@@ -26,7 +26,7 @@
             <table border=1 cellpadding=7>
                 <thead><tr><td>johanv</td><td>Jonv</td><td style="background-color: #0c0;">monarchofmany</td><td>verylongusername1</td><td>verylongusername2</td><td>verylongusername3</td><td>verylongusername4</td></tr></thead>
                 <tbody><tr><td>7 points<br/>5 words</td><td>8<span style="visibility: hidden">|</span>points<br/>7 words</td><td style="background-color: #0c0;">12 points<br/>7 words</td></tr></tbody>
-                <tbody><tr><td style="vertical-align:top">0 <span style="color: #a00">aced</span><br/>2 adorn<br/>0 <span style="color: #a00">arson</span><br/>0<span style="visibility: hidden">|</span><span style="color: #a00">ascend</span><br/>5<span style="visibility: hidden">|</span>ascends</td><td style="vertical-align:top">0 <span style="color: #a00">arson</span><br/>1 care<br/>2 cares<br/>2 cars<br/>0<span style="visibility: hidden">|</span><span style="color: #a00">cedar</span><br/>3<span style="visibility: hidden">|</span>cedars<br/>0 <span style="color: #a00">aced</span></td><td style="vertical-align:top; background-color: #0c0;">0 <span style="color: #a00">arson</span><br/>0 <span style="color: #a00">ascend</span><br/>1 dare<br/>2 dares<br/>1 done<br/>3 extent<br/>5 extents</td></tr></tbody>
+                <tbody><tr><td style="vertical-align:top">0 <span style="background-color: tomato; color: #fff">aced</span><br/>2 adorn<br/>0 <span style="color: #a00">arson</span><br/>0<span style="visibility: hidden">|</span><span style="color: #a00">ascend</span><br/>5<span style="visibility: hidden">|</span>ascends</td><td style="vertical-align:top">0 <span style="color: #a00">arson</span><br/>1 care<br/>2 cares<br/>2 cars<br/>0<span style="visibility: hidden">|</span><span style="color: #a00">cedar</span><br/>3<span style="visibility: hidden">|</span>cedars<br/>0 <span style="color: #a00">aced</span></td><td style="vertical-align:top; background-color: #0c0;">0 <span style="color: #a00">arson</span><br/>0 <span style="color: #a00">ascend</span><br/>1 dare<br/>2 dares<br/>1 done<br/>3 extent<br/>5 extents</td></tr></tbody>
                 <!-- text-decoration: line-through -->
             </table>
         </div>

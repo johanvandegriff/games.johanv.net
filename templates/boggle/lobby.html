@@ -51,31 +51,31 @@
                 </select> minutes
             </label>
             <input type="hidden" name="username" value="{{ username }}"/>
-            <input type="hidden" name="action" value="pregame"/>
+            <input type="hidden" name="page" value="pregame"/>
             <input class="greenButton" type="submit" value="Create Game"/>
         </form>
     </div>
     <div class="rightCol">
         <h2 class="scale" style="margin-bottom: 1em">Current Games</h2>
 
-        <div id="vue">
+        <div id="app">
             <div v-for="game in games" class="grayBox">
                 <div style="padding: 5px; border-bottom: 2px solid black;">
                 <form method="get">
                     <span v-if="!game.isStarted">
                         <input class="greenButton" type="submit" value="Join"/>
                         Game #[[ game.gameID ]] (waiting...)
-                        <input type="hidden" name="action" value="pregame"/>
+                        <input type="hidden" name="page" value="pregame"/>
                     </span>
                     <span v-else-if="!game.isDone">
                         <input class="blueButton" type="submit" value="Spectate"/>
                         Game #[[ game.gameID ]] (time left: [[ showTime(game.timeLeft) ]])
-                        <input type="hidden" name="action" value="play"/>
+                        <input type="hidden" name="page" value="play"/>
                     </span>
                     <span v-else>
                         <input class="purpleButton" type="submit" value="View"/>
                         Game #[[ game.gameID ]] (time's up!)
-                        <input type="hidden" name="action" value="view"/>
+                        <input type="hidden" name="page" value="view"/>
                     </span>
                     <input type="hidden" name="username" value="{{ username }}"/>
                     <input type="hidden" name="gameID" :value="game.gameID"/>
@@ -90,7 +90,7 @@
 
         <form method="get">
             <input type="hidden" name="username" value="{{ username }}"/>
-            <input type="hidden" name="action" value="stats"/>
+            <input type="hidden" name="page" value="stats"/>
             <input class="purpleButton" type="submit" value="Past Games, Records & Stats"/>
         </form>
     </div>
@@ -99,44 +99,22 @@
 
 {% include 'boggle/common.html' %}
 
+<script src="/static/socket.io-2.3.0.js"></script>
+
 <script>
-    new Vue ({
+    const app = new Vue ({
         delimiters: ['[[',']]'],
-        el: "#vue",
+        el: "#app",
         data: {
-            games: [
-                {
-                    gameID: 13,
-                    isStarted: false,
-                    isDone: false,
-                    timeLeft: 3*60,
-                    size: "5x5",
-                    letters: 4,
-                    minutes: 3,
-                    players: ["johanv", "JonV", "monarchofmany"]
-                },
-                {
-                    gameID: 12,
-                    isStarted: true,
-                    isDone: false,
-                    timeLeft: 4*60+3,
-                    size: "5x5",
-                    letters: 4,
-                    minutes: 5,
-                    players: ["johanv", "JonV", "monarchofmany"]
-                },
-                {
-                    gameID: 11,
-                    isStarted: true,
-                    isDone: true,
-                    timeLeft: 0,
-                    size: "4x4",
-                    letters: 3,
-                    minutes: 3,
-                    players: ["johanv", "JonV", "monarchofmany"]
-                }
-            ]
+            games: []
         },
+        // created () {
+        //     fetch('?request=games')
+        //     .then(response => response.json())
+        //     .then(json => {
+        //         this.games = json.games
+        //     })
+        // },
         methods: {
             //show time in the mm:ss format, with zero-padding on the seconds
             showTime: function (t) {
@@ -145,6 +123,15 @@
                 return minutes + ':' + (minutes < 10 ? '0' : '') + seconds;
             }
         }
+    });
+    
+    var socket = io();
+    socket.on('connect', function() {
+        socket.emit('boggle', {request: 'games'});
+    });
+    socket.on('response', function(msg){
+      console.log(msg);
+      app.games = msg["games"]
     });
 </script>
 

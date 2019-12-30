@@ -10,3 +10,4 @@ profanity-filter==1.1.14
 git+git://github.com/rominf/hunspell_serializable.git
 git+git://github.com/kmike/pymorphy2.git
 spacy==2.1.8
+flask-socketio==4.2.1

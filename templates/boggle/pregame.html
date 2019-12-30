@@ -16,13 +16,14 @@
         {% if host == username %}
         <form method="get">
             <input type="hidden" name="username" value="{{ username }}"/>
-            <input type="hidden" name="action" value="play"/>
+            <input type="hidden" name="page" value="play"/>
             <input class="greenButton" style="float: left; margin: 10px;" type="submit" value="Begin"/>
         </form>
         {% endif %}
         <form method="get">
             <input type="hidden" name="username" value="{{ username }}"/>
             <input type="hidden" name="action" value="cancel"/>
+            <input type="hidden" name="page" value="lobby"/>
             <input class="redButton" style="float: left; margin: 10px;" type="submit" value="{% if host == username %}Cancel{% else %}Leave Game{% endif %}"/>
         </form>
         <br/><br/>

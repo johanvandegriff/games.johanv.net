@@ -173,12 +173,12 @@ def table(rows, properties, head=True):
     if head:
         text += '<thead>'
         text += tableRow(rows[0], 'th') + '\n'
-        text += '<thead>'
+        text += '</thead>'
         rows = rows[1:]
     text += '<tbody>'
     for row in rows:
         text += tableRow(row) + '\n'
-    text += '<tbody>'
+    text += '</tbody>'
     return text + '</table>'
 
 def page(form):
