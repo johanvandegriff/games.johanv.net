@@ -429,10 +429,10 @@ def page(form):
 <input type="hidden" name="gameID" value='""" + str(myGameID) + """'>
 
 <h1><table cellpadding=13 cellspacing=3>
-<tr><td background="/static/boggle_img/space.bmp">
+<tr><td background="/static/boggle_old/space.bmp">
 <a style="text-decoration:none;color:#000000" href="javascript:type(' ')">
 Space</a></td>
-<td background="/static/boggle_img/backspace.bmp">
+<td background="/static/boggle_old/backspace.bmp">
 <a style="text-decoration:none;color:#000000" href="javascript:backspace()">
 Backspace</a></td></tr></table></h1>
 
@@ -657,7 +657,7 @@ def display(board, buttons):
                 space = "&nbsp;"
             if buttons == 1:
                 letter = '<a style="text-decoration:none;color:#000000" href="javascript:type(\'' + letter.lower() + '\')">' + letter + '</a>'
-            text += '<td width="62" height="62" background="/static/boggle_img/letter.bmp">&thinsp;' + space + letter + "</td>"
+            text += '<td width="62" height="62" background="/static/boggle_old/letter.bmp">&thinsp;' + space + letter + "</td>"
         text += "</tr>"
     text += "</table></font></h1>"
     return text

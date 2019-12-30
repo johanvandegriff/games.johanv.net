@@ -193,7 +193,7 @@ def display(board, buttons):
                 space = "&nbsp;"
             if buttons == 1:
                 letter = '<a style="text-decoration:none;color:#000000" href="javascript:type(\'' + letter.lower() + '\')">' + letter + '</a>'
-            text += '<td width="62" height="62" background="/static/boggle_img/letter.bmp">&thinsp;' + space + letter + "</td>"
+            text += '<td width="62" height="62" background="/static/boggle/letter.bmp">&thinsp;' + space + letter + "</td>"
         text += "</tr>"
     text += "</table></font></h1>"
     return text
