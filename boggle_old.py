@@ -69,7 +69,7 @@ def create(size=5):
     for i in range(size):
         row = []
         for j in range(size): #for each board spot
-            letter = dice[numbers[i*size+j]][random.randint(0,size)] #roll the dice
+            letter = dice[numbers[i*size+j]][random.randint(0,5)] #roll the dice
             row.append(letter) #set the letter on the board
         board.append(row)
     return [board]
@@ -99,10 +99,6 @@ def solve_aux(x, y, word, used, board, words, found, size):
 def solve(game, minWordLength):
     board = game[0]
     size = len(board)
-
-    minwordlength = 4
-    if len(sys.argv) > 2 and sys.argv[2].isdigit():
-        minwordlength = int(sys.argv[2])
 
     #the boggle alphabet
     alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
@@ -144,7 +140,7 @@ def solve(game, minWordLength):
 
     for line in open(ROOT_DIR + "/lists/list.txt", 'r'): #sort through each word
         line = line.strip() #remove the newline
-        if len(line) >= minwordlength: #if the word is long enough
+        if len(line) >= minWordLength: #if the word is long enough
             #if the word does not have too many of any letter
             if not any(line.count(alphabet[i].lower()) > quantities[i] for i in range(len(alphabet))):
                 #if there are no letters not on the board in this word
