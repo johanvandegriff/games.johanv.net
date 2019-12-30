@@ -296,10 +296,7 @@ input[type="text"].underlineText {
 .grayBox{
 /* 	position: relative; */
 	background-color: #ddd;
-/* 	font-size: 26px; */
 	text-align: center;
-	/* height: 150px; */
-	/* line-height: 150px; */
 	display: block;
 /* 	cursor: pointer; */
 	border: 2px solid transparent;
@@ -343,7 +340,6 @@ input:checked + label{
 
 .leftCol3 {
   width: 40%;
-  /* max-width: 2048px; */
   padding: 0;
   position:absolute;
   top:260px;
@@ -376,11 +372,41 @@ input:checked + label{
   overflow-y:scroll;
 }
 
+table.boggleBoard {
+  margin: 0 auto;
+  width: 40vw;
+  height: 40vw;
+  border-spacing: .15em;
+  table-layout: fixed;
+}
+table.boggleBoard tbody tr td {
+  border: 1px solid black;
+  border-radius: .75em;
+  /* background-color: #aaa; */
+  background-image: linear-gradient(#bbb, #777);
+  color: #238;
+  vertical-align: middle;
+}
 
+table.boggleBoard tbody tr td div {
+  border-radius: 50%;
+  background-color: #ccc;
+  width: 100%;
+  height: 100%;
+  display: table;
+}
 
+table.boggleBoard tbody tr td div span {
+  display: table-cell;
+  vertical-align: middle;
+  width: 100%;
+  height: 100%;
 
-
-
+  /* font-size: 5.5vw; */
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
 
 
 
@@ -485,6 +511,12 @@ nav:hover #navDropdown {
   .main {
     margin-top: 80px;
   }
+
+  table.boggleBoard {
+    width: 70vw;
+    height: 70vw;
+  }
+
 
 
   nav {

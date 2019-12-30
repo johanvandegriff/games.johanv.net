@@ -26,17 +26,16 @@
                         <option>5x5</option>
                         <option selected>6x6</option>
                         <option>7x7</option>
-                </select>,
-                <select class="customSelect" name="size">
-                        <option>1</option>
+                </select>, find words with
+                <select class="customSelect" name="letters">
                         <option>2</option>
                         <option>3</option>
                         <option selected>4</option>
                         <option>5</option>
                         <option>6</option>
                         <option>7</option>
-                </select> letters,
-                <select class="customSelect" name="size">
+                </select> letters or more in
+                <select class="customSelect" name="minutes">
                         <option>0.5</option>
                         <option>1</option>
                         <option>2</option>
@@ -82,7 +81,7 @@
                 </form>
                 </div>
                 <div>
-                    [[ game.size ]], [[ game.letters ]] letters, [[ game.minutes ]] min, [[ game.players.length ]] players:
+                    [[ game.size ]]x[[ game.size ]], [[ game.letters ]] letters, [[ game.minutes ]] min, [[ game.players.length ]] players:
                     <span v-for="(player, i) in game.players"><span v-if="i>0">, </span>[[ player ]]</span>
                 </div>
             </div>
@@ -131,9 +130,9 @@
     });
     socket.on('response', function(msg){
         console.log(msg);
-        if("games" in msg) {
-            app.games = msg["games"]
-        }
+        // if("games" in msg) {
+        //     app.games = msg["games"]
+        // }
     });
 </script>
 

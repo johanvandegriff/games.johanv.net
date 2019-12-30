@@ -52,8 +52,12 @@ def rq(s):
 
 def create(size=5, letters=None, minutes=3):
     if letters is None:
-        if size >=5: letters = 4
-        else: letters = 3
+        if size >=5:
+            letters = 4
+        elif size == 4:
+            letters = 3
+        else:
+            letters = 2
 
     dice = [] #no dice
 
@@ -70,30 +74,46 @@ def create(size=5, letters=None, minutes=3):
     board = [[dice[i*size+j][random.randint(0,5)] for j in range(size)] for i in range(size)]
 
     #construct a dict with all the info
-    return {"board": board, "letters": letters, "minutes": minutes}
+    game = {
+        "size": size,
+        "letters": letters,
+        "minutes": minutes,
+        "board": board,
+        "isStarted": False,
+        "isDone": False,
+        "players": []
+        #TODO: gameID
+        #TODO: timeLeft, or change to startTime
+    }
+    return game
+
+def calculatePoints(word):
+    length = len(word)
+    if length > 8: length = 8
+    return [0,1,1,1,1,2,3,5,11][length]
 
 #x, y: the current position on the board
 #word: the current word
 #used: the spots the word has letters from 
 def solve_aux(x, y, word, used, board, words, found, size):
-    myused = []
-    for item in used: #copy used to myused
-        myused.append(item)
+    myused = used[:]
 
-    myused.append([x,y]); #use the current spot
+    myused.append((x,y)); #use the current spot
     myword = word + board[x][y].lower() #add on to the word
 
     if myword in words: #if the word is in the list of possible words
         found.append(myword)
+        # found[myword] = myused
         words.remove(myword)
     if not any(re.search("^" + myword, word) for word in words):
         return
-    for newx in range(x-1,x+2):
+    for newx in range(x-1,x+2): # +2 because range() is exclusive on the upper bound
         for newy in range(y-1,y+2):
             if (newx>=0 and newy>=0 and newx<size and newy<size and not [newx,newy] in myused):
                 solve_aux(newx, newy, myword, myused, board, words, found, size)
 
 def solve(game):
+    start = time.time()
     board = game["board"]
     minWordLength = game["letters"]
     size = len(board)
@@ -114,7 +134,7 @@ def solve(game):
                 excluded.remove(letter) #remove the letter from excluded
             if letter == 'Qu' and 'U' in excluded: #if the letter is in excluded
                 excluded.remove('U') #remove the letter from excluded
-            for newx in range(x-1,x+2):
+            for newx in range(x-1,x+2): # +2 because range() is exclusive on the upper bound
                 for newy in range(y-1,y+2):
                     if (newx>=0 and newy>=0 and newx<size and newy<size
                             and not (newx == x and newy == y)):
@@ -144,6 +164,7 @@ def solve(game):
     score = 0
     numwords = 0
     found = []
+    # found = {}
 
     for x in range(size):
         for y in range(size):
@@ -151,11 +172,20 @@ def solve(game):
             word = ""
             solve_aux(x, y, word, used, board, words, found, size)
     
+    score = 0
+    for word in found:
+        score += calculatePoints(word)
+    
     game["board"] = board
     game["words"] = found
+    # game["paths"] = found
+    game["maxScore"] = score
+    game["maxWords"] = len(found)
+    game["timeToSolve"] = time.time() - start
     return game
 
-# print(solve(create(size=8, letters=4, minutes=6)))
+# print(create(size=4, letters=3, minutes=3))
+# print(solve(create(size=7, letters=4, minutes=6)))
 # print(solve({'board': [['U', 'E', 'T'], ['O', 'M', 'D'], ['S', 'D', 'Y']], 'letters': 3, 'minutes': 6}))
 
 def tableRow(row, tableItem='td'):
@@ -198,17 +228,6 @@ def display(board, buttons):
     text += "</table></font></h1>"
     return text
 
-def calculatePoints(word):
-    length = len(word)
-    if length < 7:
-        points = length - 3
-    elif length == 7:
-        points = 5
-    else:
-        points = 11
-    if points < 1:
-        points = 1;
-    return points
 
 """
 This method doesn't return html, but JSON data for JS to digest.
@@ -217,6 +236,21 @@ to update part of the page without reloading the whole thing.
 """
 def request_data(form):
     request = form["request"]
+    if request == "game":
+        return {
+            "game": {
+                "gameID": 13,
+                "isStarted": False,
+                "isDone": False,
+                "timeLeft": 180,
+                "size": 5,
+                "letters": 4,
+                "minutes": 3,
+                "players": ["johanv", "JonV", "monarchofmany"],
+                "board": [['R', 'T', 'C', 'Y'], ['S', 'O', 'E', 'G'], ['R', 'N', 'U', 'N'], ['I', 'E', 'H', 'I']],
+                'maxScore': 59, 'maxWords': 50, 'timeToSolve': 1.1375064849853516
+            }
+        }
     if request == "games":
         return {
             "games": [
@@ -225,7 +259,7 @@ def request_data(form):
                     "isStarted": False,
                     "isDone": False,
                     "timeLeft": 180,
-                    "size": "5x5",
+                    "size": 5,
                     "letters": 4,
                     "minutes": 3,
                     "players": ["johanv", "JonV", "monarchofmany"]
@@ -235,7 +269,7 @@ def request_data(form):
                     "isStarted": True,
                     "isDone": False,
                     "timeLeft": 243,
-                    "size": "5x5",
+                    "size": 5,
                     "letters": 4,
                     "minutes": 5,
                     "players": ["johanv", "JonV", "monarchofmany"]
@@ -245,7 +279,7 @@ def request_data(form):
                     "isStarted": True,
                     "isDone": True,
                     "timeLeft": 0,
-                    "size": "4x4",
+                    "size": 4,
                     "letters": 3,
                     "minutes": 3,
                     "players": ["johanv", "JonV", "monarchofmany"]

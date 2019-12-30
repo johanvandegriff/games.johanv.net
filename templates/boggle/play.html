@@ -1,25 +1,43 @@
 {% include 'header.html' %}
 
-<div class="gameArea"><form method="get">
+<div id="app" class="gameArea extraSpace"><form method="get">
     <div class="leftCol">
         <h1 class="scale">Boggle 2.0<span class="hideLarge"> Time: 2:46</span></h1>
-        <img src="/static/boggle/5x5.png" style="width: 70%">
-        <p class="scale">Words need at least {{ minLetters }} letters!</p>
+        <table v-if="game != undefined" class="boggleBoard"><tbody>
+            <tr v-for="row in game.board">
+                <td v-for="item in row">
+                    <div onclick="app.letterClick(this)">
+                        <span v-if="item == 'Qu'" v-bind:style="styleObjectQu">[[ item ]]</span>
+                        <span v-else v-bind:style="styleObject">[[ item ]]</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody></table>
     </div>
     <div class="rightCol">
         <h1 class="scale hideSmall">Time: 2:46</h1>
-        <input type="text" class="underlineText" id="name" name="username" placeholder="Word" required autofocus  style="float: left; margin: 10px;"/>
-        <input class="greenButton" type="submit" value="Add" style="float: left; margin: 10px;"/>
-        <input class="redButton" type="submit" value="X" style="float: left; margin: 10px;"/>
+        <form>
+            <input type="text" class="underlineText" id="name" name="username" placeholder="Word" required autofocus  style="float: left; margin: 10px;"/>
+            <input class="greenButton" type="submit" value="Add" style="float: left; margin: 10px;"/>
+            <input class="redButton" type="submit" value="X" style="float: left; margin: 10px;"/>
+        </form>
         <br/><br/><br/>
-        <div style="border-bottom: 2px solid black;">tintless, tossers, adorn, ascend, carless, extents, lessoned</div>
-        <br/>
+        <p style="border-bottom: 2px solid black;">tintless, tossers, adorn, ascend, carless, extents, lessoned</p>
+        <p v-if="game != undefined" style="font-size: .9em;">Words need at least [[ game.letters ]] letters!</p>
         {% if isHost %}
         host (you): {{ username }}<br/>
         {% else %}
         host: {{ host }}<br/>
         you: {{ username }}<br/>
         {% endif %}
+        <br/>
+        <form method="get">
+            <input type="hidden" name="username" value="{{ username }}"/>
+            <input type="hidden" name="action" value="cancel"/>
+            <input type="hidden" name="page" value="lobby"/>
+            <input class="redButton" type="submit" value="Leave Game"/>
+        </form>
+        <br/>
         <h2>3 players total</h2>
         johanv, JonV, monarchofmany
     </div>
@@ -27,4 +45,64 @@
 </form></div>
 
 {% include 'boggle/common.html' %}
+
+<script src="/static/socket.io-2.3.0.js"></script>
+
+<script>
+    const app = new Vue ({
+        delimiters: ['[[',']]'],
+        el: "#app",
+        data: {
+            game: undefined,
+            styleObject: undefined,
+            styleObjectQu: undefined
+        },
+        created () {
+            fetch('?request=game')
+            .then(response => response.json())
+            .then(json => {
+                this.game = json.game
+                console.log(this.game)
+                this.updateLetterSize()
+            })
+        },
+        methods: {
+            //show time in the mm:ss format, with zero-padding on the seconds
+            showTime: function (t) {
+                var minutes = Math.floor(t / 60);
+                var seconds = (t % 60);
+                return minutes + ':' + (minutes < 10 ? '0' : '') + seconds;
+            },
+            updateLetterSize: function() {
+                if (window.innerWidth > 540) {
+                    fontSize = 27;
+                } else {
+                    fontSize = 50;
+                }
+                this.styleObject = {fontSize: (fontSize / this.game["size"]) + 'vw'};
+                this.styleObjectQu = {fontSize: (fontSize*.7 / this.game["size"]) + 'vw'};
+            },
+            letterClick: function(divItem) {
+                console.log(divItem.children[0].innerHTML);
+            }
+        }
+
+    });
+    
+    var socket = io({transports: ['websocket']});
+    socket.on('connect', function() {
+        // socket.emit('boggle', {request: 'games'});
+    });
+    socket.on('response', function(msg){
+        console.log(msg);
+        // if("games" in msg) {
+        //     app.games = msg["games"]
+        // }
+    });
+
+    window.onresize = function() {
+        app.updateLetterSize();
+    }
+</script>
+
 {% include 'footer.html' %}
