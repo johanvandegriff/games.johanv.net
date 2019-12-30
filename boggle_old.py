@@ -10,7 +10,7 @@ VIEW_GAME = 3
 PLAY_GAME = 4
 GAME_OVER = 5
 
-ROOT_DIR = "/srv/Boggle"
+ROOT_DIR = "/srv/Boggle_old"
 GAMES_FILE = os.path.join(ROOT_DIR, "games.json")
 GAME_DURATION = 3 * 60 * 1000 #3 minutes in milliseconds
 formMethod = "get"

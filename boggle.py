@@ -1,19 +1,19 @@
 from flask import render_template
-import sys, cgi, json, datetime, re, os, time, decimal, subprocess, random
+import sys, cgi, json, datetime, re, time, decimal, subprocess, random
 
 from nav import nav #file in same dir
 
 ROOT_DIR = "/srv/Boggle"
-GAMES_FILE = os.path.join(ROOT_DIR, "games.json")
+GAMES_FILE = ROOT_DIR + "/games.json"
 
-#replace quotes
-def rq(s):
-  return s.replace("'", "&apos;").replace('"', '&quot;')
-  #return cgi.escape(s).replace("'", "&apos;").replace('"', '&quot;')
+DEFINITIONS_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019WithDefinitions.json'
+WORD_LIST_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019.json'
 
-def create(size=5):
-    #all the dice found in boggle deluxe
-    dice = [
+# definitions = json.load(open(DEFINITIONS_FILE,'r'))
+# wordList = json.load(open(WORD_LIST_FILE,'r'))
+
+#all the dice found in boggle deluxe
+BOGGLE_DICE = [
         ['O','O','O','T','T','U'],
         ['D','H','H','N','O','T'],
         ['N','O','U','T','O','W'],
@@ -39,26 +39,38 @@ def create(size=5):
         ['D','H','H','O','L','R'],
         ['G','O','V','R','R','W'],
         ['K','Z','X','B','J','Qu']
-    ]
+]
 
-    if size > 5:
-        size = 5
+#the boggle alphabet
+ALPHABET = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
+            'N','O','P','Qu','R','S','T','U','V','W','X','Y','Z']
 
-    #the empty board
-    board = []
+#replace quotes
+def rq(s):
+  return s.replace("'", "&apos;").replace('"', '&quot;')
+  #return cgi.escape(s).replace("'", "&apos;").replace('"', '&quot;')
 
-    numbers = [] #the order of the dice
-    for i in range(len(dice)): #randomize the dice order
-        numbers.insert(random.randint(0, i),i)
+def create(size=5, letters=None, minutes=3):
+    if letters is None:
+        if size >=5: letters = 4
+        else: letters = 3
 
-    for i in range(size):
-        row = []
-        for j in range(size): #for each board spot
-            letter = dice[numbers[i*size+j]][random.randint(0,size)] #roll the dice
-            row.append(letter) #set the letter on the board
-        board.append(row)
-    return [board]
+    dice = [] #no dice
 
+    #until we have enough dice for this board size
+    while len(dice) < size*size:
+        #add a complete set of standard dice
+        dice.extend(BOGGLE_DICE[:])
+    #if the size is 5 or less, only 1 set is required
+    #if the size is 6 or 7, 2 sets are required, etc.
+
+    random.shuffle(dice)
+
+    #construct the board, nested item-by-item
+    board = [[dice[i*size+j][random.randint(0,5)] for j in range(size)] for i in range(size)]
+
+    #construct a dict with all the info
+    return {"board": board, "letters": letters, "minutes": minutes}
 
 #x, y: the current position on the board
 #word: the current word
@@ -81,30 +93,23 @@ def solve_aux(x, y, word, used, board, words, found, size):
             if (newx>=0 and newy>=0 and newx<size and newy<size and not [newx,newy] in myused):
                 solve_aux(newx, newy, myword, myused, board, words, found, size)
 
-def solve(game, minWordLength):
-    board = game[0]
+def solve(game):
+    board = game["board"]
+    minWordLength = game["letters"]
     size = len(board)
-
-    minwordlength = 4
-    if len(sys.argv) > 2 and sys.argv[2].isdigit():
-        minwordlength = int(sys.argv[2])
-
-    #the boggle alphabet
-    alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
-                'N','O','P','Qu','R','S','T','U','V','W','X','Y','Z']
 
     quantities = [] #the quantities of each letter
 
     excluded = [] #which letters are not on the board
-    for letter in alphabet:
+    for letter in ALPHABET:
         excluded.append(letter) #copy the alphabet to excluded
         quantities.append(0) #fill quantities with 0's
-        for letter2 in alphabet:
+        for letter2 in ALPHABET:
             excluded.append(letter + letter2)
     for x in range(size):
         for y in range(size):
             letter = board[x][y]
-            quantities[alphabet.index(letter)] += 1 #increase the quantity of the letter
+            quantities[ALPHABET.index(letter)] += 1 #increase the quantity of the letter
             if letter in excluded: #if the letter is in excluded
                 excluded.remove(letter) #remove the letter from excluded
             if letter == 'Qu' and 'U' in excluded: #if the letter is in excluded
@@ -123,15 +128,15 @@ def solve(game, minWordLength):
                             excluded.remove(seq) #remove the sequence from excluded
 
     #increase the number of U's by the number of Qu's
-    quantities[alphabet.index('U')] += quantities[alphabet.index('Qu')]
+    quantities[ALPHABET.index('U')] += quantities[ALPHABET.index('Qu')]
 
     words = [] #the list of possible words
-
-    for line in open(ROOT_DIR + "/lists/list.txt", 'r'): #sort through each word
-        line = line.strip() #remove the newline
-        if len(line) >= minwordlength: #if the word is long enough
+    
+    wordList = json.load(open(WORD_LIST_FILE,'r'))
+    for line in wordList: #sort through each word
+        if len(line) >= minWordLength: #if the word is long enough
             #if the word does not have too many of any letter
-            if not any(line.count(alphabet[i].lower()) > quantities[i] for i in range(len(alphabet))):
+            if not any(line.count(ALPHABET[i].lower()) > quantities[i] for i in range(len(ALPHABET))):
                 #if there are no letters not on the board in this word
                 if not any(letter.lower() in line for letter in excluded):
                     words.append(line); #add the word to the list of possible words
@@ -145,7 +150,13 @@ def solve(game, minWordLength):
             used = []
             word = ""
             solve_aux(x, y, word, used, board, words, found, size)
-    return [board, found]
+    
+    game["board"] = board
+    game["words"] = found
+    return game
+
+# print(solve(create(size=8, letters=4, minutes=6)))
+# print(solve({'board': [['U', 'E', 'T'], ['O', 'M', 'D'], ['S', 'D', 'Y']], 'letters': 3, 'minutes': 6}))
 
 def tableRow(row, tableItem='td'):
     text = ''

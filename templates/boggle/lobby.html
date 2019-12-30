@@ -108,13 +108,13 @@
         data: {
             games: []
         },
-        // created () {
-        //     fetch('?request=games')
-        //     .then(response => response.json())
-        //     .then(json => {
-        //         this.games = json.games
-        //     })
-        // },
+        created () {
+            fetch('?request=games')
+            .then(response => response.json())
+            .then(json => {
+                this.games = json.games
+            })
+        },
         methods: {
             //show time in the mm:ss format, with zero-padding on the seconds
             showTime: function (t) {
@@ -127,11 +127,13 @@
     
     var socket = io({transports: ['websocket']});
     socket.on('connect', function() {
-        socket.emit('boggle', {request: 'games'});
+        // socket.emit('boggle', {request: 'games'});
     });
     socket.on('response', function(msg){
-      console.log(msg);
-      app.games = msg["games"]
+        console.log(msg);
+        if("games" in msg) {
+            app.games = msg["games"]
+        }
     });
 </script>
 
