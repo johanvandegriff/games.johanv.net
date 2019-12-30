@@ -125,7 +125,7 @@
         }
     });
     
-    var socket = io();
+    var socket = io({transports: ['websocket']});
     socket.on('connect', function() {
         socket.emit('boggle', {request: 'games'});
     });
