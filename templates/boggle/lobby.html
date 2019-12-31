@@ -98,8 +98,6 @@
 
 {% include 'boggle/common.html' %}
 
-<script src="/static/socket.io-2.3.0.js"></script>
-
 <script>
     const app = new Vue ({
         delimiters: ['[[',']]'],
@@ -122,17 +120,6 @@
                 return minutes + ':' + (minutes < 10 ? '0' : '') + seconds;
             }
         }
-    });
-    
-    var socket = io({transports: ['websocket']});
-    socket.on('connect', function() {
-        // socket.emit('boggle', {request: 'games'});
-    });
-    socket.on('response', function(msg){
-        console.log(msg);
-        // if("games" in msg) {
-        //     app.games = msg["games"]
-        // }
     });
 </script>
 

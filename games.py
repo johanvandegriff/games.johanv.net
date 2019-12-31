@@ -1,5 +1,4 @@
 from flask import Flask, request, render_template, url_for
-from flask_socketio import SocketIO, send, emit
 
 import os, re, sys
 
@@ -8,7 +7,6 @@ from nav import nav
 import profanity_test
 
 app = Flask(__name__)
-socketio = SocketIO(app)
 
 def run_perl_blacklist(s):
     singlequote = "'"
@@ -106,28 +104,11 @@ def showmaze_page():
     return run_perl_page(request, "showmaze.pl", "Maze")
 #END MAZE
 
-#START SOCKET.IO GENERIC
-@socketio.on('connect')
-def socketio_connect():
-    print('socket.io client connected')
-    # emit('ack', {'data': 'connected'})
-
-@socketio.on('disconnect')
-def socketio_disconnect():
-    print('socket.io client disconnected')
-#END SOCKET.IO GENERIC
-
 #START BOGGLE
 @app.route("/boggle", methods=["GET", "POST"])
 def boggle_page():
     print('boggle http request: ', request.args)
     return boggle.app(request.args)
-
-@socketio.on('boggle')
-def handle_json(json):
-    print('boggle socket.io request: ', json)
-    response = boggle.app(json)
-    emit('response', response)
 #END BOGGLE
 
 #START BOGGLE_OLD
@@ -165,4 +146,4 @@ def carl_page():
 #END CARL
 
 if __name__ == "__main__":
-    socketio.run(app)
+    app.run()
