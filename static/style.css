@@ -59,6 +59,10 @@ a.svg {
   width:100%;
 }
 
+#titleText, #asciiArt, #asciiArtSmall {
+  overflow: hidden;
+}
+
 .main {
   margin: 0;
   margin-top: 185px;
@@ -459,8 +463,6 @@ nav:hover #navDropdown {
 
 
 
-
-
   #titleText {
     display: none;
   }
@@ -523,13 +525,11 @@ nav:hover #navDropdown {
 
 
   nav {
-    /*   margin: auto; */
-    /*   margin-top: 40px; */
+      margin: auto;
       position: relative;
-    /*   width: 50vw; */
-    /*   min-width: 320px; */
       height: 50px;
   }
+
   #navToggle:checked ~ul {
     height: 0%;
   }
@@ -539,31 +539,18 @@ nav:hover #navDropdown {
     margin-top: 0;
     list-style: none;
     overflow: hidden;
-    text-align: right;
     margin-bottom: 22px;
     text-align: center;
     transition: all .4s ease-out;
-    height: 100%;
-    
   }
+  
   nav ul li {
-    border-radius: 2px;
+    border-radius: 6px;
+    margin:5px 5px;
+    text-align: center;
+    background-color: #555;
     position: relative;
-    display: inline-block;
-    margin-left: 35px;
-    line-height: 1.5;
-    width: 100%;
-    margin: 0;
-    margin-bottom: 5px;
-    box-shadow: 2px 2px 10px -2px rgba(0,0,0,.35);
-  }
-  nav ul a {
     display: block;
-    text-transform: lowercase;
-    font-size: 18px;
-    font-weight: 200;
-    text-decoration: none;
-    transition: color .3s;
   }
 }
 

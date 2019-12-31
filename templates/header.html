@@ -9,6 +9,13 @@ The source code is available at: https://gitlab.com/johanvandegriff/games.johanv
 <meta name="description" content="Johan Vandegriff's collection of games.">
 <link rel="icon" href="/static/favicon.ico?" type="image/x-icon">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  @media not all and (max-width: 540px) {
+    nav ul li {
+      width:{{ 100.0/nav|length() }}%
+    }
+  }
+</style>
 </head>
 <body>
 <div class="ribbon"><header><a href="/" class="green"><pre id="titleText">games.johanv.xyz</pre><pre id="asciiArtSmall"> 
@@ -29,7 +36,7 @@ The source code is available at: https://gitlab.com/johanvandegriff/games.johanv
 </a></header>
 <nav><div id="navDropdown">&#9776;</div><input id="navToggle" type="checkbox" checked><ul>
 {% for item in nav %}
-<li{% if active == item[0] %} class="active"{% endif %} style="width:{{ 100.0/nav|length() }}%"><a href="{% if active == item[0] %}#{% else %}{{ item[1] }}{% endif %}">{{ item[0] }}</a></li>
+<li{% if active == item[0] %} class="active"{% endif %}><a href="{% if active == item[0] %}#{% else %}{{ item[1] }}{% endif %}">{{ item[0] }}</a></li>
 {% endfor %}
 </ul></nav></div>
 <div class="main">
