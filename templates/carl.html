@@ -2,13 +2,18 @@
 
 <form method="GET">
 <input type="checkbox" style="border: 1px solid black" name="profanity" value="true"{% if allowProfanity %} checked{% endif %}>Allow Profanity?<br/>
-<div style="font-size:35px">
+<div style="font-size:25px">
 <span style="color: #3b3">CARL: {{ carl }}</span><br/>
 <span class="purple">YOU: {{ user }}</span><br/>
 <span style="color: #3b3">CARL: {{ carl2 }}</span><br/>
-<span class="purple">YOU:</span> <input autofocus="autofocus" onfocus="this.select()" type="text" name="user" autocomplete="off" style="height:50px; font-size: 30px; width: 100%">
-<input type="hidden" name="carl" value="{{ carl2 }}"><br/>
-<input type="submit" value="Talk">
+<input type="hidden" name="carl" value="{{ carl2 }}">
+
+<div>
+    <span class="purple" style="float: left">YOU:</span>&nbsp;
+    <input type="submit" value="Talk" class="purpleButton" style="float:right">
+    <input autofocus type="text" name="user" autocomplete="off" style="height:25px; font-size: 20px; width: calc(100% - 160px); min-width: 100px;"><br/>
+</div>
+
 </div></form>
 <br/><br/>
 <h1>About</h1>
