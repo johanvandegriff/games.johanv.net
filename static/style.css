@@ -383,7 +383,7 @@ table.boggleBoard tbody tr td {
   border: 1px solid black;
   border-radius: .75em;
   /* background-color: #aaa; */
-  background-image: linear-gradient(#bbb, #777);
+  background-image: linear-gradient(#b8b8b8, #585858);
   color: #238;
   vertical-align: middle;
 }
@@ -505,6 +505,9 @@ nav:hover #navDropdown {
   #asciiArt {
     display: none;
   }
+  #asciiArtSmall {
+    display: none;
+  }
   .ribbon {
     height: 80px;
   }
@@ -561,5 +564,18 @@ nav:hover #navDropdown {
     font-weight: 200;
     text-decoration: none;
     transition: color .3s;
+  }
+}
+
+
+@media all and (max-width: 915px) {
+  #asciiArt {
+    display: none;
+  }
+}
+
+@media not all and (max-width: 915px) {
+  #asciiArtSmall {
+    display: none;
   }
 }
