@@ -1,6 +1,6 @@
 {% include 'header.html' %}
 
-<div id="app" class="gameArea extraSpace">
+<div id="app" class="gameArea extraSpace" v-cloak>
     <div class="leftCol">
         <h1 class="scale">Boggle 2.0<span class="hideLarge"> Time: 2:46</span></h1>
         <table v-if="game != undefined" class="boggleBoard noselect"><tbody>
@@ -168,6 +168,14 @@
                 console.log(event)
                 self.enterLetter(event.key);
             });
+            this.$nextTick(function () {
+                // Code that will run only after the
+                // entire view has been rendered
+            })
+            setTimeout(() => { // setTimeout to put this into event queue
+                // executed after render
+                location.href="#app";
+            }, 500)
         }
     });
 </script>

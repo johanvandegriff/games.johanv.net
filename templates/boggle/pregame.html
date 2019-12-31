@@ -1,6 +1,6 @@
 {% include 'header.html' %}
 
-<div id="app" class="gameArea"><form method="get">
+<div id="app" class="gameArea" v-cloak><form method="get">
     <div class="leftCol">
         <h1 class="scale" style="margin-bottom: 1em">Boggle 2.0</h1>
         <p class="scale" v-if="game != undefined">
@@ -29,7 +29,7 @@
             <input type="hidden" name="action" value="cancel"/>
             <input type="hidden" name="page" value="lobby"/>
             <input class="redButton" style="float: left; margin: 10px;" type="submit" value="Cancel" v-if="isHost"/>
-            <input class="redButton" style="float: left; margin: 10px;" type="submit" value="Leave Game" v-else/>
+            <input class="redButton" style="float: left; margin: 10px;" type="submit" value="Leave Game" v-if="isNotHost"/>
         </form>
         <br/><br/>
     </div>
@@ -51,7 +51,8 @@
         data: {
             game: undefined,
             username: "{{ username }}",
-            isHost: false
+            isHost: false,
+            isNotHost: false
         },
         created () {
             fetch('?request=game&id={{ id }}')
@@ -60,6 +61,7 @@
                 this.game = json.game
                 console.log(this.game)
                 this.isHost = (this.game.players[0] == this.username)
+                this.isNotHost = !isHost;
             })
         }
     });

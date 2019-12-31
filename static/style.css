@@ -350,13 +350,22 @@ input:checked + label{
   width: 30%
 }
 
-.leftCol3 {
+.highscores {
   width: 40%;
   padding: 0;
   position:absolute;
-  top:260px;
+  top:250px;
   bottom:0px;
   left: 0;
+  overflow-y:scroll;
+}
+
+.gamesTable {
+  width: 60%;
+  position:absolute;
+  top:250px;
+  bottom:0px;
+  right: 0;
   overflow-y:scroll;
 }
 
@@ -374,15 +383,6 @@ input:checked + label{
   overflow-y:scroll;
 }
 
-
-.gamesTable {
-  width: 60%;
-  position:absolute;
-  top:260px;
-  bottom:0px;
-  right: 0;
-  overflow-y:scroll;
-}
 
 table.boggleBoard {
   margin: 0 auto;
@@ -468,6 +468,7 @@ nav:hover #navDropdown {
 }
 
 
+[v-cloak] { display: none; }
 
 
 
@@ -485,6 +486,16 @@ nav:hover #navDropdown {
   }
   .ribbon {
     height: 115px;
+  }
+  .gamesTable {
+    top:175px;
+    /* top: 350px; */
+    /* top: 60%; */
+  }
+  .highscores {
+    top:175px;
+    /* bottom:350px; */
+    /* bottom: 40%; */
   }
 }
 
@@ -534,11 +545,13 @@ nav:hover #navDropdown {
     top: 290px;
   }
   .gamesTable {
-    top: 350px;
+    /* top: 350px; */
+    top: 60%;
   }
-  .leftCol3 {
-    top:130px;
-    bottom:350px;
+  .highscores {
+    top:125px;
+    /* bottom:350px; */
+    bottom: 40%;
   }
 
 
