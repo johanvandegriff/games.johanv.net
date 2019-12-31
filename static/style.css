@@ -65,7 +65,7 @@ a.svg {
 
 .main {
   margin: 0;
-  margin-top: 185px;
+  margin-top: 180px;
   padding: 0;
 }
 
@@ -245,16 +245,20 @@ p.scale {
 }
 
 
-input[type="submit"].greenButton, input[type="submit"].purpleButton, input[type="submit"].redButton, input[type="submit"].blueButton {
+.greenButton, .purpleButton, .redButton, .blueButton, .grayButton {
   font-size: 1em;
-  /* width: 50%; */
   height: 2em;
-  background: #10ee10;
+  /* background: #10ee10; */
   /* text-align: center; */
   /* margin: 0 auto; */
   border-radius: 0.3em;
   border: 2px solid black;
   /* display: inline-block; */
+}
+
+.bigButton {
+  font-size: 2em;
+  margin: 3px;
 }
 
 input[type="submit"].greenButton{
@@ -268,7 +272,7 @@ input[type="submit"].purpleButton {
 
 input[type="submit"].redButton {
   background: #f00;
-  /* color: white; */
+  color: white;
 }
 
 input[type="submit"].blueButton {
@@ -276,8 +280,12 @@ input[type="submit"].blueButton {
   /* color: white; */
 }
 
+input[type="submit"].grayButton {
+  background: #ccc;
+}
 
-input[type="text"].underlineText {
+
+.underlineText {
   font-size: 0.8em;
   margin: 1em auto;
   padding: .5em .6em;
@@ -412,6 +420,20 @@ table.boggleBoard tbody tr td div span {
   padding: 0;
 }
 
+/* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting#4407335 */
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+}
+
+
+
+
 
 
 #navToggle {
@@ -459,10 +481,10 @@ nav:hover #navDropdown {
     display: none;
   }
   .main {
-    margin-top: 150px;
+    margin-top: 115px;
   }
   .ribbon {
-    height: 150px;
+    height: 115px;
   }
 }
 

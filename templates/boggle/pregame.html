@@ -1,41 +1,68 @@
 {% include 'header.html' %}
 
-<div class="gameArea"><form method="get">
+<div id="app" class="gameArea"><form method="get">
     <div class="leftCol">
         <h1 class="scale" style="margin-bottom: 1em">Boggle 2.0</h1>
-        <p class="scale">
-            5x5 | 4 letters or more | 3 minutes<br/>
-            {% if host == username %}
-            host (you): {{ username }}<br/>
-            {% else %}
-            host: {{ host }}<br/>
-            you: {{ username }}<br/>
-            {% endif %}
+        <p class="scale" v-if="game != undefined">
+            Game #[[ game.id ]]<br/>
+            [[ game.size ]]x[[ game.size ]], [[ game.letters ]] letters, [[ game.minutes ]] min<br/>
+            <span v-if="isHost">
+                host (you): [[ username ]]<br/>
+            </span>
+            <span v-else>
+                host: [[ game.players[0] ]]<br/>
+                you: [[ username ]]<br/>
+            </span>
             Waiting for players...<br/>
         </p>
-        {% if host == username %}
-        <form method="get">
-            <input type="hidden" name="username" value="{{ username }}"/>
-            <input type="hidden" name="page" value="play"/>
-            <input class="greenButton" style="float: left; margin: 10px;" type="submit" value="Begin"/>
-        </form>
-        {% endif %}
+        <span v-if="isHost">
+            <form method="get">
+                <input type="hidden" name="username" value="{{ username }}"/>
+                <input type="hidden" name="action" value="start"/>
+                <input type="hidden" name="id" value="{{ id }}"/>
+                <input type="hidden" name="page" value="play"/>
+                <input class="greenButton" style="float: left; margin: 10px;" type="submit" value="Begin"/>
+            </form>
+        </span>
         <form method="get">
             <input type="hidden" name="username" value="{{ username }}"/>
             <input type="hidden" name="action" value="cancel"/>
             <input type="hidden" name="page" value="lobby"/>
-            <input class="redButton" style="float: left; margin: 10px;" type="submit" value="{% if host == username %}Cancel{% else %}Leave Game{% endif %}"/>
+            <input class="redButton" style="float: left; margin: 10px;" type="submit" value="Cancel" v-if="isHost"/>
+            <input class="redButton" style="float: left; margin: 10px;" type="submit" value="Leave Game" v-else/>
         </form>
         <br/><br/>
     </div>
     <div class="rightCol">
         <h2>3 players total</h2>
-        <p class="scale">
-            johanv, JonV, monarchofmany
+        <p class="scale" v-if="game != undefined">
+            <span v-for="(player, i) in game.players"><span v-if="i>0">, </span>[[ player ]]</span>
         </p>
     </div>
     <div class="singleCol"></div>
 </form></div>
 
 {% include 'boggle/common.html' %}
+
+<script>
+    const app = new Vue ({
+        delimiters: ['[[',']]'],
+        el: "#app",
+        data: {
+            game: undefined,
+            username: "{{ username }}",
+            isHost: false
+        },
+        created () {
+            fetch('?request=game&id={{ id }}')
+            .then(response => response.json())
+            .then(json => {
+                this.game = json.game
+                console.log(this.game)
+                this.isHost = (this.game.players[0] == this.username)
+            })
+        }
+    });
+</script>
+
 {% include 'footer.html' %}

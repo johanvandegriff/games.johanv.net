@@ -81,8 +81,10 @@ def create(size=5, letters=None, minutes=3):
         "board": board,
         "isStarted": False,
         "isDone": False,
-        "players": []
-        #TODO: gameID
+        "players": [],
+        "timeCreatedSecond": int(time.time()),
+        "secondsLeft": minutes*60
+        #TODO: id
         #TODO: timeLeft, or change to startTime
     }
     return game
@@ -181,12 +183,38 @@ def solve(game):
     # game["paths"] = found
     game["maxScore"] = score
     game["maxWords"] = len(found)
-    game["timeToSolve"] = time.time() - start
+    game["secondsToSolve"] = time.time() - start
     return game
 
 # print(create(size=4, letters=3, minutes=3))
 # print(solve(create(size=7, letters=4, minutes=6)))
 # print(solve({'board': [['U', 'E', 'T'], ['O', 'M', 'D'], ['S', 'D', 'Y']], 'letters': 3, 'minutes': 6}))
+
+
+def saveGamesFile(games):
+    json.dump(games, open(GAMES_FILE, 'w'), indent=2) # indentation for development and debugging
+    # json.dump(games, open(GAMES_FILE, 'w'))
+
+def loadGamesFile():
+    try:
+        games = json.load(open(GAMES_FILE, 'r'))
+    except FileNotFoundError:
+        # if the file doesn't exist, create it with an empty list
+        games = []
+        saveGamesFile(games)
+    return games
+
+def getGameByID(id):
+    for game in loadGamesFile():
+        if game["id"] == id:
+            return game
+    return None
+
+# games = loadGamesFile()
+# g = solve(create(size=3))
+# g["id"] = 102
+# games.append(g)
+# saveGamesFile(games)
 
 def tableRow(row, tableItem='td'):
     text = ''
@@ -208,27 +236,6 @@ def table(rows, properties, head=True):
     return text + '</table>'
 
 
-def display(board, buttons):
-    text = ""
-    size = len(board)
-
-    text += '<h1><font color="black"><table style="background-color:black">'
-    for i in range(size):
-        text += "<tr>"
-        for j in range(size):
-            letter = board[i][j]
-            if letter == "Qu":
-                space = ""
-            else:
-                space = "&nbsp;"
-            if buttons == 1:
-                letter = '<a style="text-decoration:none;color:#000000" href="javascript:type(\'' + letter.lower() + '\')">' + letter + '</a>'
-            text += '<td width="62" height="62" background="/static/boggle/letter.bmp">&thinsp;' + space + letter + "</td>"
-        text += "</tr>"
-    text += "</table></font></h1>"
-    return text
-
-
 """
 This method doesn't return html, but JSON data for JS to digest.
 It is called with AJAX requests, and the data will be formatted
@@ -237,55 +244,21 @@ to update part of the page without reloading the whole thing.
 def request_data(form):
     request = form["request"]
     if request == "game":
-        return {
-            "game": {
-                "gameID": 13,
-                "isStarted": False,
-                "isDone": False,
-                "timeLeft": 180,
-                "size": 5,
-                "letters": 4,
-                "minutes": 3,
-                "players": ["johanv", "JonV", "monarchofmany"],
-                "board": [['R', 'T', 'C', 'Y'], ['S', 'O', 'E', 'G'], ['R', 'N', 'U', 'N'], ['I', 'E', 'H', 'I']],
-                'maxScore': 59, 'maxWords': 50, 'timeToSolve': 1.1375064849853516
-            }
-        }
+        if "id" in form:
+            id = int(form["id"])
+            game = getGameByID(id)
+            if game is None:
+                print("game request with id {}, game not found".format(id))
+                return {}
+            else:
+                print("game request with id {}, game found".format(id))
+                return {"game": game}
+        else:
+            print("game request with no id")
+            return {}
     if request == "games":
-        return {
-            "games": [
-                {
-                    "gameID": 13,
-                    "isStarted": False,
-                    "isDone": False,
-                    "timeLeft": 180,
-                    "size": 5,
-                    "letters": 4,
-                    "minutes": 3,
-                    "players": ["johanv", "JonV", "monarchofmany"]
-                },
-                {
-                    "gameID": 12,
-                    "isStarted": True,
-                    "isDone": False,
-                    "timeLeft": 243,
-                    "size": 5,
-                    "letters": 4,
-                    "minutes": 5,
-                    "players": ["johanv", "JonV", "monarchofmany"]
-                },
-                {
-                    "gameID": 11,
-                    "isStarted": True,
-                    "isDone": True,
-                    "timeLeft": 0,
-                    "size": 4,
-                    "letters": 3,
-                    "minutes": 3,
-                    "players": ["johanv", "JonV", "monarchofmany"]
-                }
-            ]
-        }
+        return {"games": loadGamesFile()}
+
     return {}
 
 def do_action(form):
@@ -293,7 +266,9 @@ def do_action(form):
 
     if action == "cancel":
         #TODO: delete a game if you are the host, otherwise remove the player from it
-        return
+        return form
+
+    return form
 
 def load_page(form):
     if not "username" in form:
@@ -308,26 +283,22 @@ def load_page(form):
 
     username = form["username"]
 
-    if page == "pregame":
-        if "gameID" in form:
-            gameID = form["gameID"]
-            host = "hostman"
-        else:
-            gameID = 1
-            host = username
-        return render_template("boggle/pregame.html", host=host, gameID=gameID, username=username, nav=nav, active="Boggle")
-
     if page == "lobby":
         return render_template("boggle/lobby.html", username=username, nav=nav, active="Boggle")
 
-    if page == "play":
-        if "gameID" in form:
-            gameID = form["gameID"]
-            host = "hostman"
+    if page == "pregame":
+        if "id" in form:
+            id = form["id"]
         else:
-            gameID = 1
-            host = username
-        return render_template("boggle/play.html", host=host, gameID=gameID, username=username, nav=nav, active="Boggle")
+            id = 100
+        return render_template("boggle/pregame.html", id=id, username=username, nav=nav, active="Boggle")
+
+    if page == "play":
+        if "id" in form:
+            id = form["id"]
+        else:
+            id = 101
+        return render_template("boggle/play.html", id=id, username=username, nav=nav, active="Boggle")
 
     if page == "view":
         if "prev" in form:
@@ -361,7 +332,7 @@ request - ask for a certain type of data, such as current
 """
 def app(form):
     if "action" in form:
-        do_action(form)
+        form = do_action(form)
     
     if "request" in form:
         return request_data(form)

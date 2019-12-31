@@ -1,14 +1,14 @@
 {% include 'header.html' %}
 
-<div id="app" class="gameArea extraSpace"><form method="get">
+<div id="app" class="gameArea extraSpace">
     <div class="leftCol">
         <h1 class="scale">Boggle 2.0<span class="hideLarge"> Time: 2:46</span></h1>
-        <table v-if="game != undefined" class="boggleBoard"><tbody>
-            <tr v-for="row in game.board">
-                <td v-for="item in row">
-                    <div onclick="app.letterClick(this)">
-                        <span v-if="item == 'Qu'" v-bind:style="styleObjectQu">[[ item ]]</span>
-                        <span v-else v-bind:style="styleObject">[[ item ]]</span>
+        <table v-if="game != undefined" class="boggleBoard noselect"><tbody>
+            <tr v-for="(row, i) in game.board">
+                <td v-for="(item, j) in row">
+                    <div onclick="app.letterClick(this)" ontouchstart="app.letterTap(this, event)" ontouchmove="app.letterDrag(this, event)" ontouchend="app.letterRelease(this, event)">
+                        <span v-if="item == 'Qu'" v-bind:style="styleObjectQu" v-bind:i="i" v-bind:j="j">[[ item ]]</span>
+                        <span v-else v-bind:style="styleObject" v-bind:i="i" v-bind:j="j">[[ item ]]</span>
                     </div>
                 </td>
             </tr>
@@ -16,20 +16,23 @@
     </div>
     <div class="rightCol">
         <h1 class="scale hideSmall">Time: 2:46</h1>
-        <form>
-            <input type="text" class="underlineText" id="name" name="username" placeholder="Word" required autofocus  style="float: left; margin: 10px;"/>
-            <input class="greenButton" type="submit" value="Add" style="float: left; margin: 10px;"/>
-            <input class="redButton" type="submit" value="X" style="float: left; margin: 10px;"/>
-        </form>
-        <br/><br/><br/>
-        <p style="border-bottom: 2px solid black;">tintless, tossers, adorn, ascend, carless, extents, lessoned</p>
+        <p class="scale" style="border: 2px solid black; overflow-wrap: break-word; padding: 5px;" onclick="app.buttonClick('Enter')" ontouchstart="app.buttonTap('Enter', event)">[[ word ]]&nbsp;</p>
+        <button onclick="app.buttonClick('Enter')" ontouchstart="app.buttonTap('Enter', event)" class="grayButton bigButton">Enter</button>
+        <button onclick="app.buttonClick('Backspace')" ontouchstart="app.buttonTap('Backspace', event)" class="grayButton bigButton">&#9003;</button>
+        <button onclick="app.buttonClick('Escape')" ontouchstart="app.buttonTap('Escape', event)" class="grayButton bigButton">Clear</button>
+
+        <p style="border-bottom: 2px solid black; overflow-wrap: break-word;">
+            <span v-for="(word, i) in words"><span v-if="i>0">, </span>[[ word ]]</span>
+        </p>
         <p v-if="game != undefined" style="font-size: .9em;">Words need at least [[ game.letters ]] letters!</p>
-        {% if isHost %}
-        host (you): {{ username }}<br/>
-        {% else %}
-        host: {{ host }}<br/>
-        you: {{ username }}<br/>
-        {% endif %}
+        <span v-if="game != undefined">Game #[[ game.id ]]</span><br/>
+        <span v-if="isHost">
+            host (you): [[ username ]]<br/>
+        </span>
+        <span v-else-if="game != undefined">
+            host: [[ game.players[0] ]]<br/>
+            you: [[ username ]]<br/>
+        </span>
         <br/>
         <form method="get">
             <input type="hidden" name="username" value="{{ username }}"/>
@@ -39,10 +42,12 @@
         </form>
         <br/>
         <h2>3 players total</h2>
-        johanv, JonV, monarchofmany
+        <p class="scale" v-if="game != undefined">
+            <span v-for="(player, i) in game.players"><span v-if="i>0">, </span>[[ player ]]</span>
+        </p>
     </div>
     <div class="singleCol"></div>
-</form></div>
+</div>
 
 {% include 'boggle/common.html' %}
 
@@ -52,16 +57,31 @@
         el: "#app",
         data: {
             game: undefined,
+            numQu: 0,
             styleObject: undefined,
-            styleObjectQu: undefined
+            styleObjectQu: undefined,
+            word: "",
+            words: [],
+            username: "{{ username }}",
+            isHost: false,
+            swipe: []
         },
         created () {
-            fetch('?request=game')
+            fetch('?request=game&id={{ id }}')
             .then(response => response.json())
             .then(json => {
                 this.game = json.game
                 console.log(this.game)
+                this.isHost = (this.game.players[0] == this.username)
                 this.updateLetterSize()
+                this.numQu = 0;
+                for (var i=0; i<this.game.board.length; i++) {
+                    for (var j=0; j<this.game.board[i].length; j++) {
+                        if (this.game.board[i][j] == "Qu") {
+                            this.numQu++;
+                        }
+                    }
+                }
             })
         },
         methods: {
@@ -77,19 +97,79 @@
                 } else {
                     fontSize = 50;
                 }
-                this.styleObject = {fontSize: (fontSize / this.game["size"]) + 'vw'};
-                this.styleObjectQu = {fontSize: (fontSize*.7 / this.game["size"]) + 'vw'};
+                this.styleObject = {fontSize: (fontSize / this.game.size) + 'vw'};
+                this.styleObjectQu = {fontSize: (fontSize*.7 / this.game.size) + 'vw'};
             },
             letterClick: function(divItem) {
-                console.log(divItem.children[0].innerHTML);
+                this.enterLetter(divItem.children[0].innerHTML);
+            },
+            letterTap: function(divItem, event) {
+                event.preventDefault();
+                this.swipe = [];
+            },
+            letterDrag: function(divItem, event) {
+                var touch = event.targetTouches[0]
+                var x = touch.clientX;
+                var y = touch.clientY;
+                var item = document.elementFromPoint(x, y);
+                if (item.tagName == "SPAN") {
+                    var i = item.getAttribute("i");
+                    var j = item.getAttribute("j");
+                    if (!this.swipe.includes(i+","+j)) {
+                        this.swipe.push(i+","+j);
+                        console.log(x, y, i, j, item);
+                        this.enterLetter(item.innerHTML);
+                    }
+                }
+
+            },
+            letterRelease: function(divItem, event) {
+                if (this.swipe.length == 0) {
+                    this.letterClick(divItem);
+                }
+            },
+            buttonClick: function(key) {
+                this.enterLetter(key);
+            },
+            buttonTap: function(key, event) {
+                event.preventDefault();
+                this.buttonClick(key);
+            },
+            enterLetter: function(key) {
+                console.log(key);
+                if (key == "Enter" || key == " " || key == ",") {
+                    if (this.word.length >= this.game.letters) {
+                        this.words.push(this.word.toLowerCase());
+                        this.word = "";
+                    }
+                } else if (key == "Escape") {
+                    this.word = "";
+                } else if (key == "Backspace") {
+                    this.word = this.word.slice(0, -1);
+                } else if (this.game != undefined && this.word.length < (this.game.size*this.game.size + this.numQu)) {
+                    //only accept a-z, ignoring case but converting to upper
+                    var letterPattern = /^[A-Z]$/i;
+                    if (!key.search(letterPattern) || key == "Qu") {
+                        this.word += key.toUpperCase();
+                    }
+                }
             }
+        },
+        mounted () {
+            let self = this;
+            window.onresize = function() {
+                self.updateLetterSize();
+            }
+            window.addEventListener('keydown', function(event) {
+                if (event.key == " ") {
+                    //disable scrolling the page on spacebar
+                    event.preventDefault();
+                }
+                console.log(event)
+                self.enterLetter(event.key);
+            });
         }
-
     });
-
-    window.onresize = function() {
-        app.updateLetterSize();
-    }
 </script>
 
 {% include 'footer.html' %}
