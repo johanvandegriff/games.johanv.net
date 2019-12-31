@@ -115,7 +115,7 @@ nav ul li {
 nav ul li a {
   color: white;
   display: block;
-  padding: 10px 12px;
+  padding: 10px 0;
   text-align: center;
   text-decoration: none;
 }
@@ -454,6 +454,24 @@ nav:hover #navDropdown {
 
 
 
+@media all and (max-width: 915px) {
+  #asciiArt {
+    display: none;
+  }
+  .main {
+    margin-top: 150px;
+  }
+  .ribbon {
+    height: 150px;
+  }
+}
+
+@media not all and (max-width: 915px) {
+  #asciiArtSmall {
+    display: none;
+  }
+}
+
 
 
 @media not all and (max-width: 540px) {
@@ -511,10 +529,10 @@ nav:hover #navDropdown {
     display: none;
   }
   .ribbon {
-    height: 80px;
+    height: 75px;
   }
   .main {
-    margin-top: 80px;
+    margin-top: 75px;
   }
 
   table.boggleBoard {
@@ -543,7 +561,7 @@ nav:hover #navDropdown {
     text-align: center;
     transition: all .4s ease-out;
   }
-  
+
   nav ul li {
     border-radius: 6px;
     margin:5px 5px;
@@ -552,17 +570,8 @@ nav:hover #navDropdown {
     position: relative;
     display: block;
   }
-}
 
-
-@media all and (max-width: 915px) {
-  #asciiArt {
-    display: none;
-  }
-}
-
-@media not all and (max-width: 915px) {
-  #asciiArtSmall {
-    display: none;
+  nav ul li a {
+    padding: 10px;
   }
 }
