@@ -2,7 +2,7 @@
 
 <div id="app" class="gameArea extraSpace" v-cloak>
     <div class="leftCol">
-        <h1 class="scale">Boggle 2.0<span class="hideLarge"> Time: 2:46</span></h1>
+        <h1 class="scale">Boggle 2.0<span class="hideLarge" v-if="game != undefined"> Time: [[ showTime(game.secondsLeft) ]]</span></h1>
         <table v-if="game != undefined" class="boggleBoard noselect"><tbody>
             <tr v-for="(row, i) in game.board">
                 <td v-for="(item, j) in row">
@@ -15,7 +15,7 @@
         </tbody></table>
     </div>
     <div class="rightCol">
-        <h1 class="scale hideSmall">Time: 2:46</h1>
+        <h1 class="scale hideSmall" v-if="game != undefined">Time: [[ showTime(game.secondsLeft) ]]</h1>
         <p class="scale" style="border: 2px solid black; overflow-wrap: break-word; padding: 5px;" onclick="app.buttonClick('Enter')" ontouchstart="app.buttonTap('Enter', event)">[[ word ]]&nbsp;</p>
         <button onclick="app.buttonClick('Enter')" ontouchstart="app.buttonTap('Enter', event)" class="grayButton bigButton">Enter</button>
         <button onclick="app.buttonClick('Backspace')" ontouchstart="app.buttonTap('Backspace', event)" class="grayButton bigButton">&#9003;</button>
@@ -41,7 +41,7 @@
             <input class="redButton" type="submit" value="Leave Game"/>
         </form>
         <br/>
-        <h2>3 players total</h2>
+        <h2>[[ game.players.length ]] players total</h2>
         <p class="scale" v-if="game != undefined">
             <span v-for="(player, i) in game.players"><span v-if="i>0">, </span>[[ player ]]</span>
         </p>
@@ -85,11 +85,22 @@
             })
         },
         methods: {
+            everySecond: function() {
+                if (this.game != undefined) {
+                    if (this.game.secondsLeft <= 0) {
+                        this.game.isDone = true;
+                        window.location = "?username={{ username }}&action=submit&id={{ id }}&page=view&words=" +
+                            this.words.join(",");
+                    } else {
+                        this.game.secondsLeft--;
+                    }
+                }
+            },
             //show time in the mm:ss format, with zero-padding on the seconds
             showTime: function (t) {
                 var minutes = Math.floor(t / 60);
                 var seconds = (t % 60);
-                return minutes + ':' + (minutes < 10 ? '0' : '') + seconds;
+                return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
             },
             updateLetterSize: function() {
                 if (window.innerWidth > 540) {
@@ -156,6 +167,9 @@
             }
         },
         mounted () {
+            this.interval = setInterval(() => {
+                this.everySecond();
+            }, 1000);
             let self = this;
             window.onresize = function() {
                 self.updateLetterSize();
@@ -168,10 +182,6 @@
                 console.log(event)
                 self.enterLetter(event.key);
             });
-            this.$nextTick(function () {
-                // Code that will run only after the
-                // entire view has been rendered
-            })
             setTimeout(() => { // setTimeout to put this into event queue
                 // executed after render
                 location.href="#app";

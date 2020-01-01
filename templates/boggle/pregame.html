@@ -34,7 +34,7 @@
         <br/><br/>
     </div>
     <div class="rightCol">
-        <h2>3 players total</h2>
+        <h2>[[ game.players.length ]] players total</h2>
         <p class="scale" v-if="game != undefined">
             <span v-for="(player, i) in game.players"><span v-if="i>0">, </span>[[ player ]]</span>
         </p>

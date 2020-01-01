@@ -12,6 +12,8 @@ WORD_LIST_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019.json'
 # definitions = json.load(open(DEFINITIONS_FILE,'r'))
 # wordList = json.load(open(WORD_LIST_FILE,'r'))
 
+ARCHIVE_TIMEOUT = 5; # remove games that are finished after this many seconds
+
 #all the dice found in boggle deluxe
 BOGGLE_DICE = [
         ['O','O','O','T','T','U'],
@@ -81,11 +83,9 @@ def create(size=5, letters=None, minutes=3):
         "board": board,
         "isStarted": False,
         "isDone": False,
+        "isArchived": False,
         "players": [],
-        "timeCreatedSecond": int(time.time()),
-        "secondsLeft": minutes*60
-        #TODO: id
-        #TODO: timeLeft, or change to startTime
+        "timeCreatedSeconds": int(time.time())
     }
     return game
 
@@ -178,7 +178,6 @@ def solve(game):
     for word in found:
         score += calculatePoints(word)
     
-    game["board"] = board
     game["words"] = found
     # game["paths"] = found
     game["maxScore"] = score
@@ -204,11 +203,17 @@ def loadGamesFile():
         saveGamesFile(games)
     return games
 
-def getGameByID(id):
-    for game in loadGamesFile():
+def getGameByID(id, games):
+    for game in games:
         if game["id"] == id:
             return game
     return None
+
+def newGameID(games):
+    ids = [int(game["id"]) for game in games]
+    id = 0
+    while id in ids: id += 1
+    return id
 
 # games = loadGamesFile()
 # g = solve(create(size=3))
@@ -236,6 +241,18 @@ def table(rows, properties, head=True):
     return text + '</table>'
 
 
+def updateGame(game):
+    if "timeStartedSeconds" in game:
+        elapsedSeconds = int(time.time()) - game["timeStartedSeconds"]
+    else:
+        elapsedSeconds = 0
+    game["secondsLeft"] = game["minutes"]*60 - elapsedSeconds
+    if game["secondsLeft"] <= 0:
+        game["isDone"] = True
+    if game["secondsLeft"] <= -ARCHIVE_TIMEOUT:
+        game["isArchived"] = True
+    return game
+
 """
 This method doesn't return html, but JSON data for JS to digest.
 It is called with AJAX requests, and the data will be formatted
@@ -246,72 +263,191 @@ def request_data(form):
     if request == "game":
         if "id" in form:
             id = int(form["id"])
-            game = getGameByID(id)
+            games = loadGamesFile()
+            game = getGameByID(id, games)
             if game is None:
                 print("game request with id {}, game not found".format(id))
                 return {}
             else:
                 print("game request with id {}, game found".format(id))
+                game = updateGame(game)
+                saveGamesFile(games)
                 return {"game": game}
         else:
             print("game request with no id")
             return {}
     if request == "games":
-        return {"games": loadGamesFile()}
+        games = loadGamesFile()
+        for game in games:
+            game = updateGame(game)
+        saveGamesFile(games)
+        return {"games": games}
 
     return {}
 
 def do_action(form):
+    # these are guaranteed by the function that calls this
     action = form["action"]
+    username = form["username"]
 
-    if action == "cancel":
-        #TODO: delete a game if you are the host, otherwise remove the player from it
-        return form
+    if action == "create":
+        if "preset" in form:
+            preset = form["preset"]
+            if preset == "5x5":
+                size = 5
+                letters = 4
+                minutes = 3
+            elif preset == "4x4":
+                size = 4
+                letters = 3
+                minutes = 3
+            elif preset == "custom" and "size" in form and "letters" in form and "minutes" in form:
+                size = form["size"]
+                size = int(size.split('x')[0])
+                letters = int(form["letters"])
+                minutes = float(form["minutes"])
+            else:
+                return "lobby", None
+            games = loadGamesFile();
+            print("creating game: size={}, letters={}, minutes={}".format(size, letters, minutes))
+            game = create(size=size, letters=letters, minutes=minutes)
+            game["id"] = newGameID(games)
+            game["players"].append(username)
+            print(game)
+            games.append(game)
+            saveGamesFile(games)
+            return "pregame", game["id"]
+        # http://127.0.0.1:5000/boggle?preset=5x5&size=6x6&letters=4&minutes=3&username=user&action=create&page=pregame
+        # http://127.0.0.1:5000/boggle?preset=4x4&size=6x6&letters=4&minutes=3&username=user&action=create&page=pregame
+        # http://127.0.0.1:5000/boggle?preset=custom&size=3x3&letters=2&minutes=1&username=user&action=create&page=pregame
+        return "lobby", None
 
-    return form
+    if action == "join" and "id" in form:
+        id = int(form["id"])
+        games = loadGamesFile()
+        game = getGameByID(id, games)
+        if game is None:
+            return "lobby", None
+        # can't join after the game is finished
+        if game["isDone"]:
+            return "view", id
+        elif not username in game["players"]:
+            game["players"].append(username)
+            saveGamesFile(games)
+        if game["isStarted"]:
+            return "play", id
+        else:
+            return "pregame", id
+        return "lobby", None
 
-def load_page(form):
+    if action == "start" and "id" in form:
+        id = int(form["id"])
+        games = loadGamesFile()
+        game = getGameByID(id, games)
+        if game is None:
+            return "lobby", None
+        players = game["players"]
+        if len(players) > 0 and players[0] == username:
+            # player is the host, start the game
+            if not game["isStarted"]:
+                game["isStarted"] = True
+                game["timeStartedSeconds"] = int(time.time())
+                saveGamesFile(games)
+        if not game["isStarted"]:
+            return "pregame", id
+        else:
+            if not game["isDone"]:
+                return "play", id
+            else:
+                return "view", id
+
+    if action == "cancel" and "id" in form:
+        id = int(form["id"])
+        games = loadGamesFile()
+        game = getGameByID(id, games)
+        # works only in the pregame and play phases (i.e. isDone = False)
+        if game is not None and not game["isDone"]:
+            # remove this player from the game, promoting the next player to host.
+            game["players"].remove(username)
+            # if there are no more players, delete the game
+            if len(game["players"]) == 0:
+                games = deleteGameByID(id, games)
+            saveGamesFile(games)
+        return "lobby", None
+
+    if action == "submit" and "id" in form and "words" in form:
+        id = int(form["id"])
+        words = form["words"].split(",")
+        games = loadGamesFile()
+        game = getGameByID(id, games)
+        if game is None:
+            return "lobby", None
+        if not game["isStarted"]:
+            return "pregame", id
+        # can't add words after the game is archived
+        if game["isArchived"]:
+            return "view", id
+        save = False
+        if not username in game["players"]:
+            game["players"].append(username)
+            save = True
+        if not "playerData" in game:
+            game["playerData"] = {}
+            save = True
+        if not username in game["playerData"]:
+            score = 0
+            for word in words:
+                score += calculatePoints(word)
+            game["playerData"][username] = {
+                "words": words,
+                "score": score,
+                "numWords": len(words)
+            }
+            save = True
+        if save:
+            saveGamesFile(games)
+        return "view", id
+
+    return "lobby", None
+
+def load_page(form, page=None, id=None):
     if not "username" in form:
         page = "login"
-    elif "page" in form:
-        page = form["page"]
-    else:
-        page = "lobby"
+    elif page is None:
+        if "page" in form:
+            page = form["page"]
+        else:
+            page = "lobby"
+
+    if id is None and "id" in form:
+        id = int(form["id"])
 
     if page == "login":
         return render_template("boggle/login.html", page=page, nav=nav, active="Boggle")
 
     username = form["username"]
 
-    if page == "lobby":
-        return render_template("boggle/lobby.html", username=username, nav=nav, active="Boggle")
-
-    if page == "pregame":
-        if "id" in form:
-            id = form["id"]
-        else:
-            id = 100
+    if page == "pregame" and id is not None:
         return render_template("boggle/pregame.html", id=id, username=username, nav=nav, active="Boggle")
 
-    if page == "play":
-        if "id" in form:
-            id = form["id"]
-        else:
-            id = 101
+    if page == "play" and id is not None:
         return render_template("boggle/play.html", id=id, username=username, nav=nav, active="Boggle")
 
-    if page == "view":
+    if page == "view" and id is not None:
         if "prev" in form:
             prev = form["prev"]
         else:
             prev = "lobby"
 
-        return render_template("boggle/view.html", username=username, prev=prev, nav=nav, active="Boggle")
+        return render_template("boggle/view.html", username=username, id=id, prev=prev, nav=nav, active="Boggle")
 
     if page == "stats":
         return render_template("boggle/stats.html", username=username, nav=nav, active="Boggle")
 
-    return "404 - '" + str(page) + "' not found"
+    if page == "lobby":
+        return render_template("boggle/lobby.html", archive_timeout=ARCHIVE_TIMEOUT, username=username, nav=nav, active="Boggle")
+
+    return "error with page '" + str(page) + "'"
 
 
 """
@@ -331,10 +467,12 @@ request - ask for a certain type of data, such as current
     ignoring the page variable.
 """
 def app(form):
-    if "action" in form:
-        form = do_action(form)
+    page = None
+    id = None
+    if "action" in form and "username" in form:
+        page, id = do_action(form)
     
     if "request" in form:
         return request_data(form)
     else:
-        return load_page(form)
+        return load_page(form, page, id)

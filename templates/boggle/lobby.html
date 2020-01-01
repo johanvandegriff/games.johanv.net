@@ -99,7 +99,7 @@
 {% include 'boggle/common.html' %}
 
 <script>
-    const POST_GAME_REMOVAL_TIMEOUT = 5; //remove games that are finished after this many seconds
+    const ARCHIVE_TIMEOUT = {{ archive_timeout }}; //remove games that are finished after this many seconds
     const app = new Vue ({
         delimiters: ['[[',']]'],
         el: "#app",
@@ -123,7 +123,7 @@
                         if (game.secondsLeft <= 0) {
                             game.isDone = true;
                         }
-                        if (game.secondsLeft > -POST_GAME_REMOVAL_TIMEOUT) {
+                        if (game.secondsLeft > -ARCHIVE_TIMEOUT) {
                             newgames.push(game);
                         }
                     } else {
