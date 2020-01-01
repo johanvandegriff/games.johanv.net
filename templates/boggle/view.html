@@ -31,7 +31,10 @@
         <h1 class="scale hideSmall">Time's Up!</h1>
         <p v-if="game != undefined" class="scale"><span style="background-color: #0c0; padding:3px; border-radius: 5px;">[[ game.winner ]]</span> wins with [[ game.winnerScore ]] points!</p>
         <div v-if="game != undefined" class="compactText">
-            [[ game.maxWords ]] possible words, [[ game.maxScore ]] possible points ([[ game.letters ]] letter minimum). [[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words were found by the players collectively.<br/>
+                Game #[[ game.id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
+                It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
+                [[ game.maxWords ]] possible words, [[ game.maxScore ]] possible points.<br/>
+                [[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words were found by all the players collectively.<br/>
             <table border=1 cellpadding=7>
                 <thead><tr>
                     <td v-for="player in game.players">[[ player ]]</td>
@@ -42,7 +45,7 @@
                     <!-- <span class="vhide">|</span> -->
                     <!-- <td>7 points<br/>5 words</td><td>8<span class="vhide">|</span>points<br/>7 words</td><td style="background-color: #0c0;">12 points<br/>7 words</td> -->
                 </tr><tr>
-                    <td v-for="data in game.playerData">
+                    <td v-for="data in game.playerData" style="vertical-align:top">
                         <span v-for="word in data.words">
                             [[ calculatePoints(word) ]] [[ word ]]<br/>
                         </span>
@@ -54,7 +57,6 @@
         </div>
         <div class="compactText" style="padding-left: 20px" v-if="game != undefined">
             <br/>
-            It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
             All possible words for this board:<br/><br/>
             <span v-for="word in game.words">[[ calculatePoints(word) ]] [[ word ]]<br/></span>
             <span style="color:green; font-weight:bold"></span>

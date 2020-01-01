@@ -1,5 +1,5 @@
 from flask import render_template
-import sys, cgi, json, datetime, re, time, decimal, subprocess, random
+import sys, cgi, json, datetime, re, time, decimal, subprocess, random, threading
 
 from nav import nav #file in same dir
 
@@ -12,7 +12,9 @@ WORD_LIST_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019.json'
 # definitions = json.load(open(DEFINITIONS_FILE,'r'))
 # wordList = json.load(open(WORD_LIST_FILE,'r'))
 
-ARCHIVE_TIMEOUT = 5; # remove games that are finished after this many seconds
+# remove games that are finished after this many seconds
+ARCHIVE_TIMEOUT = 5*60
+# ARCHIVE_TIMEOUT = 15
 
 #all the dice found in boggle deluxe
 BOGGLE_DICE = [
@@ -100,7 +102,7 @@ def calculatePoints(word):
 def solve_aux(x, y, word, used, board, words, found, size):
     myused = used[:]
 
-    myused.append((x,y)); #use the current spot
+    myused.append([x,y]); #use the current spot
     myword = word + board[x][y].lower() #add on to the word
 
     if myword in words: #if the word is in the list of possible words
@@ -185,10 +187,6 @@ def solve(game):
     game["secondsToSolve"] = time.time() - start
     return game
 
-# print(create(size=4, letters=3, minutes=3))
-# print(solve(create(size=7, letters=4, minutes=6)))
-# print(solve({'board': [['U', 'E', 'T'], ['O', 'M', 'D'], ['S', 'D', 'Y']], 'letters': 3, 'minutes': 6}))
-
 
 def saveGamesFile(games):
     json.dump(games, open(GAMES_FILE, 'w'), indent=2) # indentation for development and debugging
@@ -215,31 +213,22 @@ def newGameID(games):
     while id in ids: id += 1
     return id
 
-# games = loadGamesFile()
-# g = solve(create(size=3))
-# g["id"] = 102
-# games.append(g)
-# saveGamesFile(games)
+class BackgroundSolver(object):
+    def __init__(self, game):
+        self.game = game
+        thread = threading.Thread(target=self.run, args=())
+        thread.daemon = True
+        thread.start()
 
-def tableRow(row, tableItem='td'):
-    text = ''
-    for item in row:
-        text += '<'+tableItem+'>' + item + '</'+tableItem+'>'
-    return '<tr>' + text + '</tr>'
-
-def table(rows, properties, head=True):
-    text = '<table '+properties+'>\n'
-    if head:
-        text += '<thead>'
-        text += tableRow(rows[0], 'th') + '\n'
-        text += '</thead>'
-        rows = rows[1:]
-    text += '<tbody>'
-    for row in rows:
-        text += tableRow(row) + '\n'
-    text += '</tbody>'
-    return text + '</table>'
-
+    def run(self):
+        self.game = solve(self.game)
+        games = loadGamesFile()
+        new_game = getGameByID(self.game["id"], games)
+        new_game["words"] = self.game["words"]
+        new_game["maxScore"] = self.game["maxScore"]
+        new_game["maxWords"] = self.game["maxWords"]
+        new_game["secondsToSolve"] = self.game["secondsToSolve"]
+        saveGamesFile(games)
 
 def updateGame(game):
     if "timeStartedSeconds" in game:
@@ -311,8 +300,9 @@ def do_action(form):
             games = loadGamesFile();
             print("creating game: size={}, letters={}, minutes={}".format(size, letters, minutes))
             game = create(size=size, letters=letters, minutes=minutes)
-            game = solve(game) # TODO: do this in the background
+            # game = solve(game) # TODO: do this in the background
             game["id"] = newGameID(games)
+            BackgroundSolver(game)
             game["players"].append(username)
             print(game)
             games.append(game)
@@ -387,6 +377,7 @@ def do_action(form):
             return "pregame", id
         # can't add words after the game is archived
         if game["isArchived"]:
+            print("can't add words after the game is archived")
             return "view", id
         save = False
         if not username in game["players"]:
