@@ -311,6 +311,7 @@ def do_action(form):
             games = loadGamesFile();
             print("creating game: size={}, letters={}, minutes={}".format(size, letters, minutes))
             game = create(size=size, letters=letters, minutes=minutes)
+            game = solve(game) # TODO: do this in the background
             game["id"] = newGameID(games)
             game["players"].append(username)
             print(game)
@@ -395,6 +396,13 @@ def do_action(form):
             game["playerData"] = {}
             save = True
         if not username in game["playerData"]:
+            #TODO if it isnt solved by here, game["words"] will not be defined
+            new_words = []
+            for word in words:
+                if not word in new_words and word in game["words"]:
+                    new_words.append(word)
+            words = new_words
+            # words = [word for word in words if word in game["words"]]
             score = 0
             for word in words:
                 score += calculatePoints(word)
@@ -403,6 +411,21 @@ def do_action(form):
                 "score": score,
                 "numWords": len(words)
             }
+            winner = username
+            winnerScore = score
+            numWordsPlayersFound = 0
+            for player in game["playerData"]:
+                numWordsPlayersFound += game["playerData"][player]["numWords"]
+                playerScore = game["playerData"][player]["score"]
+                if playerScore > winnerScore:
+                    winner = player
+                    winnerScore = playerScore
+            if game["maxWords"] == 0:
+                game["percentFound"] = 100
+            else:
+                game["percentFound"] = numWordsPlayersFound / game["maxWords"] * 100
+            game["winner"] = winner
+            game["winnerScore"] = winnerScore
             save = True
         if save:
             saveGamesFile(games)

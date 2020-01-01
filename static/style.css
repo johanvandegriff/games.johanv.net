@@ -375,9 +375,9 @@ input:checked + label{
 }
 
 .scoreTable {
-  width: 65%;
+  width: 55%;
   position:absolute;
-  top:200px;
+  top:190px;
   bottom:0px;
   right: 0;
   overflow-y:scroll;
@@ -470,7 +470,9 @@ nav:hover #navDropdown {
 
 [v-cloak] { display: none; }
 
-
+.vhide {
+  visibility: hidden;
+}
 
 
 
@@ -496,6 +498,11 @@ nav:hover #navDropdown {
     top:175px;
     /* bottom:350px; */
     /* bottom: 40%; */
+  }
+  .scoreTable {
+    top:125px;
+    /* top: 350px; */
+    /* top: 60%; */
   }
 }
 
@@ -542,7 +549,9 @@ nav:hover #navDropdown {
     width: 40%;
   }
   .scoreTable {
-    top: 290px;
+    top: calc(100px + 75vw);
+    /* height: calc(100% - 100px - 75vw); */
+    min-height: 350px;
   }
   .gamesTable {
     /* top: 350px; */
