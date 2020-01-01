@@ -71,16 +71,21 @@
                 <span v-if="!game.isStarted">
                     <input class="greenButton" type="submit" value="Join"/>
                     Game #[[ game.id ]] (waiting...)
+                    <input type="hidden" name="id" v-bind:value="game.id"/>
+                    <input type="hidden" name="action" value="join"/>
                     <input type="hidden" name="page" value="pregame"/>
                 </span>
                 <span v-else-if="!game.isDone">
                     <input class="blueButton" type="submit" value="Join Late"/>
                     Game #[[ game.id ]] (time left: [[ showTime(game.secondsLeft) ]])
+                    <input type="hidden" name="id" v-bind:value="game.id"/>
+                    <input type="hidden" name="action" value="join"/>
                     <input type="hidden" name="page" value="play"/>
                 </span>
                 <span v-else>
                     <input class="purpleButton" type="submit" value="View"/>
                     Game #[[ game.id ]] (time's up!)
+                    <input type="hidden" name="id" v-bind:value="game.id"/>
                     <input type="hidden" name="page" value="view"/>
                 </span>
                 <input type="hidden" name="username" value="{{ username }}"/>
@@ -99,7 +104,7 @@
 {% include 'boggle/common.html' %}
 
 <script>
-    const ARCHIVE_TIMEOUT = {{ archive_timeout }}; //remove games that are finished after this many seconds
+    const REMOVE_FROM_LOBBY_TIMEOUT = {{ remove_from_lobby_timeout }}; //remove games that are finished after this many seconds
     const app = new Vue ({
         delimiters: ['[[',']]'],
         el: "#app",
@@ -123,7 +128,7 @@
                         if (game.secondsLeft <= 0) {
                             game.isDone = true;
                         }
-                        if (game.secondsLeft > -ARCHIVE_TIMEOUT) {
+                        if (game.secondsLeft > -REMOVE_FROM_LOBBY_TIMEOUT) {
                             newgames.push(game);
                         }
                     } else {
@@ -139,7 +144,7 @@
                 return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
             },
             getGames: function() {
-                fetch('?request=games')
+                fetch('?request=games&page=lobby')
                 .then(response => response.json())
                 .then(json => {
                     this.games = json.games
@@ -152,9 +157,12 @@
         //     minutes: function(val) {this.preset = "custom"}
         // }
         mounted () {
-            this.interval = setInterval(() => {
+            setInterval(() => {
                 this.everySecond();
             }, 1000);
+            setInterval(() => {
+                this.getGames();
+            }, 5000);
         }
     });
 </script>

@@ -27,6 +27,7 @@
         <form method="get">
             <input type="hidden" name="username" value="{{ username }}"/>
             <input type="hidden" name="action" value="cancel"/>
+            <input type="hidden" name="id" value="{{ id }}"/>
             <input type="hidden" name="page" value="lobby"/>
             <input class="redButton" style="float: left; margin: 10px;" type="submit" value="Cancel" v-if="isHost"/>
             <input class="redButton" style="float: left; margin: 10px;" type="submit" value="Leave Game" v-if="isNotHost"/>
@@ -61,8 +62,28 @@
                 this.game = json.game
                 console.log(this.game)
                 this.isHost = (this.game.players[0] == this.username)
-                this.isNotHost = !isHost;
+                this.isNotHost = !this.isHost;
             })
+        },
+        methods: {
+            getBasic: function() {
+                fetch('?request=basic&id={{ id }}')
+                .then(response => response.json())
+                .then(json => {
+                    console.log(json)
+                    this.game.players = json.players;
+                    this.isHost = (this.game.players[0] == this.username)
+                    this.isNotHost = !this.isHost;
+                    if (json.isStarted) {
+                        window.location = "?username={{ username }}&id={{ id }}&page=play";
+                    }
+                })
+            }
+        },
+        mounted () {
+            setInterval(() => {
+                this.getBasic();
+            }, 1000);
         }
     });
 </script>

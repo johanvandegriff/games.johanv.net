@@ -13,8 +13,8 @@ WORD_LIST_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019.json'
 # wordList = json.load(open(WORD_LIST_FILE,'r'))
 
 # remove games that are finished after this many seconds
-ARCHIVE_TIMEOUT = 5*60
-# ARCHIVE_TIMEOUT = 15
+ARCHIVE_TIMEOUT = 30
+REMOVE_FROM_LOBBY_TIMEOUT = 5*60
 
 #all the dice found in boggle deluxe
 BOGGLE_DICE = [
@@ -207,6 +207,9 @@ def getGameByID(id, games):
             return game
     return None
 
+def deleteGameByID(id, games):
+    return [game for game in games if game["id"] != id]
+
 def newGameID(games):
     ids = [int(game["id"]) for game in games]
     id = 0
@@ -231,16 +234,19 @@ class BackgroundSolver(object):
         saveGamesFile(games)
 
 def updateGame(game):
+    changed = False
     if "timeStartedSeconds" in game:
         elapsedSeconds = int(time.time()) - game["timeStartedSeconds"]
     else:
         elapsedSeconds = 0
     game["secondsLeft"] = game["minutes"]*60 - elapsedSeconds
-    if game["secondsLeft"] <= 0:
+    if game["secondsLeft"] <= 0 and not game["isDone"]:
         game["isDone"] = True
-    if game["secondsLeft"] <= -ARCHIVE_TIMEOUT:
+        changed = True
+    if game["secondsLeft"] <= -ARCHIVE_TIMEOUT and not game["isArchived"]:
         game["isArchived"] = True
-    return game
+        changed = True
+    return game, changed
 
 """
 This method doesn't return html, but JSON data for JS to digest.
@@ -259,19 +265,31 @@ def request_data(form):
                 return {}
             else:
                 print("game request with id {}, game found".format(id))
-                game = updateGame(game)
-                saveGamesFile(games)
+                game, changed = updateGame(game)
+                if changed:
+                    saveGamesFile(games)
                 return {"game": game}
         else:
             print("game request with no id")
             return {}
     if request == "games":
         games = loadGamesFile()
+        anyChanged = False
         for game in games:
-            game = updateGame(game)
-        saveGamesFile(games)
+            game, changed = updateGame(game)
+            if changed:
+                anyChanged = True
+        if anyChanged:
+            saveGamesFile(games)
+        if "page" in form and form["page"] == "lobby":
+            games = [game for game in games if game["secondsLeft"] > -REMOVE_FROM_LOBBY_TIMEOUT]
         return {"games": games}
-
+    if request == "basic" and "id" in form:
+        id = int(form["id"])
+        games = loadGamesFile()
+        game = getGameByID(id, games)
+        if game is not None:
+            return {"isStarted": game["isStarted"], "players": game["players"]}
     return {}
 
 def do_action(form):
@@ -371,6 +389,12 @@ def do_action(form):
         words = form["words"].split(",")
         games = loadGamesFile()
         game = getGameByID(id, games)
+        #TODO if it isnt solved by here, game["words"] will not be defined
+        # this is a dumb fix for now:
+        while not "words" in game:
+            time.sleep(1)
+            games = loadGamesFile()
+            game = getGameByID(id, games)
         if game is None:
             return "lobby", None
         if not game["isStarted"]:
@@ -387,7 +411,6 @@ def do_action(form):
             game["playerData"] = {}
             save = True
         if not username in game["playerData"]:
-            #TODO if it isnt solved by here, game["words"] will not be defined
             new_words = []
             for word in words:
                 if not word in new_words and word in game["words"]:
@@ -459,7 +482,7 @@ def load_page(form, page=None, id=None):
         return render_template("boggle/stats.html", username=username, nav=nav, active="Boggle")
 
     if page == "lobby":
-        return render_template("boggle/lobby.html", archive_timeout=ARCHIVE_TIMEOUT, username=username, nav=nav, active="Boggle")
+        return render_template("boggle/lobby.html", remove_from_lobby_timeout=REMOVE_FROM_LOBBY_TIMEOUT, username=username, nav=nav, active="Boggle")
 
     return "error with page '" + str(page) + "'"
 

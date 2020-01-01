@@ -41,14 +41,18 @@
                     <!-- <td>johanv</td><td>Jonv</td><td style="background-color: #0c0;">monarchofmany</td><td>verylongusername1</td><td>verylongusername2</td><td>verylongusername3</td><td>verylongusername4</td> -->
                 </tr></thead>
                 <tbody><tr>
-                    <td v-for="data in game.playerData">[[ data.score ]]<span class="vhide">|</span>points<br/>[[ data.numWords ]] words</td>
+                    <td v-for="player in game.players">
+                        <span v-if="player in game.playerData">[[ game.playerData[player].score ]] points<br/>[[ game.playerData[player].numWords ]] words</span>
+                        <span v-else>NO DATA</span>
+                    </td>
                     <!-- <span class="vhide">|</span> -->
                     <!-- <td>7 points<br/>5 words</td><td>8<span class="vhide">|</span>points<br/>7 words</td><td style="background-color: #0c0;">12 points<br/>7 words</td> -->
                 </tr><tr>
-                    <td v-for="data in game.playerData" style="vertical-align:top">
-                        <span v-for="word in data.words">
-                            [[ calculatePoints(word) ]] [[ word ]]<br/>
+                    <td v-for="player in game.players" style="vertical-align:top">
+                        <span v-if="player in game.playerData">
+                            <span v-for="word in game.playerData[player].words">[[ calculatePoints(word) ]] [[ word ]]<br/></span>
                         </span>
+                        <span v-else>NO DATA</span>
                     </td>
                     <!-- <td style="vertical-align:top">0 <span style="background-color: tomato; color: #fff">aced</span><br/>2 adorn<br/>0 <span style="color: #a00">arson</span><br/>0<span style="visibility: hidden">|</span><span style="color: #a00">ascend</span><br/>5<span style="visibility: hidden">|</span>ascends</td><td style="vertical-align:top">0 <span style="color: #a00">arson</span><br/>1 care<br/>2 cares<br/>2 cars<br/>0<span style="visibility: hidden">|</span><span style="color: #a00">cedar</span><br/>3<span style="visibility: hidden">|</span>cedars<br/>0 <span style="color: #a00">aced</span></td><td style="vertical-align:top; background-color: #0c0;">0 <span style="color: #a00">arson</span><br/>0 <span style="color: #a00">ascend</span><br/>1 dare<br/>2 dares<br/>1 done<br/>3 extent<br/>5 extents</td> -->
                 </tr></tbody>
@@ -78,17 +82,18 @@
             styleObjectQu: undefined
         },
         created () {
-            fetch('?request=game&id={{ id }}')
-            .then(response => response.json())
-            .then(json => {
-                this.game = json.game
-                console.log(this.game)
-                this.isHost = (this.game.players[0] == this.username)
-                this.updateLetterSize()
-            })
+            this.getGame();
         },
         methods: {
-            everySecond: function() {
+            getGame: function() {
+                fetch('?request=game&id={{ id }}')
+                .then(response => response.json())
+                .then(json => {
+                    this.game = json.game
+                    console.log(this.game)
+                    this.isHost = (this.game.players[0] == this.username)
+                    this.updateLetterSize()
+                })
             },
             updateLetterSize: function() {
                 if (window.innerWidth > 540) {
@@ -109,8 +114,10 @@
         },
         mounted () {
             this.interval = setInterval(() => {
-                this.everySecond();
-            }, 1000);
+                if (!this.game.isArchived) {
+                    this.getGame();
+                }
+            }, 5000);
             let self = this;
             window.onresize = function() {
                 self.updateLetterSize();
