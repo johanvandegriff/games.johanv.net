@@ -351,7 +351,7 @@ input:checked + label{
 }
 
 .highscores {
-  width: 40%;
+  width: calc(20% + 225px);
   padding: 0;
   position:absolute;
   top:250px;
@@ -361,7 +361,7 @@ input:checked + label{
 }
 
 .gamesTable {
-  width: 60%;
+  width: calc(80% - 225px);
   position:absolute;
   top:250px;
   bottom:0px;
@@ -473,6 +473,21 @@ nav:hover #navDropdown {
 .vhide {
   visibility: hidden;
 }
+
+
+svg.ct-chart-bar, svg.ct-chart-line{
+  overflow: visible;
+}
+.ct-label.ct-label.ct-horizontal.ct-end {
+  position: relative;
+  justify-content: flex-end;
+  text-align: right;
+  transform-origin: 50% 0;
+  /* transform: translate(-100%) rotate(-45deg); */
+  transform: rotate(45deg) translate(25%);
+  white-space:nowrap;
+}
+
 
 
 

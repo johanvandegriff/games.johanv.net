@@ -29,13 +29,15 @@
     </div>
     <div class="rightCol scoreTable">
         <h1 class="scale hideSmall">Time's Up!</h1>
-        <p v-if="game != undefined" class="scale"><span style="background-color: #0c0; padding:3px; border-radius: 5px;">[[ game.winner ]]</span> wins with [[ game.winnerScore ]] points!</p>
+        <p v-if="game != undefined" class="scale"><span style="background-color: #0c0; padding:3px; border-radius: 5px;">
+            <span v-for="(winner, i) in game.winners"><span v-if="i>0">, </span>[[ winner ]]</span>
+        </span> <span v-if="game.winners.length > 1">tie</span><span v-else>wins</span> with [[ game.winScore ]] points!</p>
         <div v-if="game != undefined" class="compactText">
                 Game #[[ game.id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
                 <span v-if="'words' in game">
                     It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
                     [[ game.maxWords ]] possible words, [[ game.maxScore ]] possible points.<br/>
-                    [[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words were found by all the players collectively.<br/>
+                    [[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words were found by the players. [[ game.duplicates ]] duplicates were found.<br/>
                 </span>
                 <span v-else>
                     The computer is still solving the board. This will update when it's done.<br/>
@@ -55,7 +57,15 @@
                 </tr><tr>
                     <td v-for="player in game.players" style="vertical-align:top">
                         <span v-if="player in game.playerData">
-                            <span v-for="word in game.playerData[player].words">[[ calculatePoints(word) ]] [[ word ]]<br/></span>
+                            <span v-for="[word, isDup] in Object.entries(game.playerData[player].words)">
+                                <span v-if="isDup" style="background-color: #e33; color: #fff; padding: 2px">
+                                    0 [[ word ]]
+                                </span>
+                                <span v-else style="padding: 2px">
+                                    [[ calculatePoints(word) ]] [[ word ]]
+                                </span>
+                                <br/>
+                            </span>
                         </span>
                         <span v-else>NO DATA</span>
                     </td>
@@ -68,8 +78,15 @@
             <br/>
             <span v-if="'words' in game">
                 All [[ game.maxWords ]] possible words for this board:<br/><br/>
-                <span v-for="word in game.words">[[ calculatePoints(word) ]] [[ word ]]<br/></span>
-                <span style="color:green; font-weight:bold"></span>
+                <span v-for="word in game.words">
+                    <span v-if="found.includes(word)" style="color:green; font-weight:bold">
+                        [[ calculatePoints(word) ]] [[ word ]]
+                    </span>
+                    <span v-else>
+                        [[ calculatePoints(word) ]] [[ word ]]
+                    </span>
+                    <br/>
+                </span>
             </span>
         </div>
     </div>
@@ -87,6 +104,20 @@
             game: undefined,
             styleObject: undefined,
             styleObjectQu: undefined
+        },
+        computed: {
+            found: function () {
+                if (this.game == undefined) {
+                    return [];
+                }
+                found = [];
+                for (player in this.game.playerData) {
+                    for (word in this.game.playerData[player].words) {
+                        found.push(word);
+                    }
+                }
+                return found;
+            }
         },
         created () {
             this.getGame();

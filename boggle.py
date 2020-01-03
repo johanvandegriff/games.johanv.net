@@ -326,8 +326,11 @@ def request_data(form):
                 anyChanged = True
         if anyChanged:
             saveGamesFile(games)
-        if "page" in form and form["page"] == "lobby":
-            games = [game for game in games if game["secondsLeft"] > -REMOVE_FROM_LOBBY_TIMEOUT]
+        if "page" in form:
+            if form["page"] == "lobby":
+                games = [game for game in games if game["secondsLeft"] > -REMOVE_FROM_LOBBY_TIMEOUT]
+            elif form["page"] == "stats":
+                games = [game for game in games if game["isArchived"]]
         return {"games": games}
     if request == "basic" and "id" in form:
         id = int(form["id"])
@@ -447,44 +450,59 @@ def do_action(form):
             game["playerData"] = {}
             save = True
         if not username in game["playerData"]:
-            new_words = []
+            wordsDict = {}
             
             wordList = json.load(open(WORD_LIST_FILE,'r'))
             for word in words:
-                if not word in new_words:
+                if not word in wordsDict:
                     if "words" in game: #if the board is already solved
                         if word in game["words"]: #check the list of solved words
-                            new_words.append(word)
+                            wordsDict[word] = False #false means it's not a duplicate
                     else: # if the board has not been solved yet
                         if isWordValid(game, word, wordList): #manually check using the board
-                            new_words.append(word)
+                            wordsDict[word] = False #false means it's not a duplicate
 
-            words = new_words
+            for player in game["playerData"]:
+                playerData = game["playerData"][player]
+                for word in wordsDict:
+                    if word in playerData["words"]:
+                        wordsDict[word] = True #true means it is a duplicate
+                        playerData["words"][word] = True
+                        playerData["score"] -= calculatePoints(word)
+            
             score = 0
-            for word in words:
-                score += calculatePoints(word)
+            for word in wordsDict:
+                if not wordsDict[word]:
+                    score += calculatePoints(word)
             game["playerData"][username] = {
-                "words": words,
+                "words": wordsDict,
                 "score": score,
-                "numWords": len(words)
+                "numWords": len(wordsDict)
             }
-            winner = username
-            winnerScore = score
+            winners = [username]
+            winScore = score
             numWordsPlayersFound = 0
+            dupes = []
             for player in game["playerData"]:
                 playerData = game["playerData"][player]
                 numWordsPlayersFound += playerData["numWords"]
                 playerScore = playerData["score"]
-                if playerScore > winnerScore:
-                    winner = player
-                    winnerScore = playerScore
+                if playerScore > winScore:
+                    winners = [player]
+                    winScore = playerScore
+                elif playerScore == winScore and not player in winners:
+                    winners.append(player)
+                for word in playerData["words"]:
+                    if playerData["words"][word] and not word in dupes:
+                        dupes.append(word)
             game["numWordsPlayersFound"] = numWordsPlayersFound
+            game["duplicates"] = len(dupes)
             if ("maxWords" not in game) or game["maxWords"] == 0:
                 game["percentFound"] = 100
             else:
                 game["percentFound"] = numWordsPlayersFound / game["maxWords"] * 100
-            game["winner"] = winner
-            game["winnerScore"] = winnerScore
+            game["winners"] = winners
+            game["winScore"] = winScore
             save = True
         if save:
             saveGamesFile(games)
