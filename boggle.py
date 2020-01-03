@@ -187,6 +187,42 @@ def solve(game):
     game["secondsToSolve"] = time.time() - start
     return game
 
+def isWordValidAux(board, word, x, y, used, size):
+    if len(word) == 0: return True
+    
+    myused = used[:]
+    myused.append([x,y]); #use the current spot
+    
+    l = board[x][y].lower()
+    if l == "qu":
+        if len(word) < 2 or word[0:2] != "qu":
+            return False
+        newword = word[2:]
+    else:
+        if word[0] != l:
+            return False
+        newword = word[1:]
+            
+    for newx in range(x-1,x+2): # +2 because range() is exclusive on the upper bound
+        for newy in range(y-1,y+2):
+            if (newx>=0 and newy>=0 and newx<size and newy<size and not [newx,newy] in myused):
+                if isWordValidAux(board, newword, newx, newy, myused, size):
+                    return True
+    return False
+
+
+def isWordValid(game, word, wordList):
+    if len(word) < game["letters"] or not word in wordList:
+        return False
+    board = game["board"]
+    size = len(board)
+    if len(word) <= size*size:
+        for x in range(size):
+            for y in range(size):
+                if isWordValidAux(board, word, x, y, [], size):
+                     return True
+    return False
+
 
 def saveGamesFile(games):
     json.dump(games, open(GAMES_FILE, 'w'), indent=2) # indentation for development and debugging
@@ -231,6 +267,14 @@ class BackgroundSolver(object):
         new_game["maxScore"] = self.game["maxScore"]
         new_game["maxWords"] = self.game["maxWords"]
         new_game["secondsToSolve"] = self.game["secondsToSolve"]
+            
+        if  new_game["maxWords"] == 0:
+            new_game["percentFound"] = 100
+        elif not "numWordsPlayersFound" in new_game:
+            new_game["percentFound"] = 0
+        else:
+            new_game["percentFound"] = new_game["numWordsPlayersFound"] / new_game["maxWords"] * 100
+
         saveGamesFile(games)
 
 def updateGame(game):
@@ -243,7 +287,8 @@ def updateGame(game):
     if game["secondsLeft"] <= 0 and not game["isDone"]:
         game["isDone"] = True
         changed = True
-    if game["secondsLeft"] <= -ARCHIVE_TIMEOUT and not game["isArchived"]:
+    # if the game has been over for longer than the archive timeout, and it's not already archived, and it's solved
+    if game["secondsLeft"] <= -ARCHIVE_TIMEOUT and not game["isArchived"] and "words" in game:
         game["isArchived"] = True
         changed = True
     return game, changed
@@ -318,7 +363,6 @@ def do_action(form):
             games = loadGamesFile();
             print("creating game: size={}, letters={}, minutes={}".format(size, letters, minutes))
             game = create(size=size, letters=letters, minutes=minutes)
-            # game = solve(game) # TODO: do this in the background
             game["id"] = newGameID(games)
             BackgroundSolver(game)
             game["players"].append(username)
@@ -326,9 +370,6 @@ def do_action(form):
             games.append(game)
             saveGamesFile(games)
             return "pregame", game["id"]
-        # http://127.0.0.1:5000/boggle?preset=5x5&size=6x6&letters=4&minutes=3&username=user&action=create&page=pregame
-        # http://127.0.0.1:5000/boggle?preset=4x4&size=6x6&letters=4&minutes=3&username=user&action=create&page=pregame
-        # http://127.0.0.1:5000/boggle?preset=custom&size=3x3&letters=2&minutes=1&username=user&action=create&page=pregame
         return "lobby", None
 
     if action == "join" and "id" in form:
@@ -389,12 +430,7 @@ def do_action(form):
         words = form["words"].split(",")
         games = loadGamesFile()
         game = getGameByID(id, games)
-        #TODO if it isnt solved by here, game["words"] will not be defined
-        # this is a dumb fix for now:
-        while not "words" in game:
-            time.sleep(1)
-            games = loadGamesFile()
-            game = getGameByID(id, games)
+
         if game is None:
             return "lobby", None
         if not game["isStarted"]:
@@ -412,11 +448,18 @@ def do_action(form):
             save = True
         if not username in game["playerData"]:
             new_words = []
+            
+            wordList = json.load(open(WORD_LIST_FILE,'r'))
             for word in words:
-                if not word in new_words and word in game["words"]:
-                    new_words.append(word)
+                if not word in new_words:
+                    if "words" in game: #if the board is already solved
+                        if word in game["words"]: #check the list of solved words
+                            new_words.append(word)
+                    else: # if the board has not been solved yet
+                        if isWordValid(game, word, wordList): #manually check using the board
+                            new_words.append(word)
+
             words = new_words
-            # words = [word for word in words if word in game["words"]]
             score = 0
             for word in words:
                 score += calculatePoints(word)
@@ -429,12 +472,14 @@ def do_action(form):
             winnerScore = score
             numWordsPlayersFound = 0
             for player in game["playerData"]:
-                numWordsPlayersFound += game["playerData"][player]["numWords"]
-                playerScore = game["playerData"][player]["score"]
+                playerData = game["playerData"][player]
+                numWordsPlayersFound += playerData["numWords"]
+                playerScore = playerData["score"]
                 if playerScore > winnerScore:
                     winner = player
                     winnerScore = playerScore
-            if game["maxWords"] == 0:
+            game["numWordsPlayersFound"] = numWordsPlayersFound
+            if ("maxWords" not in game) or game["maxWords"] == 0:
                 game["percentFound"] = 100
             else:
                 game["percentFound"] = numWordsPlayersFound / game["maxWords"] * 100

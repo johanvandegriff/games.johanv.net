@@ -32,9 +32,14 @@
         <p v-if="game != undefined" class="scale"><span style="background-color: #0c0; padding:3px; border-radius: 5px;">[[ game.winner ]]</span> wins with [[ game.winnerScore ]] points!</p>
         <div v-if="game != undefined" class="compactText">
                 Game #[[ game.id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
-                It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
-                [[ game.maxWords ]] possible words, [[ game.maxScore ]] possible points.<br/>
-                [[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words were found by all the players collectively.<br/>
+                <span v-if="'words' in game">
+                    It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
+                    [[ game.maxWords ]] possible words, [[ game.maxScore ]] possible points.<br/>
+                    [[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words were found by all the players collectively.<br/>
+                </span>
+                <span v-else>
+                    The computer is still solving the board. This will update when it's done.<br/>
+                </span>
             <table border=1 cellpadding=7>
                 <thead><tr>
                     <td v-for="player in game.players">[[ player ]]</td>
@@ -61,9 +66,11 @@
         </div>
         <div class="compactText" style="padding-left: 20px" v-if="game != undefined">
             <br/>
-            All possible words for this board:<br/><br/>
-            <span v-for="word in game.words">[[ calculatePoints(word) ]] [[ word ]]<br/></span>
-            <span style="color:green; font-weight:bold"></span>
+            <span v-if="'words' in game">
+                All [[ game.maxWords ]] possible words for this board:<br/><br/>
+                <span v-for="word in game.words">[[ calculatePoints(word) ]] [[ word ]]<br/></span>
+                <span style="color:green; font-weight:bold"></span>
+            </span>
         </div>
     </div>
     <div class="singleCol"></div>
