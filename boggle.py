@@ -467,8 +467,9 @@ def do_action(form):
                 for word in wordsDict:
                     if word in playerData["words"]:
                         wordsDict[word] = True #true means it is a duplicate
-                        playerData["words"][word] = True
-                        playerData["score"] -= calculatePoints(word)
+                        if not playerData["words"][word]:
+                            playerData["words"][word] = True
+                            playerData["score"] -= calculatePoints(word)
             
             score = 0
             for word in wordsDict:
@@ -481,11 +482,11 @@ def do_action(form):
             }
             winners = [username]
             winScore = score
-            numWordsPlayersFound = 0
+            playerWords = set([])
             dupes = []
             for player in game["playerData"]:
                 playerData = game["playerData"][player]
-                numWordsPlayersFound += playerData["numWords"]
+                playerWords = playerWords.union(playerData["words"])
                 playerScore = playerData["score"]
                 if playerScore > winScore:
                     winners = [player]
@@ -495,12 +496,12 @@ def do_action(form):
                 for word in playerData["words"]:
                     if playerData["words"][word] and not word in dupes:
                         dupes.append(word)
-            game["numWordsPlayersFound"] = numWordsPlayersFound
+            game["numWordsPlayersFound"] = len(playerWords)
             game["duplicates"] = len(dupes)
             if ("maxWords" not in game) or game["maxWords"] == 0:
                 game["percentFound"] = 100
             else:
-                game["percentFound"] = numWordsPlayersFound / game["maxWords"] * 100
+                game["percentFound"] = game["numWordsPlayersFound"] / game["maxWords"] * 100
             game["winners"] = winners
             game["winScore"] = winScore
             save = True
