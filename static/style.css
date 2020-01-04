@@ -445,7 +445,8 @@ table.grayTable tr th, table.grayTable thead tr th {
 
 table.grayTable tr th, table.grayTable thead tr th, table.grayTable tr td, table.grayTable tbody tr td {
   text-align: left;
-  padding: 16px;
+  padding: 8px;
+  /* padding: 16px; */
 }
 
 table.grayTable tr:nth-child(even), table.grayTable thead tr:nth-child(even), table.grayTable tbody tr:nth-child(even) {
