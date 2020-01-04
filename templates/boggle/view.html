@@ -46,10 +46,7 @@
             <br/>
             <table class="grayTable" style="white-space: nowrap;" v-if="game != undefined">
                 <thead><tr>
-                    <th v-for="player in game.players"
-                        :style="'max-width: 100px; overflow: auto;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')"
-                    >[[ player ]]</th>
-                    <!-- <td>johanv</td><td>Jonv</td><td style="background-color: #0c0;">monarchofmany</td><td>verylongusername1</td><td>verylongusername2</td><td>verylongusername3</td><td>verylongusername4</td> -->
+                    <th v-for="player in game.players" :style="'max-width: 100px; overflow: auto;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">[[ player ]]</th>
                 </tr></thead>
                 <tbody><tr>
                     <td v-for="player in game.players" :style="game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4'">
@@ -60,8 +57,6 @@
                         <span v-else-if="!game.isArchived">Waiting for<br/>results...</span>
                         <span v-else>Left the<br/>game :(</span>
                     </td>
-                    <!-- <span class="vhide">|</span> -->
-                    <!-- <td>7 points<br/>5 words</td><td>8<span class="vhide">|</span>points<br/>7 words</td><td style="background-color: #0c0;">12 points<br/>7 words</td> -->
                 </tr><tr>
                     <td v-for="player in game.players" :style="'vertical-align:top;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">
                         <span v-if="player in game.playerData">
@@ -77,7 +72,6 @@
                         </span>
                         <!-- <span v-else>NO DATA</span> -->
                     </td>
-                    <!-- <td style="vertical-align:top">0 <span style="background-color: tomato; color: #fff">aced</span><br/>2 adorn<br/>0 <span style="color: #a00">arson</span><br/>0<span style="visibility: hidden">|</span><span style="color: #a00">ascend</span><br/>5<span style="visibility: hidden">|</span>ascends</td><td style="vertical-align:top">0 <span style="color: #a00">arson</span><br/>1 care<br/>2 cares<br/>2 cars<br/>0<span style="visibility: hidden">|</span><span style="color: #a00">cedar</span><br/>3<span style="visibility: hidden">|</span>cedars<br/>0 <span style="color: #a00">aced</span></td><td style="vertical-align:top; background-color: #0c0;">0 <span style="color: #a00">arson</span><br/>0 <span style="color: #a00">ascend</span><br/>1 dare<br/>2 dares<br/>1 done<br/>3 extent<br/>5 extents</td> -->
                 </tr></tbody>
                 <!-- text-decoration: line-through -->
             </table>
@@ -143,12 +137,14 @@
             },
             updateLetterSize: function() {
                 if (window.innerWidth > 540) {
-                    fontSize = 27;
+                    scaleFactor = 27*4/5;
                 } else {
-                    fontSize = 50;
+                    scaleFactor = 50;
                 }
-                this.styleObject = {fontSize: (fontSize / this.game.size) + 'vw'};
-                this.styleObjectQu = {fontSize: (fontSize*.7 / this.game.size) + 'vw'};
+                fontSize = scaleFactor / this.game.size;
+
+                this.styleObject = {fontSize: fontSize + 'vw'};
+                this.styleObjectQu = {fontSize: fontSize*.7 + 'vw'};
             },
             calculatePoints: function(word) {
                 l = word.length;

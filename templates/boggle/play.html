@@ -117,12 +117,14 @@
             },
             updateLetterSize: function() {
                 if (window.innerWidth > 540) {
-                    fontSize = 27;
+                    scaleFactor = 27*4/5;
                 } else {
-                    fontSize = 50;
+                    scaleFactor = 50;
                 }
-                this.styleObject = {fontSize: (fontSize / this.game.size) + 'vw'};
-                this.styleObjectQu = {fontSize: (fontSize*.7 / this.game.size) + 'vw'};
+                fontSize = scaleFactor / this.game.size;
+
+                this.styleObject = {fontSize: fontSize + 'vw'};
+                this.styleObjectQu = {fontSize: fontSize*.7 + 'vw'};
             },
             letterClick: function(divItem) {
                 this.enterLetter(divItem.children[0].innerHTML);
