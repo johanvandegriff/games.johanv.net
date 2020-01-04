@@ -35,7 +35,7 @@ The source code is available at: https://gitlab.com/johanvandegriff/games.johanv
 </a></header>
 <nav><div id="navDropdown">&#9776;</div><input id="navToggle" type="checkbox" checked><ul>
 {% for item in nav %}
-<li{% if active == item[0] %} class="active"{% endif %}><a href="{% if active == item[0] %}#{% else %}{{ item[1] }}{% endif %}">{{ item[0] }}</a></li>
+<li{% if active == item[0] %} class="active"{% endif %}><a href="{{ item[1] }}">{{ item[0] }}</a></li>
 {% endfor %}
 </ul></nav></div>
 <div class="main">
