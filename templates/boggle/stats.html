@@ -109,20 +109,20 @@
             <input type="checkbox" v-model="showOtherMin" checked>other times<br/>
             <br/>
             Click on columns headers to sort the table.<br/>
-            <table border=1 cellpadding=7 id="over" class="sortable">
+            <table id="pastGames" class="grayTable">
                 <thead><tr>
-                    <th>Game #</th>
-                    <th>Host</th>
-                    <th>Players</th>
-                    <th>Size</th>
-                    <th>Letters</th>
-                    <th>Time (Min)</th>
-                    <th>Total # of Words</th>
-                    <th># of Words Found</th>
-                    <th>% of Words Found</th>
-                    <th>Max Score</th>
-                    <th>Winners</th>
-                    <th>Winning Score</th>
+                    <th onclick="sortTable('pastGames', 0, true)">Game #</th>
+                    <th onclick="sortTable('pastGames', 1, false)">Host</th>
+                    <th onclick="sortTable('pastGames', 2, true)">Players</th>
+                    <th onclick="sortTable('pastGames', 3, true)">Size</th>
+                    <th onclick="sortTable('pastGames', 4, true)">Letters</th>
+                    <th onclick="sortTable('pastGames', 5, true)">Time (Min)</th>
+                    <th onclick="sortTable('pastGames', 6, true)">Total # of Words</th>
+                    <th onclick="sortTable('pastGames', 7, true)"># of Words Found</th>
+                    <th onclick="sortTable('pastGames', 8, true)">% of Words Found</th>
+                    <th onclick="sortTable('pastGames', 9, true)">Max Score</th>
+                    <th onclick="sortTable('pastGames', 10, false)">Winners</th>
+                    <th onclick="sortTable('pastGames', 11, true)">Winning Score</th>
                 </tr></thead><tbody>
                 <tr v-for="game in games">
                     <td><a :href="'?id=' + game.id + '&username={{ username }}&page=view&prev=stats'">[[ game.id ]]</a></td>
@@ -146,7 +146,7 @@
 
 </form></div>
 
-<script type="text/javascript" src="/static/sorttable.js"></script>
+<script type="text/javascript" src="/static/sorttable2.js"></script>
 
 <link rel="stylesheet" href="/static/chartist.min.css">
 <script src="/static/chartist.min.js"></script>
@@ -548,7 +548,7 @@
         for (var i=0; i<app.games.length; i++) {
             s = app.games[i][property]
             for (var j=0; j<bins.length; j++) {
-                if (Math.round(s) <= bins[j]) {
+                if (Math.round(s*10)/10 <= bins[j]) {
                     data[j]++;
                     break;
                 }

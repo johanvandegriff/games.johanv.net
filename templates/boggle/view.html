@@ -3,9 +3,12 @@
 <div id="app" class="gameArea extraSpace" v-cloak><form method="get">
     <!-- <div class="leftCol" style="position: fixed; left: 0"> -->
     <div class="leftCol leftCol2">
-        <h1 class="scale hideSmall">Boggle 2.0
-            <!-- <span class="hideLarge"> Time's Up!</span> -->
-        </h1>
+        <form method="get">
+            <input type="hidden" name="username" value="{{ username }}"/>
+            <input type="hidden" name="page" value="{{ prev }}"/>
+            <input style="position: relative; top: 2px; float: left;" class="purpleButton" type="submit" value="Back to {{ prev[0]|upper }}{{ prev[1:] }}"/>
+        </form>
+        <h1 class="scale">Boggle 2.0</h1>
         <table v-if="game != undefined" class="boggleBoard noselect"><tbody>
                 <tr v-for="(row, i) in game.board">
                     <td v-for="(item, j) in row">
@@ -16,41 +19,43 @@
                     </td>
                 </tr>
         </tbody></table>
-        <form method="get">
-            <input type="hidden" name="username" value="{{ username }}"/>
-            {% if prev == "stats" %}
-            <input type="hidden" name="page" value="stats"/>
-            <input class="purpleButton" type="submit" value="Back to Stats"/>
-            {% else %}
-            <input type="hidden" name="page" value="lobby"/>
-            <input class="greenButton" type="submit" value="Back to Lobby"/>
-            {% endif %}
-        </form>
     </div>
     <div class="rightCol scoreTable">
-        <h1 class="scale hideSmall">Time's Up!</h1>
+        <h1 v-if="!game.isArchived" class="scale hideSmall">Time's Up!</h1>
+        <h1 v-else class="scale hideSmall">Past Game</h1>
         <p v-if="game != undefined" class="scale"><span style="background-color: #0c0; padding:3px; border-radius: 5px;">
             <span v-for="(winner, i) in game.winners"><span v-if="i>0">, </span>[[ winner ]]</span>
-        </span> <span v-if="game.winners.length > 1">tie</span><span v-else>wins</span> with [[ game.winScore ]] points!</p>
+        </span>
+        <span v-if="game.isArchived">
+            <span v-if="game.winners.length > 1">tied</span><span v-else>won</span>
+        </span>
+        <span v-else>
+            <span v-if="game.winners.length > 1">tie</span><span v-else>wins</span>
+        </span>
+        with [[ game.winScore ]] points!</p>
         <div v-if="game != undefined" class="compactText">
-                Game #[[ game.id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
-                <span v-if="'words' in game">
-                    It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
-                    [[ game.maxWords ]] possible words, [[ game.maxScore ]] possible points.<br/>
-                    [[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words were found by the players. [[ game.duplicates ]] duplicates were found.<br/>
-                </span>
-                <span v-else>
-                    The computer is still solving the board. This will update when it's done.<br/>
-                </span>
-            <table border=1 cellpadding=7>
+            Game #[[ game.id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
+            <span v-if="'words' in game">
+                It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
+                [[ game.maxWords ]] words were possible for a max score of [[ game.maxScore ]] possible points.<br/>
+                [[ game.numWordsPlayersFound ]] words ([[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words) were found by players. [[ game.duplicates ]] were duplicates.<br/>
+            </span>
+            <span v-else>
+                The computer is still solving the board. This will update when it's done.<br/>
+            </span>
+            <br/>
+            <table class="grayTable">
                 <thead><tr>
-                    <td v-for="player in game.players">[[ player ]]</td>
+                    <th v-for="player in game.players">[[ player ]]</th>
                     <!-- <td>johanv</td><td>Jonv</td><td style="background-color: #0c0;">monarchofmany</td><td>verylongusername1</td><td>verylongusername2</td><td>verylongusername3</td><td>verylongusername4</td> -->
                 </tr></thead>
                 <tbody><tr>
                     <td v-for="player in game.players">
-                        <span v-if="player in game.playerData">[[ game.playerData[player].score ]] points<br/>[[ game.playerData[player].numWords ]] words</span>
-                        <span v-else>NO DATA</span>
+                        <span v-if="player in game.playerData">
+                            [[ game.playerData[player].numWords ]] words<br/>
+                            <span style="font-weight: bold;">[[ game.playerData[player].score ]] points</span>
+                        </span>
+                        <span v-else>Waiting for results...</span>
                     </td>
                     <!-- <span class="vhide">|</span> -->
                     <!-- <td>7 points<br/>5 words</td><td>8<span class="vhide">|</span>points<br/>7 words</td><td style="background-color: #0c0;">12 points<br/>7 words</td> -->
