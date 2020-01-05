@@ -61,10 +61,10 @@
                     <td v-for="player in game.players" :style="'vertical-align:top;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">
                         <span v-if="player in game.playerData">
                             <span v-for="[word, isDup] in Object.entries(game.playerData[player].words)">
-                                <span v-if="isDup" style="color: #e22">
+                                <span v-if="isDup" style="color: #e22" v-on:click="showDefinition(word)">
                                     0 [[ word ]]
                                 </span>
-                                <span v-else>
+                                <span v-else v-on:click="showDefinition(word)">
                                     [[ calculatePoints(word) ]] [[ word ]]
                                 </span>
                                 <br/>
@@ -79,25 +79,20 @@
         <div class="compactText" style="padding-left: 20px" v-if="game != undefined">
             <br/>
             <span v-if="'words' in game">
-                All [[ game.maxWords ]] possible words for this board:<br/>
+                All [[ game.maxWords ]] possible words for this board.<br/>
+                Click on a word to see the definition.<br/>
                 Sort by:
                 <button onclick="app.sortByPoints = true;">Points</button>
                 <button onclick="app.sortByPoints = false;">Alphabetical</button>
                 <br/><br/>
                 <span v-if="sortByPoints"><span v-for="word in wordsPointsByPoints">
-                    <span v-if="found.includes(word[0])" style="color:green; font-weight:bold">
-                        [[ word[1] ]] [[ word[0] ]]
-                    </span>
-                    <span v-else>
+                    <span v-on:click="showDefinition(word[0])" :style="found.includes(word[0]) ? 'color:green; font-weight:bold' : ''">
                         [[ word[1] ]] [[ word[0] ]]
                     </span>
                     <br/>
                 </span></span>
                 <span v-else><span v-for="word in wordsPointsAlphabetical">
-                    <span v-if="found.includes(word[0])" style="color:green; font-weight:bold">
-                        [[ word[1] ]] [[ word[0] ]]
-                    </span>
-                    <span v-else>
+                    <span v-on:click="showDefinition(word[0])" :style="found.includes(word[0]) ? 'color:green; font-weight:bold' : ''">
                         [[ word[1] ]] [[ word[0] ]]
                     </span>
                     <br/>
@@ -106,7 +101,10 @@
         </div>
     </div>
     <div class="singleCol"></div>
-
+    <div id="popup">
+        <button class="close" onclick="document.getElementById('popup').style.display = 'none';">x</button>
+        <div class="message"></div>
+    </div>
 </form></div>
 
 {% include 'boggle/common.html' %}
@@ -176,6 +174,19 @@
                     l = 8;
                 }
                 return [0,1,1,1,1,2,3,5,11][l]
+            },
+            showDefinition: function(word) {
+                fetch('?request=definition&word=' + word)
+                .then(response => response.json())
+                .then(json => {
+                    popup = document.getElementById("popup");
+                    popup.style.display = "block";
+                    closeButton = popup.children[0];
+                    message = popup.children[1];
+                    message.innerHTML = '<p style="text-align: center">' + word + '</p><p class="compactText">' + json.definition + '</p>';
+
+                    console.log(json.definition);
+                })
             }
         },
         mounted () {

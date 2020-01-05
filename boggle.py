@@ -430,7 +430,10 @@ def request_data(form):
         if changed:
             saveGamesFile(games)
         return {"typedWords": typedWords[username]}
-
+    if request == "definition" and "word" in form:
+        word = form["word"]
+        definitions = json.load(open(DEFINITIONS_FILE,'r'))
+        return {"definition": definitions[word]}
     return {}
 
 def do_action(form):
