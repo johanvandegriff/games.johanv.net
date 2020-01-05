@@ -79,16 +79,29 @@
         <div class="compactText" style="padding-left: 20px" v-if="game != undefined">
             <br/>
             <span v-if="'words' in game">
-                All [[ game.maxWords ]] possible words for this board:<br/><br/>
-                <span v-for="word in game.words">
-                    <span v-if="found.includes(word)" style="color:green; font-weight:bold">
-                        [[ calculatePoints(word) ]] [[ word ]]
+                All [[ game.maxWords ]] possible words for this board:<br/>
+                Sort by:
+                <button onclick="app.sortByPoints = true;">Points</button>
+                <button onclick="app.sortByPoints = false;">Alphabetical</button>
+                <br/><br/>
+                <span v-if="sortByPoints"><span v-for="word in wordsPointsByPoints">
+                    <span v-if="found.includes(word[0])" style="color:green; font-weight:bold">
+                        [[ word[1] ]] [[ word[0] ]]
                     </span>
                     <span v-else>
-                        [[ calculatePoints(word) ]] [[ word ]]
+                        [[ word[1] ]] [[ word[0] ]]
                     </span>
                     <br/>
-                </span>
+                </span></span>
+                <span v-else><span v-for="word in wordsPointsAlphabetical">
+                    <span v-if="found.includes(word[0])" style="color:green; font-weight:bold">
+                        [[ word[1] ]] [[ word[0] ]]
+                    </span>
+                    <span v-else>
+                        [[ word[1] ]] [[ word[0] ]]
+                    </span>
+                    <br/>
+                </span></span>
             </span>
         </div>
     </div>
@@ -105,7 +118,8 @@
         data: {
             game: undefined,
             styleObject: undefined,
-            styleObjectQu: undefined
+            styleObjectQu: undefined,
+            sortByPoints: true
         },
         computed: {
             found: function () {
@@ -119,6 +133,16 @@
                     }
                 }
                 return found;
+            },
+            wordsPointsAlphabetical: function () {
+                wpAlpha = [];
+                for (word of this.game.words.sort()) {
+                    wpAlpha.push([word, this.calculatePoints(word)]);
+                }
+                return wpAlpha;
+            },
+            wordsPointsByPoints: function () {
+                return this.wordsPointsAlphabetical.slice().sort(function(a,b){return b[1]-a[1]});
             }
         },
         created () {
