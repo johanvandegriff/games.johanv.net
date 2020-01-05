@@ -6,7 +6,7 @@
         <form method="get">
             <input type="hidden" name="username" value="{{ username }}"/>
             <input type="hidden" name="page" value="{{ prev }}"/>
-            <input style="position: relative; top: 2px; float: left;" class="{% if prev == 'stats' %}purpleButton{% else %}greenButton{% endif %}" type="submit" value="Back to {{ prev[0]|upper }}{{ prev[1:] }}"/>
+            <input style="position: relative; top: 2px; float: left;" class="{% if prev == 'stats' %}purpleButton{% else %}greenButton{% endif %}" type="submit" value="{{ prev[0]|upper }}{{ prev[1:] }}"/>
         </form>
         <h1 class="scale">Boggle 2.0</h1>
         <table v-if="game != undefined" class="boggleBoard noselect"><tbody>
