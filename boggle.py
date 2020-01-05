@@ -362,6 +362,16 @@ def updateGame(game):
         changed = True
     return game, changed
 
+def toIntOrDefault(v, default):
+    try:
+        return int(v)
+    except ValueError:
+        return default
+
+def filterUsername(username):
+    #only alphanumeric, max length is 32 chars
+    return re.sub('[^a-zA-Z\d]', '', username)[:32]
+
 """
 This method doesn't return html, but JSON data for JS to digest.
 It is called with AJAX requests, and the data will be formatted
@@ -371,7 +381,7 @@ def request_data(form):
     request = form["request"]
     if request == "game":
         if "id" in form:
-            id = int(form["id"])
+            id = toIntOrDefault(form["id"], -1)
             games = loadGamesFile()
             game = getGameByID(id, games)
             if game is None:
@@ -402,15 +412,15 @@ def request_data(form):
                 games = [game for game in games if game["isArchived"]]
         return {"games": games}
     if request == "basic" and "id" in form:
-        id = int(form["id"])
+        id = toIntOrDefault(form["id"], -1)
         games = loadGamesFile()
         game = getGameByID(id, games)
         if game is not None:
             return {"isStarted": game["isStarted"], "players": game["players"]}
     if request == "saveWords" and "id" in form and "words" in form and "username" in form:
-        id = int(form["id"])
+        id = toIntOrDefault(form["id"])
         words = form["words"].split(",")
-        username = form["username"]
+        username = filterUsername(form["username"])
         games = loadGamesFile()
         game = getGameByID(id, games)
         game, changed = updateGame(game)
@@ -439,7 +449,7 @@ def request_data(form):
 def do_action(form):
     # these are guaranteed by the function that calls this
     action = form["action"]
-    username = form["username"]
+    username = filterUsername(form["username"])
 
     if action == "create":
         if "preset" in form:
@@ -540,7 +550,7 @@ def load_page(form, page=None, id=None):
     if page == "login":
         return render_template("boggle/login.html", page=page, nav=nav, active="Boggle")
 
-    username = form["username"]
+    username = filterUsername(form["username"])
 
     if page == "pregame" and id is not None:
         return render_template("boggle/pregame.html", id=id, username=username, nav=nav, active="Boggle")
