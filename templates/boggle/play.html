@@ -74,6 +74,9 @@
                 console.log(this.game)
                 this.isHost = (this.game.players[0] == this.username)
                 this.updateLetterSize()
+                if (this.game.typedWords != undefined) {
+                    this.words = this.game.typedWords[this.username];
+                }
                 this.numQu = 0;
                 for (var i=0; i<this.game.board.length; i++) {
                     for (var j=0; j<this.game.board[i].length; j++) {
@@ -90,11 +93,10 @@
                     if (this.game.secondsLeft <= 0) {
                         this.game.isDone = true;
                         if (this.word.length >= this.game.letters) {
-                            this.words.push(this.word.toLowerCase());
+                            this.enterWord(this.word);
                             this.word = "";
                         }
-                        window.location = "?username={{ username }}&action=submit&id={{ id }}&page=view&words=" +
-                            this.words.join(",");
+                        window.location = "?username={{ username }}&id={{ id }}&page=view";
                     } else {
                         this.game.secondsLeft--;
                     }
@@ -165,7 +167,7 @@
                 console.log(key);
                 if (key == "Enter" || key == " " || key == ",") {
                     if (this.word.length >= this.game.letters) {
-                        this.words.push(this.word.toLowerCase());
+                        this.enterWord(this.word);
                         this.word = "";
                     }
                 } else if (key == "Escape") {
@@ -178,6 +180,14 @@
                     if (!key.search(letterPattern) || key == "Qu") {
                         this.word += key.toUpperCase();
                     }
+                }
+            },
+            enterWord: function(word) {
+                word = word.toLowerCase();
+                if (this.words.indexOf(word) == -1) {
+                    this.words.push(word);
+                    // this.game.typedWords[this.username].push(word);
+                    fetch('?request=saveWords&id={{ id }}&username={{ username }}&words=' + this.words.join(","));
                 }
             }
         },

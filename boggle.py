@@ -277,6 +277,74 @@ class BackgroundSolver(object):
 
         saveGamesFile(games)
 
+def processAllTypedWords(game):
+    if not "typedWords" in game:
+        return game
+    wordList = json.load(open(WORD_LIST_FILE,'r'))
+    if not "playerData" in game:
+        game["playerData"] = {}
+    for username in game["typedWords"]:
+        words = game["typedWords"][username]
+        
+        if not username in game["players"]:
+            game["players"].append(username)
+        
+        wordsDict = {}
+        
+        for word in words:
+            if not word in wordsDict:
+                if "words" in game: #if the board is already solved
+                    if word in game["words"]: #check the list of solved words
+                        wordsDict[word] = False #false means it's not a duplicate
+                else: # if the board has not been solved yet
+                    if isWordValid(game, word, wordList): #manually check using the board
+                        wordsDict[word] = False #false means it's not a duplicate
+
+        for player in game["playerData"]:
+            playerData = game["playerData"][player]
+            for word in wordsDict:
+                if word in playerData["words"]:
+                    wordsDict[word] = True #true means it is a duplicate
+                    if not playerData["words"][word]:
+                        playerData["words"][word] = True
+                        playerData["score"] -= calculatePoints(word)
+    
+        score = 0
+        for word in wordsDict:
+            if not wordsDict[word]:
+                score += calculatePoints(word)
+        game["playerData"][username] = {
+            "words": wordsDict,
+            "score": score,
+            "numWords": len(wordsDict)
+        }
+
+    winners = []
+    winScore = -1
+    playerWords = set([])
+    dupes = []
+    for player in game["playerData"]:
+        playerData = game["playerData"][player]
+        playerWords = playerWords.union(playerData["words"])
+        playerScore = playerData["score"]
+        if playerScore > winScore:
+            winners = [player]
+            winScore = playerScore
+        elif playerScore == winScore and not player in winners:
+            winners.append(player)
+        for word in playerData["words"]:
+            if playerData["words"][word] and not word in dupes:
+                dupes.append(word)
+    game["numWordsPlayersFound"] = len(playerWords)
+    game["duplicates"] = len(dupes)
+    if ("maxWords" not in game) or game["maxWords"] == 0:
+        game["percentFound"] = 100
+    else:
+        game["percentFound"] = game["numWordsPlayersFound"] / game["maxWords"] * 100
+    game["winners"] = winners
+    game["winScore"] = winScore
+    return game
+
 def updateGame(game):
     changed = False
     if "timeStartedSeconds" in game:
@@ -286,6 +354,7 @@ def updateGame(game):
     game["secondsLeft"] = game["minutes"]*60 - elapsedSeconds
     if game["secondsLeft"] <= 0 and not game["isDone"]:
         game["isDone"] = True
+        game = processAllTypedWords(game)
         changed = True
     # if the game has been over for longer than the archive timeout, and it's not already archived, and it's solved
     if game["secondsLeft"] <= -ARCHIVE_TIMEOUT and not game["isArchived"] and "words" in game:
@@ -338,6 +407,30 @@ def request_data(form):
         game = getGameByID(id, games)
         if game is not None:
             return {"isStarted": game["isStarted"], "players": game["players"]}
+    if request == "saveWords" and "id" in form and "words" in form and "username" in form:
+        id = int(form["id"])
+        words = form["words"].split(",")
+        username = form["username"]
+        games = loadGamesFile()
+        game = getGameByID(id, games)
+        game, changed = updateGame(game)
+        if not "typedWords" in game:
+            game["typedWords"] = {}
+            changed = True
+        typedWords = game["typedWords"]
+        if not game["isDone"]:
+            if not username in typedWords:
+                typedWords[username] = []
+                changed = True
+            myTypedWords = typedWords[username]
+            for word in words:
+                if not word in myTypedWords:
+                    myTypedWords.append(word)
+                    changed = True
+        if changed:
+            saveGamesFile(games)
+        return {"typedWords": typedWords[username]}
+
     return {}
 
 def do_action(form):
@@ -427,88 +520,6 @@ def do_action(form):
                 games = deleteGameByID(id, games)
             saveGamesFile(games)
         return "lobby", None
-
-    if action == "submit" and "id" in form and "words" in form:
-        id = int(form["id"])
-        words = form["words"].split(",")
-        games = loadGamesFile()
-        game = getGameByID(id, games)
-
-        if game is None:
-            return "lobby", None
-        if not game["isStarted"]:
-            return "pregame", id
-        # can't add words after the game is archived
-        if game["isArchived"]:
-            print("can't add words after the game is archived")
-            return "view", id
-        save = False
-        if not username in game["players"]:
-            game["players"].append(username)
-            save = True
-        if not "playerData" in game:
-            game["playerData"] = {}
-            save = True
-        if not username in game["playerData"]:
-            wordsDict = {}
-            
-            wordList = json.load(open(WORD_LIST_FILE,'r'))
-            for word in words:
-                if not word in wordsDict:
-                    if "words" in game: #if the board is already solved
-                        if word in game["words"]: #check the list of solved words
-                            wordsDict[word] = False #false means it's not a duplicate
-                    else: # if the board has not been solved yet
-                        if isWordValid(game, word, wordList): #manually check using the board
-                            wordsDict[word] = False #false means it's not a duplicate
-
-            for player in game["playerData"]:
-                playerData = game["playerData"][player]
-                for word in wordsDict:
-                    if word in playerData["words"]:
-                        wordsDict[word] = True #true means it is a duplicate
-                        if not playerData["words"][word]:
-                            playerData["words"][word] = True
-                            playerData["score"] -= calculatePoints(word)
-            
-            score = 0
-            for word in wordsDict:
-                if not wordsDict[word]:
-                    score += calculatePoints(word)
-            game["playerData"][username] = {
-                "words": wordsDict,
-                "score": score,
-                "numWords": len(wordsDict)
-            }
-            winners = [username]
-            winScore = score
-            playerWords = set([])
-            dupes = []
-            for player in game["playerData"]:
-                playerData = game["playerData"][player]
-                playerWords = playerWords.union(playerData["words"])
-                playerScore = playerData["score"]
-                if playerScore > winScore:
-                    winners = [player]
-                    winScore = playerScore
-                elif playerScore == winScore and not player in winners:
-                    winners.append(player)
-                for word in playerData["words"]:
-                    if playerData["words"][word] and not word in dupes:
-                        dupes.append(word)
-            game["numWordsPlayersFound"] = len(playerWords)
-            game["duplicates"] = len(dupes)
-            if ("maxWords" not in game) or game["maxWords"] == 0:
-                game["percentFound"] = 100
-            else:
-                game["percentFound"] = game["numWordsPlayersFound"] / game["maxWords"] * 100
-            game["winners"] = winners
-            game["winScore"] = winScore
-            save = True
-        if save:
-            saveGamesFile(games)
-        return "view", id
-
     return "lobby", None
 
 def load_page(form, page=None, id=None):
