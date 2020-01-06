@@ -187,7 +187,7 @@
                 if (this.words.indexOf(word) == -1) {
                     this.words.push(word);
                     // this.game.typedWords[this.username].push(word);
-                    fetch('?request=saveWords&id={{ id }}&username={{ username }}&words=' + this.words.join(","));
+                    fetch('?request=savewords&id={{ id }}&username={{ username }}&words=' + this.words.join(","));
                 }
             }
         },

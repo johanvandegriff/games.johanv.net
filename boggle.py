@@ -428,7 +428,7 @@ def request_data(form):
         game = getGameByID(id, games)
         if game is not None:
             return {"isStarted": game["isStarted"], "players": game["players"]}
-    if request == "saveWords" and "id" in form and "words" in form and "username" in form:
+    if request == "savewords" and "id" in form and "words" in form and "username" in form:
         id = toIntOrDefault(form["id"], -1)
         words = form["words"].split(",")
         words = [filterWord(word) for word in words]
