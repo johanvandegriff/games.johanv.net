@@ -368,9 +368,19 @@ def toIntOrDefault(v, default):
     except ValueError:
         return default
 
+def toFloatOrDefault(v, default):
+    try:
+        return float(v)
+    except ValueError:
+        return default
+
 def filterUsername(username):
     #only alphanumeric, max length is 32 chars
     return re.sub('[^a-zA-Z\d]', '', username)[:32]
+
+def filterWord(word):
+    #only letters, convert to lowercase
+    return re.sub('[^a-z]', '', word.lower())
 
 """
 This method doesn't return html, but JSON data for JS to digest.
@@ -378,7 +388,7 @@ It is called with AJAX requests, and the data will be formatted
 to update part of the page without reloading the whole thing.
 """
 def request_data(form):
-    request = form["request"]
+    request = filterWord(form["request"])
     if request == "game":
         if "id" in form:
             id = toIntOrDefault(form["id"], -1)
@@ -406,9 +416,10 @@ def request_data(form):
         if anyChanged:
             saveGamesFile(games)
         if "page" in form:
-            if form["page"] == "lobby":
+            page = filterWord(form["page"])
+            if page == "lobby":
                 games = [game for game in games if game["secondsLeft"] > -REMOVE_FROM_LOBBY_TIMEOUT]
-            elif form["page"] == "stats":
+            elif page == "stats":
                 games = [game for game in games if game["isArchived"]]
         return {"games": games}
     if request == "basic" and "id" in form:
@@ -418,8 +429,9 @@ def request_data(form):
         if game is not None:
             return {"isStarted": game["isStarted"], "players": game["players"]}
     if request == "saveWords" and "id" in form and "words" in form and "username" in form:
-        id = toIntOrDefault(form["id"])
+        id = toIntOrDefault(form["id"], -1)
         words = form["words"].split(",")
+        words = [filterWord(word) for word in words]
         username = filterUsername(form["username"])
         games = loadGamesFile()
         game = getGameByID(id, games)
@@ -441,14 +453,14 @@ def request_data(form):
             saveGamesFile(games)
         return {"typedWords": typedWords[username]}
     if request == "definition" and "word" in form:
-        word = form["word"]
+        word = filterWord(form["word"])
         definitions = json.load(open(DEFINITIONS_FILE,'r'))
         return {"definition": definitions[word]}
     return {}
 
 def do_action(form):
     # these are guaranteed by the function that calls this
-    action = form["action"]
+    action = filterWord(form["action"])
     username = filterUsername(form["username"])
 
     if action == "create":
@@ -464,9 +476,17 @@ def do_action(form):
                 minutes = 3
             elif preset == "custom" and "size" in form and "letters" in form and "minutes" in form:
                 size = form["size"]
-                size = int(size.split('x')[0])
-                letters = int(form["letters"])
-                minutes = float(form["minutes"])
+                matched = re.match("^(\d+)x(\d+)$", size)
+                if matched is None:
+                    size = 5
+                else:
+                    size = int(matched.groups()[0])
+                if size < 5:
+                    lettersDefault = 3
+                else:
+                    lettersDefault = 4
+                letters = toIntOrDefault(form["letters"], lettersDefault)
+                minutes = toFloatOrDefault(form["minutes"], 3)
             else:
                 return "lobby", None
             games = loadGamesFile();
@@ -482,7 +502,7 @@ def do_action(form):
         return "lobby", None
 
     if action == "join" and "id" in form:
-        id = int(form["id"])
+        id = toIntOrDefault(form["id"], -1)
         games = loadGamesFile()
         game = getGameByID(id, games)
         if game is None:
@@ -500,7 +520,7 @@ def do_action(form):
         return "lobby", None
 
     if action == "start" and "id" in form:
-        id = int(form["id"])
+        id = toIntOrDefault(form["id"], -1)
         games = loadGamesFile()
         game = getGameByID(id, games)
         if game is None:
@@ -521,7 +541,7 @@ def do_action(form):
                 return "view", id
 
     if action == "cancel" and "id" in form:
-        id = int(form["id"])
+        id = toIntOrDefault(form["id"], -1)
         games = loadGamesFile()
         game = getGameByID(id, games)
         # works only in the pregame and play phases (i.e. isDone = False)
@@ -540,12 +560,12 @@ def load_page(form, page=None, id=None):
         page = "login"
     elif page is None:
         if "page" in form:
-            page = form["page"]
+            page = filterWord(form["page"])
         else:
             page = "lobby"
 
     if id is None and "id" in form:
-        id = int(form["id"])
+        id = toIntOrDefault(form["id"], -1)
 
     if page == "login":
         return render_template("boggle/login.html", page=page, nav=nav, active="Boggle")
@@ -560,7 +580,7 @@ def load_page(form, page=None, id=None):
 
     if page == "view" and id is not None:
         if "prev" in form:
-            prev = form["prev"]
+            prev = filterWord(form["prev"])
         else:
             prev = "lobby"
 
