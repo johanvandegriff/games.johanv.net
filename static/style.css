@@ -48,7 +48,7 @@ a.svg {
   top: 0;
 }
 
-.ribbon {
+#ribbon {
   background-color: #000000;
   clear: both;
   height: 155px;
@@ -63,9 +63,9 @@ a.svg {
   overflow: hidden;
 }
 
-.main {
+#main {
   margin: 0;
-  margin-top: 180px;
+  margin-top: 185px;
   padding: 0;
 }
 
@@ -125,7 +125,7 @@ nav ul li a:hover:not(.active) {
   transition: all .4s;
 }
 
-.active {
+#active {
   background-color: #631fa3;
 }
 
@@ -146,7 +146,7 @@ footer {
     padding: 10px;
 }
 
-.green {
+.greenLink {
   color: #0f0;
   font-weight: bold;
   text-decoration: none;
@@ -179,7 +179,52 @@ footer {
     margin-right:auto;
 }
 
+.img65left {
+    width:65%;
+    display:block;
+    margin-left:0;
+}
 
+.img35left {
+    width:35%;
+    display:block;
+    margin-left:0;
+}
+
+.mono {
+    font-family: 'Monospace', sans-serif;
+}
+
+#navToggle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+  opacity: 0;
+  cursor: pointer;
+  height: 38px;
+  margin: 0;
+  padding: 0;
+}
+
+#navDropdown {
+  color: white;
+  background-color: #333;
+  border-top: 1px solid #0f0;
+  margin: 0;
+  width: 100%;
+  height: 18px;
+
+  padding: 10px 0;
+  text-align: center;
+
+  transition: all .4s;
+}
+
+nav:hover #navDropdown {
+  background-color: #111;
+}
 
 
 
@@ -455,40 +500,6 @@ table.grayTable tr:nth-child(even), table.grayTable thead tr:nth-child(even), ta
 }
 
 
-
-
-#navToggle {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  z-index: 1;
-  opacity: 0;
-  cursor: pointer;
-  height: 38px;
-  margin: 0;
-  padding: 0;
-}
-
-#navDropdown {
-  color: white;
-  background-color: #333;
-  border-top: 1px solid #0f0;
-  margin: 0;
-  width: 100%;
-  height: 18px;
-
-  padding: 10px 0;
-  text-align: center;
-
-  transition: all .4s;
-}
-
-nav:hover #navDropdown {
-  background-color: #111;
-}
-
-
 [v-cloak] { display: none; }
 
 
@@ -552,10 +563,10 @@ svg.ct-chart-bar, svg.ct-chart-line{
   #asciiArt {
     display: none;
   }
-  .main {
+  #main {
     margin-top: 115px;
   }
-  .ribbon {
+  #ribbon {
     height: 115px;
   }
   .gamesTable {
@@ -641,10 +652,10 @@ svg.ct-chart-bar, svg.ct-chart-line{
   #asciiArtSmall {
     display: none;
   }
-  .ribbon {
+  #ribbon {
     height: 75px;
   }
-  .main {
+  #main {
     margin-top: 75px;
   }
 
