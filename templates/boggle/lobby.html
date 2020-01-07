@@ -2,7 +2,7 @@
 
 <div id="app" class="gameArea">
     <div class="leftCol">
-        <form method="get">
+        <form method="{{ formMethod }}">
             <h1 class="scale">Boggle 2.0 Lobby</h1>
             <p class="scale">Welcome, {{ username }}! Select a game type, or join an existing game.</p>
             <input class="radioHide" type="radio" name="preset" id="5x5" value="5x5" v-model="preset">
@@ -56,7 +56,7 @@
             <input class="greenButton" type="submit" value="Create Game"/>
         </form>
         <br/>
-        <form method="get">
+        <form method="{{ formMethod }}">
             <input type="hidden" name="username" value="{{ username }}"/>
             <input type="hidden" name="page" value="stats"/>
             <input class="purpleButton" type="submit" value="Past Games, Records & Stats"/>
@@ -67,7 +67,7 @@
 
         <div v-for="game in games" class="grayBox" v-cloak>
             <div style="padding: 5px; border-bottom: 2px solid black;">
-            <form method="get">
+            <form method="{{ formMethod }}">
                 <span v-if="!game.isStarted">
                     <input class="greenButton" type="submit" value="Join"/>
                     Game #[[ game.id ]] (waiting...)

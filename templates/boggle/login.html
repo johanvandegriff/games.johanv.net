@@ -1,6 +1,6 @@
 {% include 'header.html' %}
 
-<div class="gameArea"><form method="get" action="/boggle" name="login" onsubmit="return validateUsername()">
+<div class="gameArea"><form method="{{ formMethod }}" action="/boggle" name="login" onsubmit="return validateUsername()">
     <div class="singleCol">
         <h1 class="scale" style="margin-bottom: 1em">Boggle 2.0</h1>
     </div>

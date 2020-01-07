@@ -1,6 +1,6 @@
 {% include 'header.html' %}
 
-<div id="app" class="gameArea" v-cloak><form method="get">
+<div id="app" class="gameArea" v-cloak><form method="{{ formMethod }}">
     <div class="leftCol">
         <h1 class="scale" style="margin-bottom: 1em">Boggle 2.0</h1>
         <p class="scale" v-if="game != undefined">
@@ -16,7 +16,7 @@
             Waiting for players...<br/>
         </p>
         <span v-if="isHost">
-            <form method="get">
+            <form method="{{ formMethod }}">
                 <input type="hidden" name="username" value="{{ username }}"/>
                 <input type="hidden" name="action" value="start"/>
                 <input type="hidden" name="id" value="{{ id }}"/>
@@ -24,7 +24,7 @@
                 <input class="greenButton" style="float: left; margin: 10px;" type="submit" value="Begin"/>
             </form>
         </span>
-        <form method="get">
+        <form method="{{ formMethod }}">
             <input type="hidden" name="username" value="{{ username }}"/>
             <input type="hidden" name="action" value="cancel"/>
             <input type="hidden" name="id" value="{{ id }}"/>

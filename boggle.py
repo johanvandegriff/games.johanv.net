@@ -567,16 +567,25 @@ def load_page(form, page=None, id=None):
     if id is None and "id" in form:
         id = toIntOrDefault(form["id"], -1)
 
+    kwargs = {
+        "nav": nav,
+        "active": "Boggle",
+        "stylesheet": "boggle",
+        "formMethod": "get",
+        "id": id
+    }
+
     if page == "login":
-        return render_template("boggle/login.html", page=page, nav=nav, active="Boggle", stylesheet="boggle")
+        return render_template("boggle/login.html", page=page, **kwargs)
 
     username = filterUsername(form["username"])
+    kwargs["username"] = username
 
     if page == "pregame" and id is not None:
-        return render_template("boggle/pregame.html", id=id, username=username, nav=nav, active="Boggle", stylesheet="boggle")
+        return render_template("boggle/pregame.html", **kwargs)
 
     if page == "play" and id is not None:
-        return render_template("boggle/play.html", id=id, username=username, nav=nav, active="Boggle", stylesheet="boggle")
+        return render_template("boggle/play.html", **kwargs)
 
     if page == "view" and id is not None:
         if "prev" in form:
@@ -584,13 +593,13 @@ def load_page(form, page=None, id=None):
         else:
             prev = "lobby"
 
-        return render_template("boggle/view.html", username=username, id=id, prev=prev, nav=nav, active="Boggle", stylesheet="boggle")
+        return render_template("boggle/view.html", prev=prev, **kwargs)
 
     if page == "stats":
-        return render_template("boggle/stats.html", username=username, nav=nav, active="Boggle", stylesheet="boggle")
+        return render_template("boggle/stats.html", **kwargs)
 
     if page == "lobby":
-        return render_template("boggle/lobby.html", remove_from_lobby_timeout=REMOVE_FROM_LOBBY_TIMEOUT, username=username, nav=nav, active="Boggle", stylesheet="boggle")
+        return render_template("boggle/lobby.html", remove_from_lobby_timeout=REMOVE_FROM_LOBBY_TIMEOUT, **kwargs)
 
     return "error with page '" + str(page) + "'"
 

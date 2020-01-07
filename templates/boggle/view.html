@@ -1,9 +1,9 @@
 {% include 'header.html' %}
 
-<div id="app" class="gameArea extraSpace" v-cloak><form method="get">
+<div id="app" class="gameArea extraSpace" v-cloak><form method="{{ formMethod }}">
     <!-- <div class="leftCol" style="position: fixed; left: 0"> -->
     <div class="leftCol leftCol2">
-        <form method="get">
+        <form method="{{ formMethod }}">
             <input type="hidden" name="username" value="{{ username }}"/>
             <input type="hidden" name="page" value="{{ prev }}"/>
             <input style="position: relative; top: 2px; float: left;" class="{% if prev == 'stats' %}purpleButton{% else %}greenButton{% endif %}" type="submit" value="{{ prev[0]|upper }}{{ prev[1:] }}"/>
