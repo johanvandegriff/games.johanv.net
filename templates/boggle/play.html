@@ -74,7 +74,7 @@
                 console.log(this.game)
                 this.isHost = (this.game.players[0] == this.username)
                 this.updateLetterSize()
-                if (this.game.typedWords != undefined) {
+                if (this.game.typedWords != undefined && this.game.typedWords[this.username] != undefined) {
                     this.words = this.game.typedWords[this.username];
                 }
                 this.numQu = 0;
