@@ -283,8 +283,11 @@ def processAllTypedWords(game):
     wordList = json.load(open(WORD_LIST_FILE,'r'))
     if not "playerData" in game:
         game["playerData"] = {}
-    for username in game["typedWords"]:
-        words = game["typedWords"][username]
+    for username in game["players"]:
+        if username in game["typedWords"]:
+            words = game["typedWords"][username]
+        else:
+            words = []
         
         if not username in game["players"]:
             game["players"].append(username)

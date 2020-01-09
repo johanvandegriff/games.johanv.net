@@ -21,10 +21,9 @@
         <button onclick="app.buttonClick('Backspace')" ontouchstart="app.buttonTap('Backspace', event)" class="grayButton bigButton">&#9003;</button>
         <button onclick="app.buttonClick('Escape')" ontouchstart="app.buttonTap('Escape', event)" class="grayButton bigButton">Clear</button>
 
-        <p style="border-bottom: 2px solid black; overflow-wrap: break-word;">
+        <p style="border-bottom: 2px solid black; overflow-wrap: break-word; font-size: .9em;">
             <span v-for="(word, i) in words"><span v-if="i>0">, </span>[[ word ]]</span>
         </p>
-        <p v-if="game != undefined" style="font-size: .9em;">Words need at least [[ game.letters ]] letters!</p>
         <span v-if="game != undefined">Game #[[ game.id ]]</span><br/>
         <span v-if="isHost">
             host (you): [[ username ]]<br/>
@@ -33,10 +32,11 @@
             host: [[ game.players[0] ]]<br/>
             you: [[ username ]]<br/>
         </span>
-        <br/>
+        <p v-if="game != undefined" style="font-size: .9em;">Words need at least [[ game.letters ]] letters.</p>
         <form method="{{ formMethod }}">
             <input type="hidden" name="username" value="{{ username }}"/>
             <input type="hidden" name="action" value="cancel"/>
+            <input type="hidden" name="id" value="{{ id }}"/>
             <input type="hidden" name="page" value="lobby"/>
             <input class="redButton" type="submit" value="Leave Game"/>
         </form>
@@ -109,6 +109,7 @@
                 .then(json => {
                     console.log(json)
                     this.game.players = json.players;
+                    this.isHost = (this.game.players[0] == this.username)
                 })
             },
             //show time in the mm:ss format, with zero-padding on the seconds
