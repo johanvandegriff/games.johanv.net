@@ -99,22 +99,22 @@ def calculatePoints(word):
 #x, y: the current position on the board
 #word: the current word
 #used: the spots the word has letters from 
-def solve_aux(x, y, word, used, board, words, found, size):
-    myused = used[:]
+# def solve_aux(x, y, word, used, board, words, found, size):
+#     myused = used[:]
 
-    myused.append([x,y]); #use the current spot
-    myword = word + board[x][y].lower() #add on to the word
+#     myused.append([x,y]); #use the current spot
+#     myword = word + board[x][y].lower() #add on to the word
 
-    if myword in words: #if the word is in the list of possible words
-        found.append(myword)
-        # found[myword] = myused
-        words.remove(myword)
-    if not any(re.search("^" + myword, word) for word in words):
-        return
-    for newx in range(x-1,x+2): # +2 because range() is exclusive on the upper bound
-        for newy in range(y-1,y+2):
-            if (newx>=0 and newy>=0 and newx<size and newy<size and not [newx,newy] in myused):
-                solve_aux(newx, newy, myword, myused, board, words, found, size)
+#     if myword in words: #if the word is in the list of possible words
+#         found.append(myword)
+#         # found[myword] = myused
+#         words.remove(myword)
+#     if not any(re.search("^" + myword, word) for word in words):
+#         return
+#     for newx in range(x-1,x+2): # +2 because range() is exclusive on the upper bound
+#         for newy in range(y-1,y+2):
+#             if (newx>=0 and newy>=0 and newx<size and newy<size and not [newx,newy] in myused):
+#                 solve_aux(newx, newy, myword, myused, board, words, found, size)
 
 def solve(game):
     start = time.time()
@@ -154,7 +154,8 @@ def solve(game):
     #increase the number of U's by the number of Qu's
     quantities[ALPHABET.index('U')] += quantities[ALPHABET.index('Qu')]
 
-    words = [] #the list of possible words
+    # words = [] #the list of possible words
+    found = []
     
     wordList = json.load(open(WORD_LIST_FILE,'r'))
     for line in wordList: #sort through each word
@@ -163,18 +164,19 @@ def solve(game):
             if not any(line.count(ALPHABET[i].lower()) > quantities[i] for i in range(len(ALPHABET))):
                 #if there are no letters not on the board in this word
                 if not any(letter.lower() in line for letter in excluded):
-                    words.append(line); #add the word to the list of possible words
+                    # words.append(line); #add the word to the list of possible words
+                    if isWordValid(game, line, None):
+                        found.append(line)
 
     score = 0
-    numwords = 0
-    found = []
+    #found = []
     # found = {}
 
-    for x in range(size):
-        for y in range(size):
-            used = []
-            word = ""
-            solve_aux(x, y, word, used, board, words, found, size)
+    # for x in range(size):
+    #     for y in range(size):
+    #         used = []
+    #         word = ""
+    #         solve_aux(x, y, word, used, board, words, found, size)
     
     score = 0
     for word in found:
@@ -189,18 +191,16 @@ def solve(game):
 
 def isWordValidAux(board, word, x, y, used, size):
     if len(word) == 0: return True
-    
     myused = used[:]
     myused.append([x,y]); #use the current spot
-    
     l = board[x][y].lower()
     if l == "qu":
-        if len(word) < 2 or word[0:2] != "qu":
-            return False
+        if len(word) < 2 or word[0:2] != "qu": return False
+        if word == "qu": return True
         newword = word[2:]
     else:
-        if word[0] != l:
-            return False
+        if word[0] != l: return False
+        if word == l: return True
         newword = word[1:]
             
     for newx in range(x-1,x+2): # +2 because range() is exclusive on the upper bound
@@ -212,7 +212,7 @@ def isWordValidAux(board, word, x, y, used, size):
 
 
 def isWordValid(game, word, wordList):
-    if len(word) < game["letters"] or not word in wordList:
+    if len(word) < game["letters"] or (wordList is not None and not word in wordList):
         return False
     board = game["board"]
     size = len(board)
@@ -222,7 +222,6 @@ def isWordValid(game, word, wordList):
                 if isWordValidAux(board, word, x, y, [], size):
                      return True
     return False
-
 
 def saveGamesFile(games):
     json.dump(games, open(GAMES_FILE, 'w'), indent=2) # indentation for development and debugging
