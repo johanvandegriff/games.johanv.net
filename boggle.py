@@ -277,13 +277,11 @@ class BackgroundSolver(object):
         saveGamesFile(games)
 
 def processAllTypedWords(game):
-    if not "typedWords" in game:
-        return game
     wordList = json.load(open(WORD_LIST_FILE,'r'))
     if not "playerData" in game:
         game["playerData"] = {}
     for username in game["players"]:
-        if username in game["typedWords"]:
+        if "typedWords" in game and username in game["typedWords"]:
             words = game["typedWords"][username]
         else:
             words = []
