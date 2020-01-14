@@ -121,8 +121,8 @@
                     <th onclick="sortTable('pastGames', 7, true)"># of Words Found</th>
                     <th onclick="sortTable('pastGames', 8, true)">% of Words Found</th>
                     <th onclick="sortTable('pastGames', 9, true)">Max Score</th>
-                    <th onclick="sortTable('pastGames', 10, false)">Winners</th>
-                    <th onclick="sortTable('pastGames', 11, true)">Winning Score</th>
+                    <th onclick="sortTable('pastGames', 10, true)">Winning Score</th>
+                    <th onclick="sortTable('pastGames', 11, false)">Winners</th>
                 </tr></thead><tbody>
                 <tr v-for="game in games">
                     <td><a :href="'?id=' + game.id + '&username={{ username }}&page=view&prev=stats'">[[ game.id ]]</a></td>
@@ -135,8 +135,8 @@
                     <td>[[ game.numWordsPlayersFound ]]</td>
                     <td>[[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]%</td>
                     <td>[[ game.maxScore ]]</td>
-                    <td><span v-for="(winner, i) in game.winners"><span v-if="i>0">, </span>[[ winner ]]</span></td>
                     <td>[[ game.winScore ]]</td>
+                    <td><span v-for="(winner, i) in game.winners"><span v-if="i>0">, </span>[[ winner ]]</span></td>
                 </tr>
                 </tbody>
             </table>
