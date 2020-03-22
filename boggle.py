@@ -556,16 +556,21 @@ def do_action(form):
     return "lobby", None
 
 def load_page(form, page=None, id=None):
-    if not "username" in form:
-        page = "login"
-    elif page is None:
+    if page is None:
         if "page" in form:
             page = filterWord(form["page"])
         else:
             page = "lobby"
+    if not "username" in form and page != "stats":
+        page = "login"
 
     if id is None and "id" in form:
         id = toIntOrDefault(form["id"], -1)
+    
+    if "prev" in form:
+        prev = filterWord(form["prev"])
+    else:
+        prev = "lobby"
 
     kwargs = {
         "nav": nav,
@@ -578,7 +583,11 @@ def load_page(form, page=None, id=None):
     if page == "login":
         return render_template("boggle/login.html", page=page, **kwargs)
 
-    username = filterUsername(form["username"])
+    if "username" in form:
+        username = filterUsername(form["username"])
+    else:
+        username = ""
+
     kwargs["username"] = username
 
     if page == "pregame" and id is not None:
@@ -588,15 +597,10 @@ def load_page(form, page=None, id=None):
         return render_template("boggle/play.html", **kwargs)
 
     if page == "view" and id is not None:
-        if "prev" in form:
-            prev = filterWord(form["prev"])
-        else:
-            prev = "lobby"
-
         return render_template("boggle/view.html", prev=prev, **kwargs)
 
     if page == "stats":
-        return render_template("boggle/stats.html", **kwargs)
+        return render_template("boggle/stats.html", prev=prev, **kwargs)
 
     if page == "lobby":
         return render_template("boggle/lobby.html", remove_from_lobby_timeout=REMOVE_FROM_LOBBY_TIMEOUT, **kwargs)

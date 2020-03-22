@@ -1,6 +1,6 @@
 {% include 'header.html' %}
 
-<div class="gameArea"><form method="{{ formMethod }}" action="/boggle" name="login" onsubmit="return validateUsername()">
+<div class="gameArea">
     <div class="singleCol">
         <h1 class="scale" style="margin-bottom: 1em">Boggle 2.0</h1>
     </div>
@@ -8,17 +8,26 @@
         <img src="/static/boggle/5x5.png" style="width: 70%">
     </div>
     <div class="rightCol">
-        <input type="text" class="underlineText" id="name" name="username" placeholder="Nickname" required autofocus/>
-        <br/>
-        <input class="greenButton" type="submit" value="Enter Lobby"/>
-        <p id="error" style="background-color: #e33; color: white;"></p>
+        <form method="{{ formMethod }}" action="/boggle" name="login" onsubmit="return validateUsername()">
+          <input type="text" class="underlineText" id="name" name="username" placeholder="Nickname" required autofocus/>
+          <br/>
+          <input class="greenButton" type="submit" value="Enter Lobby"/>
+          <p id="error" style="background-color: #e33; color: white;"></p>
+        </form>
     </div>
     <div class="singleCol">
         <input type="hidden" name="page" value="lobby"/>
         <p class="scale">Boggle is a word game with a grid of random letters. The goal is to find letters next to each other that form words. The game lasts 3 minutes and the person with the highest score (longer words are worth more) at the end wins.</p>
+
+        <form method="{{ formMethod }}">
+          <input type="hidden" name="page" value="stats"/>
+          <input type="hidden" name="prev" value="login"/>
+          <input class="purpleButton" type="submit" value="Past Games & Stats"/>
+        </form>
+
         <p class="scale"><a href="/boggle_old">Visit the old Boggle game >></a></p>
     </div>
-</form></div>
+</div>
 
 <script>
 function validateUsername() {
