@@ -42,7 +42,7 @@
         </form>
         <br/>
         <h2 class="scale">Video Call</h2>
-        <p><a target="_blank" href="https://whereby.com/johanv-boggle">Join the video chat!</a></p>
+        <p><a target="_blank" href="https://drive.confuzer.cloud/index.php/call/wscgqe9r">Join the video chat!</a></p>
         <h2 v-if="game != undefined">[[ game.players.length ]] players total</h2>
         <p class="scale" v-if="game != undefined">
             <span v-for="(player, i) in game.players"><span v-if="i>0">, </span>[[ player ]]</span>
@@ -216,6 +216,12 @@
             }, 500)
         }
     });
+    document.onkeydown = KeyPress;
+    function KeyPress(e) {
+        if (!e.metaKey){
+            e.preventDefault();
+        }
+    }
 </script>
 
 {% include 'footer.html' %}
