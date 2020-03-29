@@ -396,16 +396,16 @@ def request_data(form):
             game = getGameByID(id, games)
             if game is None:
                 print("game request with id {}, game not found".format(id))
-                return {}
+                return json.dumps({})
             else:
                 print("game request with id {}, game found".format(id))
                 game, changed = updateGame(game)
                 if changed:
                     saveGamesFile(games)
-                return {"game": game}
+                return json.dumps({"game": game})
         else:
             print("game request with no id")
-            return {}
+            return json.dumps({})
     if request == "games":
         games = loadGamesFile()
         anyChanged = False
@@ -421,13 +421,13 @@ def request_data(form):
                 games = [game for game in games if game["secondsLeft"] > -REMOVE_FROM_LOBBY_TIMEOUT]
             elif page == "stats":
                 games = [game for game in games if game["isArchived"]]
-        return {"games": games}
+        return json.dumps({"games": games})
     if request == "basic" and "id" in form:
         id = toIntOrDefault(form["id"], -1)
         games = loadGamesFile()
         game = getGameByID(id, games)
         if game is not None:
-            return {"isStarted": game["isStarted"], "players": game["players"]}
+            return json.dumps({"isStarted": game["isStarted"], "players": game["players"]})
     if request == "savewords" and "id" in form and "words" in form and "username" in form:
         id = toIntOrDefault(form["id"], -1)
         words = form["words"].split(",")
@@ -451,12 +451,12 @@ def request_data(form):
                     changed = True
         if changed:
             saveGamesFile(games)
-        return {"typedWords": typedWords[username]}
+        return json.dumps({"typedWords": typedWords[username]})
     if request == "definition" and "word" in form:
         word = filterWord(form["word"])
         definitions = json.load(open(DEFINITIONS_FILE,'r'))
-        return {"definition": definitions[word]}
-    return {}
+        return json.dumps({"definition": definitions[word]})
+    return json.dumps({})
 
 def do_action(form):
     # these are guaranteed by the function that calls this
