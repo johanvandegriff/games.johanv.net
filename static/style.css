@@ -245,7 +245,7 @@ nav:hover #navDropdown {
   }
 }
 
-@media not all and (max-width: 540px) {
+@media not all and (max-width: 720px) {
   .hideLarge {
     display: none;
   }
@@ -260,7 +260,7 @@ nav:hover #navDropdown {
   }
 }
 
-@media all and (max-width: 540px) {
+@media all and (max-width: 720px) {
 
   #asciiArt {
     display: none;
