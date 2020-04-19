@@ -467,7 +467,7 @@
                 fetch('?request=games&page=stats')
                 .then(response => response.json())
                 .then(json => {
-                    this.gamesAll = json.games
+                    this.gamesAll = json.games.reverse()
                 })
             }
         },
