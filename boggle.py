@@ -3,7 +3,7 @@ import sys, cgi, json, datetime, re, time, decimal, subprocess, random, threadin
 
 from nav import nav #file in same dir
 
-ROOT_DIR = "/srv/Boggle"
+ROOT_DIR = "/srv/boggle"
 GAMES_FILE = ROOT_DIR + "/games.json"
 GAMES_LOCK_FILE = ROOT_DIR + "/games.json.lock"
 
@@ -260,9 +260,10 @@ def deleteGameByID(id, games):
 
 def newGameID(games):
     ids = [int(game["id"]) for game in games]
-    id = 0
-    while id in ids: id += 1
-    return id
+    return max(ids)+1
+    # id = 0
+    # while id in ids: id += 1
+    # return id
 
 class BackgroundSolver(object):
     def __init__(self, game):
