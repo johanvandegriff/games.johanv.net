@@ -77,26 +77,26 @@
             <form method="{{ formMethod }}">
                 <span v-if="!game.isStarted">
                     <input class="greenButton" type="submit" value="Join"/>
-                    Game #[[ game.id ]] (waiting...)
-                    <input type="hidden" name="id" v-bind:value="game.id"/>
+                    Game #[[ game._id ]] (waiting...)
+                    <input type="hidden" name="id" v-bind:value="game._id"/>
                     <input type="hidden" name="action" value="join"/>
                     <input type="hidden" name="page" value="pregame"/>
                 </span>
                 <span v-else-if="!game.isDone">
                     <input class="blueButton" type="submit" value="Join Late"/>
-                    Game #[[ game.id ]] (time left: [[ showTime(game.secondsLeft) ]])
-                    <input type="hidden" name="id" v-bind:value="game.id"/>
+                    Game #[[ game._id ]] (time left: [[ showTime(game.secondsLeft) ]])
+                    <input type="hidden" name="id" v-bind:value="game._id"/>
                     <input type="hidden" name="action" value="join"/>
                     <input type="hidden" name="page" value="play"/>
                 </span>
                 <span v-else>
                     <input class="purpleButton" type="submit" value="View"/>
-                    Game #[[ game.id ]] (time's up!)
-                    <input type="hidden" name="id" v-bind:value="game.id"/>
+                    Game #[[ game._id ]] (time's up!)
+                    <input type="hidden" name="id" v-bind:value="game._id"/>
                     <input type="hidden" name="page" value="view"/>
                 </span>
                 <input type="hidden" name="username" value="{{ username }}"/>
-                <input type="hidden" name="id" :value="game.id"/>
+                <input type="hidden" name="id" :value="game._id"/>
             </form>
             </div>
             <div>

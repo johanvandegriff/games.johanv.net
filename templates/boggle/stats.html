@@ -14,47 +14,47 @@
         <p class="scale" style="margin: 10px;">
             <div v-if="games5x5.length > 0" class="grayBox">
                 <h3>5x5, 4 letters, 3 min</h3>
-                <a :href="'?id=' + highScore5x5.id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScore5x5.winScore ]]<br/>
-                <a :href="'?id=' + highWords5x5.id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWords5x5.numWordsPlayersFound ]]<br/>
-                <a :href="'?id=' + highPercent5x5.id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercent5x5.percentFound * 100) / 100).toFixed(2) ]]%<br/>
-                <a :href="'?id=' + highMaxScore5x5.id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScore5x5.maxScore ]]<br/>
-                <a :href="'?id=' + highMaxWords5x5.id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWords5x5.maxWords ]]<br/>
-                <a :href="'?id=' + lowMaxScore5x5.id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScore5x5.maxScore ]]<br/>
-                <a :href="'?id=' + lowMaxWords5x5.id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWords5x5.maxWords ]]<br/>
-                <a :href="'?id=' + highDuplicates5x5.id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicates5x5.duplicates ]]<br/>
+                <a :href="'?id=' + highScore5x5._id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScore5x5.winScore ]]<br/>
+                <a :href="'?id=' + highWords5x5._id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWords5x5.numWordsPlayersFound ]]<br/>
+                <a :href="'?id=' + highPercent5x5._id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercent5x5.percentFound * 100) / 100).toFixed(2) ]]%<br/>
+                <a :href="'?id=' + highMaxScore5x5._id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScore5x5.maxScore ]]<br/>
+                <a :href="'?id=' + highMaxWords5x5._id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWords5x5.maxWords ]]<br/>
+                <a :href="'?id=' + lowMaxScore5x5._id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScore5x5.maxScore ]]<br/>
+                <a :href="'?id=' + lowMaxWords5x5._id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWords5x5.maxWords ]]<br/>
+                <a :href="'?id=' + highDuplicates5x5._id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicates5x5.duplicates ]]<br/>
             </div>
             <div v-if="games4x4.length > 0" class="grayBox">
                 <h3>4x4, 3 letters, 3 min</h3>
-                <a :href="'?id=' + highScore4x4.id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScore4x4.winScore ]]<br/>
-                <a :href="'?id=' + highWords4x4.id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWords4x4.numWordsPlayersFound ]]<br/>
-                <a :href="'?id=' + highPercent4x4.id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercent4x4.percentFound * 100) / 100).toFixed(2) ]]%<br/>
-                <a :href="'?id=' + highMaxScore4x4.id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScore4x4.maxScore ]]<br/>
-                <a :href="'?id=' + highMaxWords4x4.id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWords4x4.maxWords ]]<br/>
-                <a :href="'?id=' + lowMaxScore4x4.id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScore4x4.maxScore ]]<br/>
-                <a :href="'?id=' + lowMaxWords4x4.id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWords4x4.maxWords ]]<br/>
-                <a :href="'?id=' + highDuplicates4x4.id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicates4x4.duplicates ]]<br/>
+                <a :href="'?id=' + highScore4x4._id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScore4x4.winScore ]]<br/>
+                <a :href="'?id=' + highWords4x4._id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWords4x4.numWordsPlayersFound ]]<br/>
+                <a :href="'?id=' + highPercent4x4._id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercent4x4.percentFound * 100) / 100).toFixed(2) ]]%<br/>
+                <a :href="'?id=' + highMaxScore4x4._id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScore4x4.maxScore ]]<br/>
+                <a :href="'?id=' + highMaxWords4x4._id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWords4x4.maxWords ]]<br/>
+                <a :href="'?id=' + lowMaxScore4x4._id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScore4x4.maxScore ]]<br/>
+                <a :href="'?id=' + lowMaxWords4x4._id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWords4x4.maxWords ]]<br/>
+                <a :href="'?id=' + highDuplicates4x4._id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicates4x4.duplicates ]]<br/>
             </div>
             <div v-if="games.length > 0" class="grayBox">
                 <h3>Games Selected</h3>
-                <a :href="'?id=' + highScoreSel.id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScoreSel.winScore ]]<br/>
-                <a :href="'?id=' + highWordsSel.id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWordsSel.numWordsPlayersFound ]]<br/>
-                <a :href="'?id=' + highPercentSel.id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercentSel.percentFound * 100) / 100).toFixed(2) ]]%<br/>
-                <a :href="'?id=' + highMaxScoreSel.id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScoreSel.maxScore ]]<br/>
-                <a :href="'?id=' + highMaxWordsSel.id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWordsSel.maxWords ]]<br/>
-                <a :href="'?id=' + lowMaxScoreSel.id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScoreSel.maxScore ]]<br/>
-                <a :href="'?id=' + lowMaxWordsSel.id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWordsSel.maxWords ]]<br/>
-                <a :href="'?id=' + highDuplicatesSel.id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicatesSel.duplicates ]]<br/>
+                <a :href="'?id=' + highScoreSel._id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScoreSel.winScore ]]<br/>
+                <a :href="'?id=' + highWordsSel._id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWordsSel.numWordsPlayersFound ]]<br/>
+                <a :href="'?id=' + highPercentSel._id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercentSel.percentFound * 100) / 100).toFixed(2) ]]%<br/>
+                <a :href="'?id=' + highMaxScoreSel._id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScoreSel.maxScore ]]<br/>
+                <a :href="'?id=' + highMaxWordsSel._id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWordsSel.maxWords ]]<br/>
+                <a :href="'?id=' + lowMaxScoreSel._id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScoreSel.maxScore ]]<br/>
+                <a :href="'?id=' + lowMaxWordsSel._id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWordsSel.maxWords ]]<br/>
+                <a :href="'?id=' + highDuplicatesSel._id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicatesSel.duplicates ]]<br/>
             </div>
             <div v-if="gamesAll.length > 0" class="grayBox">
                 <h3>All Games</h3>
-                <a :href="'?id=' + highScoreAll.id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScoreAll.winScore ]]<br/>
-                <a :href="'?id=' + highWordsAll.id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWordsAll.numWordsPlayersFound ]]<br/>
-                <a :href="'?id=' + highPercentAll.id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercentAll.percentFound * 100) / 100).toFixed(2) ]]%<br/>
-                <a :href="'?id=' + highMaxScoreAll.id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScoreAll.maxScore ]]<br/>
-                <a :href="'?id=' + highMaxWordsAll.id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWordsAll.maxWords ]]<br/>
-                <a :href="'?id=' + lowMaxScoreAll.id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScoreAll.maxScore ]]<br/>
-                <a :href="'?id=' + lowMaxWordsAll.id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWordsAll.maxWords ]]<br/>
-                <a :href="'?id=' + highDuplicatesAll.id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicatesAll.duplicates ]]<br/>
+                <a :href="'?id=' + highScoreAll._id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScoreAll.winScore ]]<br/>
+                <a :href="'?id=' + highWordsAll._id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWordsAll.numWordsPlayersFound ]]<br/>
+                <a :href="'?id=' + highPercentAll._id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercentAll.percentFound * 100) / 100).toFixed(2) ]]%<br/>
+                <a :href="'?id=' + highMaxScoreAll._id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScoreAll.maxScore ]]<br/>
+                <a :href="'?id=' + highMaxWordsAll._id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWordsAll.maxWords ]]<br/>
+                <a :href="'?id=' + lowMaxScoreAll._id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScoreAll.maxScore ]]<br/>
+                <a :href="'?id=' + lowMaxWordsAll._id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWordsAll.maxWords ]]<br/>
+                <a :href="'?id=' + highDuplicatesAll._id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicatesAll.duplicates ]]<br/>
             </div>
         </p>
         <!-- <p class="compactText" style="margin: 10px;">
@@ -125,7 +125,7 @@
                     <th onclick="sortTable('pastGames', 11, false)">Winners</th>
                 </tr></thead><tbody>
                 <tr v-for="game in games">
-                    <td><a :href="'?id=' + game.id + '&username={{ username }}&page=view&prev=stats'">[[ game.id ]]</a></td>
+                    <td><a :href="'?id=' + game._id + '&username={{ username }}&page=view&prev=stats'">[[ game._id ]]</a></td>
                     <td><span v-if="game.players.length > 0">[[ game.players[0] ]]</span></td>
                     <td>[[ game.players.length ]]</td>
                     <td>[[ game.size ]]x[[ game.size ]]</td>

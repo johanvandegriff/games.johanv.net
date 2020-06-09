@@ -24,7 +24,7 @@
         <p style="border-bottom: 2px solid black; overflow-wrap: break-word; font-size: .9em;">
             <span v-for="(word, i) in words"><span v-if="i>0">, </span>[[ word ]]</span>
         </p>
-        <span v-if="game != undefined">Game #[[ game.id ]]</span><br/>
+        <span v-if="game != undefined">Game #[[ game._id ]]</span><br/>
         <span v-if="isHost">
             host (you): [[ username ]]<br/>
         </span>

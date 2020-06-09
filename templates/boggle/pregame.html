@@ -4,7 +4,7 @@
     <div class="leftCol">
         <h1 class="scale" style="margin-bottom: 1em">Boggle 2.0</h1>
         <p class="scale" v-if="game != undefined">
-            Game #[[ game.id ]]<br/>
+            Game #[[ game._id ]]<br/>
             [[ game.size ]]x[[ game.size ]], [[ game.letters ]] letters, [[ game.minutes ]] min<br/>
             <span v-if="isHost">
                 host (you): [[ username ]]<br/>

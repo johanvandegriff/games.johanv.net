@@ -34,7 +34,7 @@
         </span>
         with [[ game.winScore ]] points!</p>
         <div v-if="game != undefined" class="compactText">
-            Game #[[ game.id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
+            Game #[[ game._id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
             <span v-if="'words' in game">
                 It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
                 [[ game.maxWords ]] words were possible for a max score of [[ game.maxScore ]] possible points.<br/>

@@ -1,11 +1,11 @@
 from flask import render_template
-import sys, cgi, json, datetime, re, time, decimal, subprocess, random, threading, os
+import sys, cgi, json, datetime, re, time, decimal, subprocess, random, threading, os, pymongo
 
 from nav import nav #file in same dir
 
 ROOT_DIR = "/srv/boggle"
-GAMES_FILE = ROOT_DIR + "/games.json"
-GAMES_LOCK_FILE = ROOT_DIR + "/games.json.lock"
+# GAMES_FILE = ROOT_DIR + "/games.json"
+# GAMES_LOCK_FILE = ROOT_DIR + "/games.json.lock"
 
 DEFINITIONS_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019WithDefinitions.json'
 WORD_LIST_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019.json'
@@ -49,6 +49,15 @@ BOGGLE_DICE = [
 #the boggle alphabet
 ALPHABET = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
             'N','O','P','Qu','R','S','T','U','V','W','X','Y','Z']
+
+DB_NAME = "boggle"
+COLL_NAME = "games"
+
+dbClient = pymongo.MongoClient("mongodb://localhost:27017")
+db = dbClient[DB_NAME]
+coll = db[COLL_NAME]
+
+wordList = json.load(open(WORD_LIST_FILE,'r'))
 
 #replace quotes
 def rq(s):
@@ -224,46 +233,21 @@ def isWordValid(game, word, wordList):
                      return True
     return False
 
-def lockGamesFile():
-    #wait for the file lock to go away
-    while os.path.exists(GAMES_LOCK_FILE):
-        print("Waiting for lock...")
-        time.sleep(0.1)
-    #create the file lock to indicate that the file is being used
-    open(GAMES_LOCK_FILE, 'a').close()
 
-def unlockGamesFile():
-    #delete the file lock to indicate that the file is not in use anymore
-    os.remove(GAMES_LOCK_FILE)
+def getGameByID(id):
+    return coll.find_one({"_id": id})
 
-def saveGamesFile(games):
-    json.dump(games, open(GAMES_FILE, 'w'), indent=2) # indentation for development and debugging
-    # json.dump(games, open(GAMES_FILE, 'w'))
+def deleteGameByID(id):
+    coll.delete_one({"_id": id})
 
-def loadGamesFile():
-    try:
-        games = json.load(open(GAMES_FILE, 'r'))
-    except FileNotFoundError:
-        # if the file doesn't exist, create it with an empty list
-        games = []
-        saveGamesFile(games)
-    return games
+def getAllIDs():
+    return [x["_id"] for x in coll.find({}, {"_id": 1})]
+def newGameID():
+    return max(getAllIDs())+1
 
-def getGameByID(id, games):
-    for game in games:
-        if game["id"] == id:
-            return game
-    return None
+def updateAttr(game, attr):
+    coll.update_one({"_id": game["_id"]}, {"$set": {attr: game[attr]}})
 
-def deleteGameByID(id, games):
-    return [game for game in games if game["id"] != id]
-
-def newGameID(games):
-    ids = [int(game["id"]) for game in games]
-    return max(ids)+1
-    # id = 0
-    # while id in ids: id += 1
-    # return id
 
 class BackgroundSolver(object):
     def __init__(self, game):
@@ -274,9 +258,9 @@ class BackgroundSolver(object):
 
     def run(self):
         self.game = solve(self.game)
-        lockGamesFile()
-        games = loadGamesFile()
-        new_game = getGameByID(self.game["id"], games)
+        # lockGamesFile()
+        # games = loadGamesFile()
+        new_game = getGameByID(self.game["_id"])
         new_game["words"] = self.game["words"]
         new_game["maxScore"] = self.game["maxScore"]
         new_game["maxWords"] = self.game["maxWords"]
@@ -289,11 +273,12 @@ class BackgroundSolver(object):
         else:
             new_game["percentFound"] = new_game["numWordsPlayersFound"] / new_game["maxWords"] * 100
 
-        saveGamesFile(games)
-        unlockGamesFile()
+        coll.update_one({"_id": new_game["_id"]}, {"$set": {"words": new_game["words"], "maxScore": new_game["maxScore"], "maxWords": new_game["maxWords"], "secondsToSolve": new_game["secondsToSolve"], "percentFound": new_game["percentFound"]}})
+
+        # saveGamesFile(games)
+        # unlockGamesFile()
 
 def processAllTypedWords(game):
-    wordList = json.load(open(WORD_LIST_FILE,'r'))
     if not "playerData" in game:
         game["playerData"] = {}
     for username in game["players"]:
@@ -359,6 +344,7 @@ def processAllTypedWords(game):
         game["percentFound"] = game["numWordsPlayersFound"] / game["maxWords"] * 100
     game["winners"] = winners
     game["winScore"] = winScore
+    coll.update_one({"_id": game["_id"]}, {"$set": {"playerData": game["playerData"], "typedWords": game["typedWords"], "numWordsPlayersFound": game["numWordsPlayersFound"], "duplicates": game["duplicates"], "percentFound": game["percentFound"], "winners": game["winners"], "winScore": game["winScore"]}})
     return game
 
 def updateGame(game):
@@ -376,7 +362,9 @@ def updateGame(game):
     if game["secondsLeft"] <= -ARCHIVE_TIMEOUT and not game["isArchived"] and "words" in game:
         game["isArchived"] = True
         changed = True
-    return game, changed
+    if changed:
+        coll.update_one({"_id": game["_id"]}, {"$set": {"secondsLeft": game["secondsLeft"], "isDone": game["isDone"], "isArchived": game["isArchived"]}})
+    return game
 
 def toIntOrDefault(v, default):
     try:
@@ -408,34 +396,36 @@ def request_data(form):
     if request == "game":
         if "id" in form:
             id = toIntOrDefault(form["id"], -1)
-            lockGamesFile()
-            games = loadGamesFile()
-            game = getGameByID(id, games)
+            # lockGamesFile()
+            # games = loadGamesFile()
+            game = getGameByID(id)
             if game is None:
                 print("game request with id {}, game not found".format(id))
-                unlockGamesFile()
+                # unlockGamesFile()
                 return json.dumps({})
             else:
                 print("game request with id {}, game found".format(id))
-                game, changed = updateGame(game)
-                if changed:
-                    saveGamesFile(games)
-                unlockGamesFile()
+                game = updateGame(game)
+                # if changed:
+                #     saveGamesFile(games)
+                # unlockGamesFile()
                 return json.dumps({"game": game})
         else:
             print("game request with no id")
             return json.dumps({})
     if request == "games":
-        lockGamesFile()
-        games = loadGamesFile()
-        anyChanged = False
-        for game in games:
-            game, changed = updateGame(game)
-            if changed:
-                anyChanged = True
-        if anyChanged:
-            saveGamesFile(games)
-        unlockGamesFile()
+        # lockGamesFile()
+        # games = loadGamesFile()
+        # anyChanged = False
+        games = coll.find()
+        games = [updateGame(game) for game in games]
+        # for id in getAllIDs():
+        #     updateGame(getGameByID(id))
+            # if changed:
+            #     anyChanged = True
+        # if anyChanged:
+        #     saveGamesFile(games)
+        # unlockGamesFile()
         if "page" in form:
             page = filterWord(form["page"])
             if page == "lobby":
@@ -445,10 +435,10 @@ def request_data(form):
         return json.dumps({"games": games})
     if request == "basic" and "id" in form:
         id = toIntOrDefault(form["id"], -1)
-        lockGamesFile()
-        games = loadGamesFile()
-        unlockGamesFile()
-        game = getGameByID(id, games)
+        # lockGamesFile()
+        # games = loadGamesFile()
+        # unlockGamesFile()
+        game = getGameByID(id)
         if game is not None:
             return json.dumps({"isStarted": game["isStarted"], "players": game["players"]})
     if request == "savewords" and "id" in form and "words" in form and "username" in form:
@@ -456,10 +446,10 @@ def request_data(form):
         words = form["words"].split(",")
         words = [filterWord(word) for word in words]
         username = filterUsername(form["username"])
-        lockGamesFile()
-        games = loadGamesFile()
-        game = getGameByID(id, games)
-        game, changed = updateGame(game)
+        # lockGamesFile()
+        # games = loadGamesFile()
+        game = getGameByID(id)
+        game = updateGame(game)
         if not "typedWords" in game:
             game["typedWords"] = {}
             changed = True
@@ -474,8 +464,10 @@ def request_data(form):
                     myTypedWords.append(word)
                     changed = True
         if changed:
-            saveGamesFile(games)
-        unlockGamesFile()
+            updateAttr(game, "typedWords")
+            # coll.update_one({"_id": game["_id"]}, {"$set": {"typedWords": typedWords})
+            # saveGamesFile(games)
+        # unlockGamesFile()
         return json.dumps({"typedWords": typedWords[username]})
     if request == "definition" and "word" in form:
         word = filterWord(form["word"])
@@ -514,36 +506,39 @@ def do_action(form):
                 minutes = toFloatOrDefault(form["minutes"], 3)
             else:
                 return "lobby", None
-            lockGamesFile()
-            games = loadGamesFile()
+            # lockGamesFile()
+            # games = loadGamesFile()
             print("creating game: size={}, letters={}, minutes={}".format(size, letters, minutes))
             game = create(size=size, letters=letters, minutes=minutes)
-            game["id"] = newGameID(games)
+            game["_id"] = newGameID()
             BackgroundSolver(game)
             game["players"].append(username)
             print(game)
-            games.append(game)
-            saveGamesFile(games)
-            unlockGamesFile()
-            return "pregame", game["id"]
+            coll.insert_one(game)
+            # games.append(game)
+            # saveGamesFile(games)
+            # unlockGamesFile()
+            return "pregame", game["_id"]
         return "lobby", None
 
     if action == "join" and "id" in form:
         id = toIntOrDefault(form["id"], -1)
-        lockGamesFile()
-        games = loadGamesFile()
-        game = getGameByID(id, games)
+        # lockGamesFile()
+        # games = loadGamesFile()
+        game = getGameByID(id)
         if game is None:
-            unlockGamesFile()
+            # unlockGamesFile()
             return "lobby", None
         # can't join after the game is finished
         if game["isDone"]:
-            unlockGamesFile()
+            # unlockGamesFile()
             return "view", id
         elif not username in game["players"]:
             game["players"].append(username)
-            saveGamesFile(games)
-        unlockGamesFile()
+            updateAttr(game, "players")
+            # coll.update_one({"_id": game["_id"]}, {"$set": {"players": game["players"]})
+            # saveGamesFile(games)
+        # unlockGamesFile()
         if game["isStarted"]:
             return "play", id
         else:
@@ -551,11 +546,11 @@ def do_action(form):
 
     if action == "start" and "id" in form:
         id = toIntOrDefault(form["id"], -1)
-        lockGamesFile()
-        games = loadGamesFile()
-        game = getGameByID(id, games)
+        # lockGamesFile()
+        # games = loadGamesFile()
+        game = getGameByID(id)
         if game is None:
-            unlockGamesFile()
+            # unlockGamesFile()
             return "lobby", None
         players = game["players"]
         if len(players) > 0 and players[0] == username:
@@ -563,8 +558,9 @@ def do_action(form):
             if not game["isStarted"]:
                 game["isStarted"] = True
                 game["timeStartedSeconds"] = int(time.time())
-                saveGamesFile(games)
-        unlockGamesFile()
+                coll.update_one({"_id": game["_id"]}, {"$set": {"isStarted": game["isStarted"], "timeStartedSeconds": game["timeStartedSeconds"]}})
+                # saveGamesFile(games)
+        # unlockGamesFile()
         if not game["isStarted"]:
             return "pregame", id
         elif not game["isDone"]:
@@ -574,18 +570,20 @@ def do_action(form):
 
     if action == "cancel" and "id" in form:
         id = toIntOrDefault(form["id"], -1)
-        lockGamesFile()
-        games = loadGamesFile()
-        game = getGameByID(id, games)
+        # lockGamesFile()
+        # games = loadGamesFile()
+        game = getGameByID(id)
         # works only in the pregame and play phases (i.e. isDone = False)
         if game is not None and not game["isDone"]:
             # remove this player from the game, promoting the next player to host.
             game["players"].remove(username)
             # if there are no more players, delete the game
             if len(game["players"]) == 0:
-                games = deleteGameByID(id, games)
-            saveGamesFile(games)
-        unlockGamesFile()
+                games = deleteGameByID(id)
+            else:
+                updateAttr(game, "players")
+            # saveGamesFile(games)
+        # unlockGamesFile()
         return "lobby", None
     return "lobby", None
 
