@@ -593,7 +593,7 @@ def load_page(form, page=None, id=None):
             page = filterWord(form["page"])
         else:
             page = "lobby"
-    if not "username" in form and page != "stats":
+    if not "username" in form and not page in ("stats", "json"):
         page = "login"
 
     if id is None and "id" in form:
@@ -633,6 +633,9 @@ def load_page(form, page=None, id=None):
 
     if page == "stats":
         return render_template("boggle/stats.html", prev=prev, **kwargs)
+
+    if page == "json":
+        return json.dumps([x for x in coll.find()], indent=2)
 
     if page == "lobby":
         return render_template("boggle/lobby.html", remove_from_lobby_timeout=REMOVE_FROM_LOBBY_TIMEOUT, **kwargs)
