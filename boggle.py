@@ -53,7 +53,10 @@ ALPHABET = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
 DB_NAME = "boggle"
 COLL_NAME = "games"
 
-dbClient = pymongo.MongoClient("mongodb://localhost:27017")
+with open("/srv/boggle/mongodb-url.txt", 'r') as f:
+    DB_URL = f.read()
+
+dbClient = pymongo.MongoClient(DB_URL)
 db = dbClient[DB_NAME]
 coll = db[COLL_NAME]
 
