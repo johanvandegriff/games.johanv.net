@@ -284,8 +284,10 @@ class BackgroundSolver(object):
 def processAllTypedWords(game):
     if not "playerData" in game:
         game["playerData"] = {}
+    if not "typedWords" in game:
+        game["typedWords"] = {}
     for username in game["players"]:
-        if "typedWords" in game and username in game["typedWords"]:
+        if username in game["typedWords"]:
             words = game["typedWords"][username]
         else:
             words = []
