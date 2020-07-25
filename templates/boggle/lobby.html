@@ -154,6 +154,7 @@
                 fetch('?request=games&page=lobby')
                 .then(response => response.json())
                 .then(json => {
+                    json.games.sort((a, b) => (a._id < b._id) ? 1 : -1)
                     this.games = json.games
                 })
             }
