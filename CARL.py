@@ -7,6 +7,8 @@ def getLeastUsed(links, excludeIdx):
     for i, item in enumerate(links):
         if i != excludeIdx:
             least.append(len(item))
+    if len(least) == 0:
+        return random.randint(0,len(links)-1)
     least = min(least)
     leastIdx = []
     for i, link in enumerate(links):
