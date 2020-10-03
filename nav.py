@@ -1,10 +1,10 @@
 nav = [
-    ["Home", "https://johanv.xyz"],
-    ["Games", "/"],
+    ["home", "https://johanv.xyz"],
+    ["games", "/"],
     ["CARL", "/carl"],
-    ["Boggle", "/boggle"],
-    ["Maze", "/maze"],
-    ["Whack", "/whack.pl"],
-    ["Math", "/math"],
-    ["Chem", "/chem"]
+    ["boggle", "/boggle"],
+    ["maze", "/maze"],
+    ["whack", "/whack.pl"],
+    ["math", "/math"],
+    ["chem", "/chem"]
 ]
