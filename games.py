@@ -30,7 +30,7 @@ def run_perl_page(request, perl_program, title):
 
 @app.route("/")
 def main():
-    return render_template("index.html", nav=nav, active="Games")
+    return render_template("index.html", nav=nav, active="games")
 
 #START profanity-tests
 @app.route("/profanity-test")
@@ -74,13 +74,13 @@ def stoichiometry():
             grams_or_moles_value = chem_whitelist(args["grams_or_moles_value"])
             optional_args = " '" + compound + "' " + grams_or_moles_value + " " + grams_or_moles
         result = os.popen("java -jar Stoichiometry.jar '" + equation + "'" + optional_args).read()
-    return render_template("stoichiometry.html", nav=nav, active="Chem", result=result, equation=equation, compound=compound, grams_or_moles_value=grams_or_moles_value, grams_or_moles=grams_or_moles)
+    return render_template("stoichiometry.html", nav=nav, active="chem", result=result, equation=equation, compound=compound, grams_or_moles_value=grams_or_moles_value, grams_or_moles=grams_or_moles)
 #END STOICHIOMETRY
 
 #START MATH
 @app.route("/math")
 def math_page():
-    return render_template("math.html", nav=nav, active="Math")
+    return render_template("math.html", nav=nav, active="math")
 
 @app.route("/math_game.pl", methods=["GET", "POST"])
 def math_game():
@@ -94,17 +94,17 @@ def math_score():
 #START WHACK
 @app.route("/whack.pl", methods=["GET", "POST"])
 def whack_page():
-    return run_perl_page(request, "whack.pl", "Whack")
+    return run_perl_page(request, "whack.pl", "whack")
 #END WHACK
 
 #START MAZE
 @app.route("/maze")
 def maze_page():
-    return render_template("maze.html", nav=nav, active="Maze")
+    return render_template("maze.html", nav=nav, active="maze")
 
 @app.route("/showmaze.pl", methods=["GET", "POST"])
 def showmaze_page():
-    return run_perl_page(request, "showmaze.pl", "Maze")
+    return run_perl_page(request, "showmaze.pl", "maze")
 #END MAZE
 
 #START BOGGLE

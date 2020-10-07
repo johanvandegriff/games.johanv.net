@@ -246,7 +246,11 @@ def deleteGameByID(id):
 def getAllIDs():
     return [x["_id"] for x in coll.find({}, {"_id": 1})]
 def newGameID():
-    return max(getAllIDs())+1
+    allIDs = getAllIDs()
+    if len(allIDs) == 0: #if there are no IDs, max([]) will fail
+        return 0 #so return 1 so it starts with game #0
+    else:
+        return max(getAllIDs())+1
 
 def updateAttr(game, attr):
     coll.update_one({"_id": game["_id"]}, {"$set": {attr: game[attr]}})
@@ -611,7 +615,7 @@ def load_page(form, page=None, id=None):
 
     kwargs = {
         "nav": nav,
-        "active": "Boggle",
+        "active": "boggle",
         "stylesheet": "boggle",
         "formMethod": "get",
         "id": id
