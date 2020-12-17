@@ -51,6 +51,10 @@
                         <option>10</option>
                 </select> minutes
             </label>
+            <input class="radioHide" type="radio" name="preset" id="random" value="random" v-model="preset">
+            <label class="singleCol grayBox" for="random">
+                Random Board!<br/>
+            </label>
             <input type="hidden" name="username" value="{{ username }}"/>
             <input type="hidden" name="action" value="create"/>
             <input type="hidden" name="page" value="pregame"/>

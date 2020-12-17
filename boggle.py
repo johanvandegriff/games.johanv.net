@@ -500,6 +500,20 @@ def do_action(form):
                 size = 4
                 letters = 3
                 minutes = 3
+            elif preset == "random":
+                size = random.randint(2,8)
+                letters = [0,0,
+                    random.randint(2,3), #2
+                    random.randint(2,4), #3
+                    random.randint(2,5), #4
+                    random.randint(2,6), #5
+                    random.randint(2,7), #6
+                    random.randint(2,7), #7
+                    random.randint(2,7)  #8
+                ]
+                letters = letters[size]
+                minutes = random.randint(0,10)
+                if minutes == 0: minutes = 0.5
             elif preset == "custom" and "size" in form and "letters" in form and "minutes" in form:
                 size = form["size"]
                 matched = re.match("^(\d+)x(\d+)$", size)
