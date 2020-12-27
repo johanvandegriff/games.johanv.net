@@ -642,7 +642,7 @@ def load_page(form, page=None, id=None):
             page = filterWord(form["page"])
         else:
             page = "lobby"
-    if not "username" in form and not page in ("stats", "json"):
+    if not "username" in form and not page in ("stats", "json", "view"):
         page = "login"
 
     if id is None and "id" in form:
