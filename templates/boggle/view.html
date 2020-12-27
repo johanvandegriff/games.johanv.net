@@ -93,10 +93,10 @@
                     <tr v-for="word in allWordsPlayersFound">
                         <td v-for="player in game.players" :class="game.winners.indexOf(player) == -1 ? '' : 'winner'">
                             <span v-if="player in game.playerData && word in game.playerData[player].words">
-                                <span v-if="game.playerData[player].words[word]" style="color: #e22" v-on:click="showDefinition(word)">
+                                <span v-if="game.playerData[player].words[word]" style="color: #e22" v-on:click="wordClicked(word)">
                                     0 [[ word ]]
                                 </span>
-                                <span v-else v-on:click="showDefinition(word)">
+                                <span v-else v-on:click="wordClicked(word)">
                                     [[ calculatePoints(word) ]] [[ word ]]
                                 </span>
                             </span>
@@ -108,10 +108,10 @@
                         <td v-for="player in game.players" :style="'vertical-align:top;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">
                             <span v-if="player in game.playerData">
                                 <span v-for="[word, isDup] in Object.entries(game.playerData[player].words)">
-                                    <span v-if="isDup" style="color: #e22" v-on:click="showDefinition(word)">
+                                    <span v-if="isDup" style="color: #e22" v-on:click="wordClicked(word)">
                                         0 [[ word ]]
                                     </span>
-                                    <span v-else v-on:click="showDefinition(word)">
+                                    <span v-else v-on:click="wordClicked(word)">
                                         [[ calculatePoints(word) ]] [[ word ]]
                                     </span>
                                     <br/>
@@ -134,13 +134,13 @@
                 <button onclick="app.sortByPoints = false;">Alphabetical</button>
                 <br/><br/>
                 <span v-if="sortByPoints"><span v-for="word in wordsPointsByPoints">
-                    <span v-on:click="showDefinition(word[0])" :style="found.includes(word[0]) ? 'color:green; font-weight:bold' : ''">
+                    <span v-on:click="wordClicked(word[0])" :style="found.includes(word[0]) ? 'color:green; font-weight:bold' : ''">
                         [[ word[1] ]] [[ word[0] ]]
                     </span>
                     <br/>
                 </span></span>
                 <span v-else><span v-for="word in wordsPointsAlphabetical">
-                    <span v-on:click="showDefinition(word[0])" :style="found.includes(word[0]) ? 'color:green; font-weight:bold' : ''">
+                    <span v-on:click="wordClicked(word[0])" :style="found.includes(word[0]) ? 'color:green; font-weight:bold' : ''">
                         [[ word[1] ]] [[ word[0] ]]
                     </span>
                     <br/>
@@ -150,7 +150,7 @@
     </div>
     <div class="singleCol"></div>
     <div id="popup">
-        <button class="close" onclick="document.getElementById('popup').style.display = 'none';">x</button>
+        <button class="close" onclick="document.getElementById('popup').style.display = 'none'; app.clearHighlight();">x</button>
         <div class="message"></div>
     </div>
 </form></div>
@@ -263,6 +263,32 @@
                 }
                 return [0,1,1,1,1,2,3,5,11][l]
             },
+            wordClicked: function(word) {
+                this.clearHighlight()
+                this.highlightPath(this.getWordPath(word));
+                this.showDefinition(word);
+            },
+            highlightPath: function(path) {
+                // console.log("path:", path)
+                if (path == undefined) {
+                    return
+                }
+                path.forEach(p => {
+                    x = p[1]
+                    y = p[0]
+                    // console.log("x, y", x, y)
+                    document.getElementsByClassName("boggleBoard")[0].rows[y].cells[x].childNodes[0].style["color"] = "#ccc";
+                    document.getElementsByClassName("boggleBoard")[0].rows[y].cells[x].childNodes[0].style["backgroundColor"] = "#238";
+                })
+            },
+            clearHighlight: function() {
+                for (var x=0; x<this.game.size; x++) {
+                    for (var y=0; y<this.game.size; y++) {
+                        document.getElementsByClassName("boggleBoard")[0].rows[y].cells[x].childNodes[0].style["color"] = "#238";
+                        document.getElementsByClassName("boggleBoard")[0].rows[y].cells[x].childNodes[0].style["backgroundColor"] = "#ccc";
+                    }
+                }
+            },
             showDefinition: function(word) {
                 fetch('?request=definition&word=' + word)
                 .then(response => response.json())
@@ -275,6 +301,69 @@
 
                     console.log(json.definition);
                 })
+            },
+            getWordPath: function(word) {
+                for (var x=0; x<this.game.size; x++) {
+                    for (var y=0; y<this.game.size; y++) {
+                        path = this.getWordPathAux(word, x, y, []);
+                        if (path != undefined) {
+                            return path
+                        }
+                    }
+                }
+            },
+            getWordPathAux: function(word, x, y, path) {
+                // console.log(x, y, word, path)
+                if (word.size == 0) {
+                    return path
+                }
+                var mypath = path.slice() //create a copy
+                mypath.push([x,y]) //add the current spot so it cannot use this letter again
+
+                var l = this.game.board[x][y].toLowerCase();
+                var newword;
+                if (l == "qu") {
+                    if (word.size < 2 || word[0] != "q" || word[1] != "u") {
+                        return undefined
+                    }
+                    if (word == "qu") {
+                        return mypath
+                    }
+                    newword = word.substr(2) //remove 1st 2 chars
+                } else {
+                    if (word[0] != l) {
+                        return undefined
+                    }
+                    if (word == l) {
+                        return mypath
+                    }
+                    newword = word.substr(1) //remove 1st char
+                }
+                
+                // console.log("----------")
+                for (var newx=x-1; newx <= x+1; newx++) {
+                    for (var newy=y-1; newy <= y+1; newy++) {
+                        // console.log(l, newx, newy, mypath)
+                        if (newx>=0 && newy>=0
+                            && newx<this.game.size && newy<this.game.size
+                            && !this.containsTuple(mypath, [newx, newy])
+                        ) {
+                            path2 = this.getWordPathAux(newword, newx, newy, mypath);
+                            if (path2 != undefined) {
+                                return path2
+                            }
+                        }
+                    }
+                }
+                return undefined
+            },
+            containsTuple: function(array, tuple) {
+                for (var i=0; i<array.length; i++) {
+                    if (array[i][0] === tuple[0] && array[i][1] === tuple[1]) {
+                        return true
+                    }
+                }
+                return false;
             }
         },
         mounted () {
