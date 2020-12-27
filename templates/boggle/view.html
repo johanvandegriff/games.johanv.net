@@ -21,7 +21,7 @@
         </tbody></table>
     </div>
     <div class="rightCol scoreTable">
-        <h1 v-if="!game.isArchived" class="scale hideSmall">Time's Up!</h1>
+        <h1 v-if="game == undefined || !game.isArchived" class="scale hideSmall">Time's Up!</h1>
         <h1 v-else class="scale hideSmall">Past Game</h1>
         <p v-if="game != undefined" class="scale"><span style="background-color: #4f4; padding:3px; border-radius: 5px;">
             <span v-for="(winner, i) in game.winners"><span v-if="i>0">, </span>[[ winner ]]</span>
@@ -33,17 +33,41 @@
             <span v-if="game.winners.length > 1">tie</span><span v-else>wins</span>
         </span>
         with [[ game.winScore ]] points!</p>
-        <div v-if="game != undefined" class="compactText">
-            Game #[[ game._id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
-            <span v-if="'words' in game">
-                It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
-                [[ game.maxWords ]] words were possible for a max score of [[ game.maxScore ]] possible points.<br/>
-                [[ game.numWordsPlayersFound ]] words ([[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words) were found by players. [[ game.duplicates ]] were duplicates.<br/>
-            </span>
-            <span v-else>
-                The computer is still solving the board. This will update when it's done.<br/>
-            </span>
-            <br/>
+            <div v-if="game != undefined" class="compactText">
+                <div class="leftCol2Thirds">
+                    Game #[[ game._id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
+                    <span v-if="'words' in game">
+                        It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
+                        [[ game.maxWords ]] words were possible for a max score of [[ game.maxScore ]] possible points.<br/>
+                        [[ game.numWordsPlayersFound ]] words ([[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words) were found by players. [[ game.duplicates ]] were duplicates.<br/>
+                    </span>
+                    <span v-else>
+                        The computer is still solving the board. This will update when it's done.<br/>
+                    </span>
+                    <br/>
+                </div>
+                <div class="rightCol1Third">
+                    <form v-if="isHost" method="{{ formMethod }}">
+                        Create a board of the same type and invite everyone:
+                        <input type="hidden" name="username" value="{{ username }}"/>
+                        <input type="hidden" name="action" value="create"/>
+                        <input type="hidden" name="page" value="pregame"/>
+                        <input type="hidden" name="preset" value="custom"/>
+                        <input type="hidden" name="size" :value="game.size+'x'+game.size"/>
+                        <input type="hidden" name="letters" :value="game.letters"/>
+                        <input type="hidden" name="minutes" :value="game.minutes"/>
+                        <input type="hidden" name="inviteFrom" :value="game._id"/>
+                        <input class="greenButton" type="submit" value="Play Again"/>
+                    </form>
+                    <form v-else-if="invitation != undefined" method="{{ formMethod }}">
+                        The host wants to play another board of the same type.
+                        <input type="hidden" name="username" value="{{ username }}"/>
+                        <input type="hidden" name="id" v-bind:value="invitation"/>
+                        <input type="hidden" name="action" value="join"/>
+                        <input type="hidden" name="page" value="pregame"/>
+                        <input class="greenButton" type="submit" value="Join Again"/>
+                    </form>
+                </div>
             <table class="grayTable" style="white-space: nowrap;" v-if="game != undefined">
                 <thead><tr>
                     <th v-for="player in game.players" :style="'max-width: 100px; overflow: auto;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">[[ player ]]</th>
@@ -117,7 +141,11 @@
             game: undefined,
             styleObject: undefined,
             styleObjectQu: undefined,
-            sortByPoints: true
+            sortByPoints: true,
+            username: "{{ username }}",
+            sizeStr: undefined,
+            isHost: undefined,
+            invitation: undefined
         },
         computed: {
             found: function () {
@@ -154,7 +182,16 @@
                     this.game = json.game
                     console.log(this.game)
                     this.isHost = (this.game.players[0] == this.username)
+                    this.sizeStr = this.game.size + "x" + this.game.size
                     this.updateLetterSize()
+                })
+            },
+            getInvitation: function() {
+                fetch('?request=invitation&id={{ id }}')
+                .then(response => response.json())
+                .then(json => {
+                    this.invitation = json.invitation
+                    console.log("this.invitation: " + this.invitation)
                 })
             },
             updateLetterSize: function() {
@@ -195,6 +232,9 @@
                     this.getGame();
                 }
             }, 5000);
+            setInterval(() => {
+                this.getInvitation();
+            }, 1000);
             let self = this;
             window.onresize = function() {
                 self.updateLetterSize();

@@ -62,6 +62,12 @@ coll = db[COLL_NAME]
 
 wordList = json.load(open(WORD_LIST_FILE,'r'))
 
+
+#invitations to play again. the key is the game ID that players are invited from,
+#  and the value is the new game they are invited to.
+invitations = {}
+
+
 #replace quotes
 def rq(s):
   return s.replace("'", "&apos;").replace('"', '&quot;')
@@ -482,6 +488,21 @@ def request_data(form):
         word = filterWord(form["word"])
         definitions = json.load(open(DEFINITIONS_FILE,'r'))
         return json.dumps({"definition": definitions[word]})
+    if request == "invitation" and "id" in form:
+        id = toIntOrDefault(form["id"], -1)
+        toDelete = []
+        for inv in invitations:
+            newGame = getGameByID(invitations[inv])
+            #If the new game is archived, the invitation is useless and can be removed from the list
+            if newGame is None or newGame["isArchived"]:
+                toDelete.append(inv)
+        for inv in toDelete:
+            del invitations[inv]
+        print("invitations:", invitations)
+        if id in invitations:
+            invitedTo = invitations[id]
+            return json.dumps({"invitation": invitedTo})
+
     return json.dumps({})
 
 def do_action(form):
@@ -518,9 +539,9 @@ def do_action(form):
                 size = form["size"]
                 matched = re.match("^(\d+)x(\d+)$", size)
                 if matched is None:
-                    size = 5
-                else:
-                    size = int(matched.groups()[0])
+                        size = 5
+                    else:
+                        size = int(matched.groups()[0])
                 if size < 5:
                     lettersDefault = 3
                 else:
@@ -541,6 +562,11 @@ def do_action(form):
             # games.append(game)
             # saveGamesFile(games)
             # unlockGamesFile()
+            if "inviteFrom" in form:
+                inviteFrom = toIntOrDefault(form["inviteFrom"], -1)
+                if inviteFrom >= 0:
+                    invitations[inviteFrom] = game["_id"]
+                print("invitations:", invitations)
             return "pregame", game["_id"]
         return "lobby", None
 

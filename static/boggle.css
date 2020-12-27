@@ -55,6 +55,18 @@ p.scale {
   /* background-color: #00f; */
 }
 
+.leftCol2Thirds {
+  float: left;
+  width: 63%;
+  /* background-color: #0f0; */
+}
+
+.rightCol1Third {
+  float: right;
+  width: 31%;
+  /* background-color: #00f; */
+}
+
 .singleCol {
   clear: both;
   /* background-color: #f00; */
