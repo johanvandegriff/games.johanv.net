@@ -34,7 +34,7 @@
         </span>
         with [[ game.winScore ]] points!</p>
             <div v-if="game != undefined" class="compactText">
-                <div class="leftCol2Thirds">
+                <!-- <div class="leftCol2Thirds"> -->
                     Game #[[ game._id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
                     <span v-if="'words' in game">
                         It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
@@ -45,8 +45,8 @@
                         The computer is still solving the board. This will update when it's done.<br/>
                     </span>
                     <br/>
-                </div>
-                <div class="rightCol1Third">
+                <!-- </div>
+                <div class="rightCol1Third"> -->
                     <form v-if="isHost" method="{{ formMethod }}">
                         Create a board of the same type and invite everyone:
                         <input type="hidden" name="username" value="{{ username }}"/>
@@ -67,7 +67,11 @@
                         <input type="hidden" name="page" value="pregame"/>
                         <input class="greenButton" type="submit" value="Join Again"/>
                     </form>
-                </div>
+                <!-- </div> -->
+                <br/>
+                Display words:
+                <button onclick="app.parallelView = true;">Parallel</button>
+                <button onclick="app.parallelView = false;">Chronological</button>
             <table class="grayTable" style="white-space: nowrap;" v-if="game != undefined">
                 <thead><tr>
                     <th v-for="player in game.players" :style="'max-width: 100px; overflow: auto;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">[[ player ]]</th>
@@ -84,14 +88,32 @@
                 </tr><tr>
                     <td v-for="player in game.players" :style="'vertical-align:top;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">
                         <span v-if="player in game.playerData">
-                            <span v-for="[word, isDup] in Object.entries(game.playerData[player].words)">
-                                <span v-if="isDup" style="color: #e22" v-on:click="showDefinition(word)">
-                                    0 [[ word ]]
+                            <span v-if="parallelView">
+                                <span v-for="word in allWordsPlayersFound">
+                                    <span v-if="word in game.playerData[player].words">
+                                        <span v-if="game.playerData[player].words[word]" style="color: #e22" v-on:click="showDefinition(word)">
+                                            0 [[ word ]]
+                                        </span>
+                                        <span v-else v-on:click="showDefinition(word)">
+                                            [[ calculatePoints(word) ]] [[ word ]]
+                                        </span>
+                                    </span>
+                                    <span v-else>
+                                        -
+                                    </span>
+                                    <br/>
                                 </span>
-                                <span v-else v-on:click="showDefinition(word)">
-                                    [[ calculatePoints(word) ]] [[ word ]]
+                            </span>
+                            <span v-else>
+                                <span v-for="[word, isDup] in Object.entries(game.playerData[player].words)">
+                                    <span v-if="isDup" style="color: #e22" v-on:click="showDefinition(word)">
+                                        0 [[ word ]]
+                                    </span>
+                                    <span v-else v-on:click="showDefinition(word)">
+                                        [[ calculatePoints(word) ]] [[ word ]]
+                                    </span>
+                                    <br/>
                                 </span>
-                                <br/>
                             </span>
                         </span>
                         <!-- <span v-else>NO DATA</span> -->
@@ -145,7 +167,9 @@
             username: "{{ username }}",
             sizeStr: undefined,
             isHost: undefined,
-            invitation: undefined
+            invitation: undefined,
+            allWordsPlayersFound: undefined,
+            parallelView: true,
         },
         computed: {
             found: function () {
@@ -184,6 +208,31 @@
                     this.isHost = (this.game.players[0] == this.username)
                     this.sizeStr = this.game.size + "x" + this.game.size
                     this.updateLetterSize()
+                    this.allWordsPlayersFound = []
+
+                    Object.entries(this.game.players).forEach(x => {
+                        player = x[1]
+                        Object.entries(this.game.playerData[player].words).forEach(y => {
+                            word = y[0]
+                            if (!this.allWordsPlayersFound.includes(word)) {
+                                this.allWordsPlayersFound.push(word)
+                            }
+                        })
+                    })
+                    this.allWordsPlayersFound.sort()
+
+
+                    // for ([playerID, player] in Object.entries(this.game.players)) {
+                    //     for ([word, isDup] in Object.entries(this.game.playerData[player].words)) {
+                    //         this.allWordsPlayersFound.push(word)
+                    //     }
+                    // }
+                    // for (var i=0; i<this.game.playerData.length; i++) {
+                    //     words = this.game.playerData[i].words;
+                    //     for (var j=0; j<words.length; j++) {
+                    //         this.allWordsPlayersFound.push(words[j])
+                    //     }
+                    // }
                 })
             },
             getInvitation: function() {
