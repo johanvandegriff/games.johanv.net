@@ -274,13 +274,25 @@ table.grayTable tr th, table.grayTable thead tr th {
 
 table.grayTable tr th, table.grayTable thead tr th, table.grayTable tr td, table.grayTable tbody tr td {
   text-align: left;
-  padding: 8px;
+  padding: 10px;
   /* padding: 16px; */
+}
+table.grayTable tr td, table.grayTable tbody tr td {
+  padding: 1px 10px;
 }
 
 table.grayTable tr:nth-child(even), table.grayTable thead tr:nth-child(even), table.grayTable tbody tr:nth-child(even) {
   background-color: #ddd
 }
+
+table.grayTable tr td.winner, table.grayTable tbody tr td.winner {
+  background-color: #8f8
+}
+
+table.grayTable tr:nth-child(even) td.winner, table.grayTable thead tr:nth-child(even) td.winner, table.grayTable tbody tr:nth-child(even) td.winner {
+  background-color: #4f4
+}
+
 
 
 [v-cloak] { display: none; }

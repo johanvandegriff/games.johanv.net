@@ -34,77 +34,79 @@
         </span>
         with [[ game.winScore ]] points!</p>
             <div v-if="game != undefined" class="compactText">
-                <!-- <div class="leftCol2Thirds"> -->
-                    Game #[[ game._id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
-                    <span v-if="'words' in game">
-                        It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
-                        [[ game.maxWords ]] words were possible for a max score of [[ game.maxScore ]] possible points.<br/>
-                        [[ game.numWordsPlayersFound ]] words ([[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words) were found by players. [[ game.duplicates ]] were duplicates.<br/>
-                    </span>
-                    <span v-else>
-                        The computer is still solving the board. This will update when it's done.<br/>
-                    </span>
+                Game #[[ game._id ]]: [[ game.size ]]x[[ game.size ]] board, words with [[ game.letters ]] at least letters, [[ game.minutes ]] minute timer.<br/><br/>
+                <span v-if="'words' in game">
+                    It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
+                    [[ game.maxWords ]] words were possible for a max score of [[ game.maxScore ]] possible points.<br/>
+                    [[ game.numWordsPlayersFound ]] words ([[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words) were found by players. [[ game.duplicates ]] were duplicates.<br/>
+                </span>
+                <span v-else>
+                    The computer is still solving the board. This will update when it's done.<br/>
+                </span>
+                <form v-if="isHost" method="{{ formMethod }}">
                     <br/>
-                <!-- </div>
-                <div class="rightCol1Third"> -->
-                    <form v-if="isHost" method="{{ formMethod }}">
-                        Create a board of the same type and invite everyone:
-                        <input type="hidden" name="username" value="{{ username }}"/>
-                        <input type="hidden" name="action" value="create"/>
-                        <input type="hidden" name="page" value="pregame"/>
-                        <input type="hidden" name="preset" value="custom"/>
-                        <input type="hidden" name="size" :value="game.size+'x'+game.size"/>
-                        <input type="hidden" name="letters" :value="game.letters"/>
-                        <input type="hidden" name="minutes" :value="game.minutes"/>
-                        <input type="hidden" name="inviteFrom" :value="game._id"/>
-                        <input class="greenButton" type="submit" value="Play Again"/>
-                    </form>
-                    <form v-else-if="invitation != undefined" method="{{ formMethod }}">
-                        The host wants to play another board of the same type.
-                        <input type="hidden" name="username" value="{{ username }}"/>
-                        <input type="hidden" name="id" v-bind:value="invitation"/>
-                        <input type="hidden" name="action" value="join"/>
-                        <input type="hidden" name="page" value="pregame"/>
-                        <input class="greenButton" type="submit" value="Join Again"/>
-                    </form>
-                <!-- </div> -->
+                    Create a board of the same type and invite everyone:
+                    <input type="hidden" name="username" value="{{ username }}"/>
+                    <input type="hidden" name="action" value="create"/>
+                    <input type="hidden" name="page" value="pregame"/>
+                    <input type="hidden" name="preset" value="custom"/>
+                    <input type="hidden" name="size" :value="game.size+'x'+game.size"/>
+                    <input type="hidden" name="letters" :value="game.letters"/>
+                    <input type="hidden" name="minutes" :value="game.minutes"/>
+                    <input type="hidden" name="inviteFrom" :value="game._id"/>
+                    <input class="greenButton" type="submit" value="Play Again"/>
+                </form>
+                <form v-else-if="invitation != undefined" method="{{ formMethod }}">
+                    <br/>
+                    The host wants to play another board of the same type.
+                    <input type="hidden" name="username" value="{{ username }}"/>
+                    <input type="hidden" name="id" v-bind:value="invitation"/>
+                    <input type="hidden" name="action" value="join"/>
+                    <input type="hidden" name="page" value="pregame"/>
+                    <input class="greenButton" type="submit" value="Join Again"/>
+                </form>
                 <br/>
                 Display words:
                 <button onclick="app.parallelView = true;">Parallel</button>
                 <button onclick="app.parallelView = false;">Chronological</button>
             <table class="grayTable" style="white-space: nowrap;" v-if="game != undefined">
-                <thead><tr>
-                    <th v-for="player in game.players" :style="'max-width: 100px; overflow: auto;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">[[ player ]]</th>
-                </tr></thead>
-                <tbody><tr>
-                    <td v-for="player in game.players" :style="game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4'">
-                        <span v-if="player in game.playerData">
-                            <span style="font-weight: bold;">[[ game.playerData[player].score ]] points</span><br/>
-                            [[ game.playerData[player].numWords ]] words
-                        </span>
-                        <span v-else-if="!game.isArchived">Waiting for<br/>results...</span>
-                        <span v-else>Left the<br/>game :(</span>
-                    </td>
-                </tr><tr>
-                    <td v-for="player in game.players" :style="'vertical-align:top;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">
-                        <span v-if="player in game.playerData">
-                            <span v-if="parallelView">
-                                <span v-for="word in allWordsPlayersFound">
-                                    <span v-if="word in game.playerData[player].words">
-                                        <span v-if="game.playerData[player].words[word]" style="color: #e22" v-on:click="showDefinition(word)">
-                                            0 [[ word ]]
-                                        </span>
-                                        <span v-else v-on:click="showDefinition(word)">
-                                            [[ calculatePoints(word) ]] [[ word ]]
-                                        </span>
-                                    </span>
-                                    <span v-else>
-                                        -
-                                    </span>
-                                    <br/>
-                                </span>
+                <thead>
+                    <tr>
+                        <th v-for="player in game.players" :style="'max-width: 100px; overflow: auto;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">
+                            [[ player ]]<br/>
+                            <span v-if="player in game.playerData">
+                                [[ game.playerData[player].score ]] point<span v-if="game.playerData[player].score != 1">s</span><br/>
+                                [[ game.playerData[player].numWords ]] word<span v-if="game.playerData[player].numWords != 1">s</span>
+                            </span>
+                            <span v-else-if="!game.isArchived">
+                                Waiting for<br/>
+                                results...
                             </span>
                             <span v-else>
+                                Left the<br/>
+                                game :(
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody v-if="parallelView">
+                    <tr v-for="word in allWordsPlayersFound">
+                        <td v-for="player in game.players" :class="game.winners.indexOf(player) == -1 ? '' : 'winner'">
+                            <span v-if="player in game.playerData && word in game.playerData[player].words">
+                                <span v-if="game.playerData[player].words[word]" style="color: #e22" v-on:click="showDefinition(word)">
+                                    0 [[ word ]]
+                                </span>
+                                <span v-else v-on:click="showDefinition(word)">
+                                    [[ calculatePoints(word) ]] [[ word ]]
+                                </span>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody v-else>
+                    <tr>
+                        <td v-for="player in game.players" :style="'vertical-align:top;' + (game.winners.indexOf(player) == -1 ? '' : 'background-color: #4f4')">
+                            <span v-if="player in game.playerData">
                                 <span v-for="[word, isDup] in Object.entries(game.playerData[player].words)">
                                     <span v-if="isDup" style="color: #e22" v-on:click="showDefinition(word)">
                                         0 [[ word ]]
@@ -115,10 +117,10 @@
                                     <br/>
                                 </span>
                             </span>
-                        </span>
-                        <!-- <span v-else>NO DATA</span> -->
-                    </td>
-                </tr></tbody>
+                            <!-- <span v-else>NO DATA</span> -->
+                        </td>
+                    </tr>
+                </tbody>
                 <!-- text-decoration: line-through -->
             </table>
         </div>
