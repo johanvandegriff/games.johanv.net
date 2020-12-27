@@ -539,9 +539,9 @@ def do_action(form):
                 size = form["size"]
                 matched = re.match("^(\d+)x(\d+)$", size)
                 if matched is None:
-                        size = 5
-                    else:
-                        size = int(matched.groups()[0])
+                    size = 5
+                else:
+                    size = int(matched.groups()[0])
                 if size < 5:
                     lettersDefault = 3
                 else:
