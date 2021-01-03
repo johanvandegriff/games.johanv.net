@@ -73,6 +73,9 @@
                 .then(response => response.json())
                 .then(json => {
                     console.log(json)
+                    if (Object.keys(json).length == 0) { //game has been deleted
+                        window.location = "?username={{ username }}&page=lobby"; //go back to lobby
+                    }
                     this.game.players = json.players;
                     this.isHost = (this.game.players[0] == this.username)
                     this.isNotHost = !this.isHost;

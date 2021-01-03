@@ -118,7 +118,7 @@
     function removeCookie() {
         document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     }
-    const REMOVE_FROM_LOBBY_TIMEOUT = {{ remove_from_lobby_timeout }}; //remove games that are finished after this many seconds
+    const REMOVE_COMPLETED_FROM_LOBBY_TIMEOUT = {{ remove_completed_from_lobby_timeout }}; //remove games that are finished after this many seconds
     const app = new Vue ({
         delimiters: ['[[',']]'],
         el: "#app",
@@ -142,7 +142,7 @@
                         if (game.secondsLeft <= 0) {
                             game.isDone = true;
                         }
-                        if (game.secondsLeft > -REMOVE_FROM_LOBBY_TIMEOUT) {
+                        if (game.secondsLeft > -REMOVE_COMPLETED_FROM_LOBBY_TIMEOUT) {
                             newgames.push(game);
                         }
                     } else {

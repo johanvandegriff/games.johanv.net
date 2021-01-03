@@ -14,8 +14,9 @@ WORD_LIST_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019.json'
 # wordList = json.load(open(WORD_LIST_FILE,'r'))
 
 # remove games that are finished after this many seconds
-ARCHIVE_TIMEOUT = 30
-REMOVE_FROM_LOBBY_TIMEOUT = 5*60
+ARCHIVE_TIMEOUT = 30 #archive a COMPLETED game but keep in the lobby
+REMOVE_COMPLETED_FROM_LOBBY_TIMEOUT = 5*60 #remove a COMPLETED game from the lobby
+REMOVE_STALE_FROM_LOBBY_TIMEOUT = 2*60*60 #remove a NOT STARTED game from lobby
 
 #all the dice found in boggle deluxe
 BOGGLE_DICE = [
@@ -364,11 +365,20 @@ def processAllTypedWords(game):
 
 def updateGame(game):
     changed = False
+
+    elapsedSinceCreatedSeconds = int(time.time()) - game["timeCreatedSeconds"]
     if "timeStartedSeconds" in game:
-        elapsedSeconds = int(time.time()) - game["timeStartedSeconds"]
+        elapsedSinceStartedSeconds = int(time.time()) - game["timeStartedSeconds"]
     else:
-        elapsedSeconds = 0
-    game["secondsLeft"] = game["minutes"]*60 - elapsedSeconds
+        elapsedSinceStartedSeconds = 0
+    
+    #check for stale games in the lobby
+    if not game["isStarted"] and elapsedSinceCreatedSeconds > REMOVE_STALE_FROM_LOBBY_TIMEOUT:
+        deleteGameByID(game["_id"])
+        print("stale game #{} removed from lobby".format(game["_id"]))
+        return None
+
+    game["secondsLeft"] = game["minutes"]*60 - elapsedSinceStartedSeconds
     if game["secondsLeft"] <= 0 and not game["isDone"]:
         game["isDone"] = True
         game = processAllTypedWords(game)
@@ -413,14 +423,17 @@ def request_data(form):
             id = toIntOrDefault(form["id"], -1)
             # lockGamesFile()
             # games = loadGamesFile()
+            print("game request with id {}".format(id))
             game = getGameByID(id)
             if game is None:
-                print("game request with id {}, game not found".format(id))
+                print("game not found")
                 # unlockGamesFile()
                 return json.dumps({})
             else:
-                print("game request with id {}, game found".format(id))
                 game = updateGame(game)
+                if game is None:
+                    return json.dumps({})
+                print("game found")
                 # if changed:
                 #     saveGamesFile(games)
                 # unlockGamesFile()
@@ -434,6 +447,7 @@ def request_data(form):
         # anyChanged = False
         games = coll.find()
         games = [updateGame(game) for game in games]
+        games = [game for game in games if game] #remove entries that are "None"
         # for id in getAllIDs():
         #     updateGame(getGameByID(id))
             # if changed:
@@ -444,7 +458,7 @@ def request_data(form):
         if "page" in form:
             page = filterWord(form["page"])
             if page == "lobby":
-                games = [game for game in games if game["secondsLeft"] > -REMOVE_FROM_LOBBY_TIMEOUT]
+                games = [game for game in games if game["secondsLeft"] > -REMOVE_COMPLETED_FROM_LOBBY_TIMEOUT]
             elif page == "stats":
                 games = [game for game in games if game["isArchived"]]
         return json.dumps({"games": games})
@@ -455,6 +469,8 @@ def request_data(form):
         # unlockGamesFile()
         game = getGameByID(id)
         if game is not None:
+            game = updateGame(game)
+        if game is not None:
             return json.dumps({"isStarted": game["isStarted"], "players": game["players"]})
     if request == "savewords" and "id" in form and "words" in form and "username" in form:
         id = toIntOrDefault(form["id"], -1)
@@ -464,7 +480,8 @@ def request_data(form):
         # lockGamesFile()
         # games = loadGamesFile()
         game = getGameByID(id)
-        game = updateGame(game)
+        if game is not None:
+            game = updateGame(game)
         if not "typedWords" in game:
             game["typedWords"] = {}
             changed = True
@@ -687,7 +704,7 @@ def load_page(form, page=None, id=None):
         return json.dumps([x for x in coll.find()], indent=2)
 
     if page == "lobby":
-        return render_template("boggle/lobby.html", remove_from_lobby_timeout=REMOVE_FROM_LOBBY_TIMEOUT, **kwargs)
+        return render_template("boggle/lobby.html", remove_completed_from_lobby_timeout=REMOVE_COMPLETED_FROM_LOBBY_TIMEOUT, **kwargs)
 
     return "error with page '" + str(page) + "'"
 
