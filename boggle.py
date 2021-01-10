@@ -18,6 +18,8 @@ ARCHIVE_TIMEOUT = 30 #archive a COMPLETED game but keep in the lobby
 REMOVE_COMPLETED_FROM_LOBBY_TIMEOUT = 5*60 #remove a COMPLETED game from the lobby
 REMOVE_STALE_FROM_LOBBY_TIMEOUT = 2*60*60 #remove a NOT STARTED game from lobby
 
+EXTRA_SECONDS_TO_SUBMIT = 1
+
 #all the dice found in boggle deluxe
 BOGGLE_DICE = [
         ['O','O','O','T','T','U'],
@@ -379,7 +381,7 @@ def updateGame(game):
         return None
 
     game["secondsLeft"] = game["minutes"]*60 - elapsedSinceStartedSeconds
-    if game["secondsLeft"] <= 0 and not game["isDone"]:
+    if game["secondsLeft"] <= -EXTRA_SECONDS_TO_SUBMIT and not game["isDone"]:
         game["isDone"] = True
         game = processAllTypedWords(game)
         changed = True
