@@ -10,9 +10,6 @@ ROOT_DIR = "/srv/boggle"
 DEFINITIONS_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019WithDefinitions.json'
 WORD_LIST_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019.json'
 
-# definitions = json.load(open(DEFINITIONS_FILE,'r'))
-# wordList = json.load(open(WORD_LIST_FILE,'r'))
-
 # remove games that are finished after this many seconds
 ARCHIVE_TIMEOUT = 30 #archive a COMPLETED game but keep in the lobby
 REMOVE_COMPLETED_FROM_LOBBY_TIMEOUT = 5*60 #remove a COMPLETED game from the lobby
@@ -64,6 +61,7 @@ db = dbClient[DB_NAME]
 coll = db[COLL_NAME]
 
 wordList = json.load(open(WORD_LIST_FILE,'r'))
+allDefinitions = json.load(open(DEFINITIONS_FILE,'r'))
 
 
 #invitations to play again. the key is the game ID that players are invited from,
@@ -503,10 +501,14 @@ def request_data(form):
             # saveGamesFile(games)
         # unlockGamesFile()
         return json.dumps({"typedWords": typedWords[username]})
-    if request == "definition" and "word" in form:
-        word = filterWord(form["word"])
-        definitions = json.load(open(DEFINITIONS_FILE,'r'))
-        return json.dumps({"definition": definitions[word]})
+    if request == "definitions" and "id" in form:
+        id = toIntOrDefault(form["id"], -1)
+        game = getGameByID(id)
+        if game is not None:
+            definitions = {}
+            for word in game["words"]:
+                definitions[word] = allDefinitions[word]
+            return json.dumps({"definitions": definitions})
     if request == "invitation" and "id" in form:
         id = toIntOrDefault(form["id"], -1)
         toDelete = []

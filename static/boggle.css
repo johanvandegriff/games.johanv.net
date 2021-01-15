@@ -314,44 +314,6 @@ svg.ct-chart-bar, svg.ct-chart-line{
 
 
 
-#popup {
-  display: none;
-  background-color: #F3F5F6;
-  color: #000000;
-  border: 1px solid #aaa;
-  border-radius: 6px;
-  position: fixed;
-  width: 40%;
-  /* width: 300px; */
-  /* height: 100px; */
-  left: 40%;
-  top: 40%;
-  box-sizing: border-box;
-  text-align: center;
-}
-#popup button {
-  background-color: #e22;
-  color: #fff;
-  display: block;
-  float: right;
-  border-radius: 5px;
-  border: 1px solid #000;
-  padding: 5px;
-  text-align: center;
-  width: 25px;
-  cursor: pointer;
-}
-#popup .message {
-  text-align: left;
-  padding: 3px;
-}
-
-
-
-
-
-
-
 
 
 
@@ -395,7 +357,7 @@ svg.ct-chart-bar, svg.ct-chart-line{
     width: 40%;
   }
   .scoreTable {
-    top: calc(100px + 75vw);
+    top: calc(155px + 75vw);
     /* height: calc(100% - 100px - 75vw); */
     min-height: 350px;
   }
