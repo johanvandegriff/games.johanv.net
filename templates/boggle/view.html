@@ -69,8 +69,12 @@
                 </form>
                 <br/>
                 Display words:
-                <button onclick="app.parallelView = true;">Parallel</button>
-                <button onclick="app.parallelView = false;">Chronological</button>
+                Parallel
+                <label class="switch">
+                    <input type="checkbox" onclick="app.parallelView = this.checked;">
+                    <span class="slider round"></span>
+                </label>
+                Chronological
             <table class="grayTable" style="white-space: nowrap;" v-if="game != undefined">
                 <thead>
                     <tr>
@@ -132,8 +136,14 @@
                 All [[ game.maxWords ]] possible words for this board.<br/>
                 Hover/Tap a word to see the definition.<br/>
                 Sort by:
-                <button onclick="app.sortByPoints = true;">Points</button>
-                <button onclick="app.sortByPoints = false;">Alphabetical</button>
+                Points
+                <label class="switch">
+                    <input type="checkbox" onclick="app.sortByPoints = !this.checked;">
+                    <span class="slider round"></span>
+                </label>
+                Alphabetical
+                <!-- <button onclick="app.sortByPoints = true;">Points</button>
+                <button onclick="app.sortByPoints = false;">Alphabetical</button> -->
                 <br/><br/>
                 <span v-if="sortByPoints"><span v-for="word in wordsPointsByPoints">
                     <span @mouseenter="wordHoverStart(word[0])" @mouseleave="wordHoverEnd(word[0])" :style="found.includes(word[0]) ? 'color:green; font-weight:bold' : ''">
