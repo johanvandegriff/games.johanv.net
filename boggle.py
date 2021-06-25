@@ -915,7 +915,13 @@ request - ask for a certain type of data, such as current
     ignoring the page variable.
 """
 def app(request):
-    form = request.args | request.form
+    # form = request.args | request.form
+    form = {}
+    for k, v in request.args.items():
+        form[k] = v
+    for k, v in request.form.items():
+        form[k] = v
+
     print("boggle http request:", form)
     page = None
     id = None
