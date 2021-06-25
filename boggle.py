@@ -557,9 +557,12 @@ def request_data(form, files):
                 print("File saved to to:", destination)
                 upload.save(destination)
                 message = "File uploaded"
-                lettersGuessed, confidence = processImage(destination)
-                message += "; " + lettersGuessed
-                message += "; " + str(confidence)
+                try:
+                    lettersGuessed, confidence = processImage(destination)
+                    message += "; " + lettersGuessed
+                    message += "; " + str(confidence)
+                except BoggleError as e:
+                    message += "; " + str(e)
             else:
                 message = "File type not supported, please use .png, .jpg, .jpeg, or .gif"
         else:
