@@ -1,5 +1,5 @@
 from flask import render_template
-import sys, cgi, json, datetime, re, time, decimal, subprocess, random, threading, os, pymongo
+import sys, cgi, json, datetime, re, time, decimal, subprocess, random, threading, os, pymongo, traceback
 from functools import reduce
 
 from nav import nav #file in same dir
@@ -561,8 +561,11 @@ def request_data(form, files):
                     lettersGuessed, confidence = processImage(destination)
                     message += "; " + lettersGuessed
                     message += "; " + str(confidence)
-                except BoggleError as e:
-                    message += "; " + str(e)
+                except Exception as e:
+                    message += "; " + str(e) + "; " + repr(e) + "; " + traceback.format_exc()
+                with open(destination+".txt", "w") as f:
+                    print("Message saved to to:", destination+".txt")
+                    f.write(message)
             else:
                 message = "File type not supported, please use .png, .jpg, .jpeg, or .gif"
         else:
@@ -888,11 +891,20 @@ def load_page(form, page=None, id=None):
     
     if page == "upload":
         return """
+        <!DOCTYPE html><html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=2.0">
+        </head>
+        <body>
         <form method="POST" enctype="multipart/form-data" action="">
             <input type="hidden" name="request" value="upload">
             <input type="file" name="upload" accept="image/*"/>
+            <br/><br/>
             <input type="submit" value="Upload">
         </form>
+        </body>
+        </html>
         """
 
     if page == "lobby":
