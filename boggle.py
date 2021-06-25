@@ -1,5 +1,6 @@
 from flask import render_template
 import sys, cgi, json, datetime, re, time, decimal, subprocess, random, threading, os, pymongo
+from functools import reduce
 
 from nav import nav #file in same dir
 from BoggleCVPipeline import processImage, BoggleError
@@ -412,6 +413,12 @@ def filterWord(word):
     #only letters, convert to lowercase
     return re.sub('[^a-z]', '', word.lower())
 
+def getAllGames():
+    games = coll.find()
+    games = [updateGame(game) for game in games]
+    games = [game for game in games if game] #remove entries that are "None"
+    return games
+
 """
 This method doesn't return html, but JSON data for JS to digest.
 It is called with AJAX requests, and the data will be formatted
@@ -446,9 +453,7 @@ def request_data(form):
         # lockGamesFile()
         # games = loadGamesFile()
         # anyChanged = False
-        games = coll.find()
-        games = [updateGame(game) for game in games]
-        games = [game for game in games if game] #remove entries that are "None"
+        games = getAllGames()
         # for id in getAllIDs():
         #     updateGame(getGameByID(id))
             # if changed:
@@ -658,6 +663,38 @@ def do_action(form):
         return "lobby", None
     return "lobby", None
 
+
+def histogram(games, maxGame, prop):
+    hs = maxGame[prop]
+    bins = []
+    data = []
+    if hs < 10:
+        for i in range(int(hs)+1):
+            bins.append(i)
+            data.append(0)
+    else:
+        for i in range(1,10+1): #1 to 10 inclusive
+            bins.append(round(i*hs)/10)
+            data.append(0)
+    
+    for game in games:
+        s = game[prop]
+        for j in range(len(bins)):
+            if round(s*10)/10 <= bins[j]:
+                data[j] += 1
+                break
+    
+    return {"labels": bins, "series": [data]}
+
+def text2bool(text):
+    return text.lower() == "true"
+
+def get_param(form, kwargs, name, converter=lambda text: text, fallback=""):
+    if name in form:
+        kwargs[name] = converter(form[name])
+    else:
+        kwargs[name] = fallback
+
 def load_page(form, page=None, id=None):
     if page is None:
         if "page" in form:
@@ -683,15 +720,11 @@ def load_page(form, page=None, id=None):
         "id": id
     }
 
+
     if page == "login":
         return render_template("boggle/login.html", page=page, **kwargs)
 
-    if "username" in form:
-        username = filterUsername(form["username"])
-    else:
-        username = ""
-
-    kwargs["username"] = username
+    get_param(form, kwargs, "username", filterUsername)
 
     if page == "pregame" and id is not None:
         return render_template("boggle/pregame.html", **kwargs)
@@ -703,7 +736,113 @@ def load_page(form, page=None, id=None):
         return render_template("boggle/view.html", prev=prev, **kwargs)
 
     if page == "stats":
-        return render_template("boggle/stats.html", prev=prev, **kwargs)
+        games = getAllGames()
+        games = [game for game in games if game["isArchived"]]
+
+        get_param(form, kwargs, "selectedUsed", text2bool, False)
+        
+        if kwargs["selectedUsed"]:
+            fallback = ""
+        else:
+            fallback = "checked"
+
+        showLabels = [
+            "show2x2", "show3x3", "show4x4", "show5x5", "show6x6", "show7x7", "showOtherSizes",
+            "show2L", "show3L", "show4L", "show5L", "show6L", "show7L", "showOtherL",
+            "show30Sec", "show1Min", "show2Min", "show3Min", "show4Min", "show5Min",
+            "show6Min", "show7Min", "show8Min", "show9Min", "show10Min", "showOtherMin"
+        ]
+
+        labelBool = {}
+        numChecked = 0
+        for label in showLabels:
+            get_param(form, kwargs, label, lambda text: "checked" if text == "on" else "", fallback)
+            labelBool[label] = kwargs[label] == "checked"
+            if labelBool[label]:
+                numChecked += 1
+
+        kwargs["selectAll"] = "checked" if numChecked >= len(labelBool)/2 else ""
+        # print(labelBool)
+
+        gamesFiltered = {}
+        gamesFiltered["5x5"] = [game for game in games if game["size"] == 5 and game["letters"] == 4 and game["minutes"] == 3]
+        gamesFiltered["4x4"] = [game for game in games if game["size"] == 4 and game["letters"] == 3 and game["minutes"] == 3]
+        gamesFiltered["Sel"] = []
+        for game in games:
+            if (
+                    labelBool["show2x2"] and game["size"] == 2 or
+                    labelBool["show3x3"] and game["size"] == 3 or
+                    labelBool["show4x4"] and game["size"] == 4 or
+                    labelBool["show5x5"] and game["size"] == 5 or
+                    labelBool["show6x6"] and game["size"] == 6 or
+                    labelBool["show7x7"] and game["size"] == 7 or
+                    labelBool["showOtherSizes"] and not game["size"] in [2,3,4,5,6,7]
+                ) and (
+                    labelBool["show2L"] and game["letters"] == 2 or
+                    labelBool["show3L"] and game["letters"] == 3 or
+                    labelBool["show4L"] and game["letters"] == 4 or
+                    labelBool["show5L"] and game["letters"] == 5 or
+                    labelBool["show6L"] and game["letters"] == 6 or
+                    labelBool["show7L"] and game["letters"] == 7 or
+                    labelBool["showOtherL"] and not game["letters"] in [2,3,4,5,6,7]
+                ) and (
+                    labelBool["show30Sec"] and game["minutes"] == 0.5 or
+                    labelBool["show1Min"] and game["minutes"] == 1 or
+                    labelBool["show2Min"] and game["minutes"] == 2 or
+                    labelBool["show3Min"] and game["minutes"] == 3 or
+                    labelBool["show4Min"] and game["minutes"] == 4 or
+                    labelBool["show5Min"] and game["minutes"] == 5 or
+                    labelBool["show6Min"] and game["minutes"] == 6 or
+                    labelBool["show7Min"] and game["minutes"] == 7 or
+                    labelBool["show8Min"] and game["minutes"] == 8 or
+                    labelBool["show9Min"] and game["minutes"] == 9 or
+                    labelBool["show10Min"] and game["minutes"] == 10 or
+                    labelBool["showOtherMin"] and not game["minutes"] in [0.5,1,2,3,4,5,6,7,8,9,10]
+                ):
+                gamesFiltered["Sel"].append(game)
+        gamesFiltered["All"] = games
+
+        for gameType in ["5x5", "4x4", "Sel", "All"]:
+            kwargs["has"+gameType] = (len(gamesFiltered[gameType]) > 0)
+            if kwargs["has"+gameType]:
+                for prop in ["winScore", "numWordsPlayersFound", "percentFound", "maxScore", "maxWords", "duplicates", "secondsToSolve"]:
+                    kwargs[prop+gameType] = reduce(lambda prev, curr: prev if prev[prop] > curr[prop] else curr, gamesFiltered[gameType]) 
+                for prop in ["maxScore", "maxWords"]:
+                    kwargs["low_"+prop+gameType] = reduce(lambda prev, curr: prev if prev[prop] < curr[prop] else curr, gamesFiltered[gameType])
+
+        get_param(form, kwargs, "sortCol", int, 0)
+        get_param(form, kwargs, "isAscending", text2bool, False)
+
+        #these correspond to the columns on the stats page
+        lambdas = [
+            lambda game: game["_id"],
+            lambda game: game["players"][0].lower(),
+            lambda game: len(game["players"]),
+            lambda game: game["size"],
+            lambda game: game["letters"],
+            lambda game: game["minutes"],
+            lambda game: game["maxWords"],
+            lambda game: game["numWordsPlayersFound"],
+            lambda game: game["percentFound"],
+            lambda game: game["maxScore"],
+            lambda game: game["winScore"],
+            lambda game: game["winners"][0].lower(),
+        ]
+        
+        if kwargs["hasSel"]:
+            for prop in ["winScore", "maxScore", "numWordsPlayersFound", "maxWords", "percentFound", "duplicates", "secondsToSolve"]:
+                kwargs[prop+"Chart"] = histogram(gamesFiltered["Sel"], kwargs[prop+"Sel"], prop)
+
+            kwargs["sizeChart"] = histogram(gamesFiltered["Sel"], {"size": 7}, "size")
+            print(kwargs["sizeChart"])
+            kwargs["sizeChart"]["labels"] = ["2x2", "3x3", "4x4", "5x5", "6x6", "7x7"]
+            kwargs["sizeChart"]["series"][0] = kwargs["sizeChart"]["series"][0][2:] #remove 1st 2 items
+            print(kwargs["sizeChart"])
+
+        games_sorted = sorted(gamesFiltered["Sel"], key=lambdas[kwargs["sortCol"]], reverse=(not kwargs["isAscending"]))
+
+        # print(kwargs)
+        return render_template("boggle/stats.html", prev=prev, games=games_sorted, **kwargs)
 
     if page == "json":
         return json.dumps([x for x in coll.find()], indent=2)

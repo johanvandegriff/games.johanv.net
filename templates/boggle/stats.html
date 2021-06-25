@@ -11,59 +11,65 @@
             <input type="hidden" name="page" value="json"/>
             <input style="position: relative; top: 0; left: 0; float: left; margin-left: 10px" class="purpleButton" type="submit" value="JSON Data"/>
         </form>
+        <input style="position: relative; top: 0; left: 0; float: left; margin-left: 10px" class="grayButton" type="button" value="Reload" onclick="window.location.reload();"/>
         <h1 class="scale">Boggle 2.0 - Stats</h1>
     </div>
     <div class="leftCol highscores">
         <h2>Highscores</h2>
         <p class="scale" style="margin: 10px;">
-            <div v-if="games5x5.length > 0" class="grayBox">
+            {% if has5x5 %}
+            <div class="grayBox">
                 <h3>5x5, 4 letters, 3 min</h3>
-                <a :href="'?id=' + highScore5x5._id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScore5x5.winScore ]]<br/>
-                <a :href="'?id=' + highWords5x5._id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWords5x5.numWordsPlayersFound ]]<br/>
-                <a :href="'?id=' + highPercent5x5._id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercent5x5.percentFound * 100) / 100).toFixed(2) ]]%<br/>
-                <a :href="'?id=' + highMaxScore5x5._id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScore5x5.maxScore ]]<br/>
-                <a :href="'?id=' + highMaxWords5x5._id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWords5x5.maxWords ]]<br/>
-                <a :href="'?id=' + lowMaxScore5x5._id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScore5x5.maxScore ]]<br/>
-                <a :href="'?id=' + lowMaxWords5x5._id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWords5x5.maxWords ]]<br/>
-                <a :href="'?id=' + highDuplicates5x5._id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicates5x5.duplicates ]]<br/>
+                <a href="?id={{ winScore5x5._id }}&username={{ username }}&page=view&prev=stats">high score</a>: {{ winScore5x5.winScore }}<br/>
+                <a href="?id={{ numWordsPlayersFound5x5._id }}&username={{ username }}&page=view&prev=stats">most words found</a>: {{ numWordsPlayersFound5x5.numWordsPlayersFound }}<br/>
+                <a href="?id={{ percentFound5x5._id }}&username={{ username }}&page=view&prev=stats">highest % found</a>: {{ ((percentFound5x5.percentFound*100)|round)/100 }}%<br/>
+                <a href="?id={{ maxScore5x5._id }}&username={{ username }}&page=view&prev=stats">high possible score</a>: {{ maxScore5x5.maxScore }}<br/>
+                <a href="?id={{ maxWords5x5._id }}&username={{ username }}&page=view&prev=stats">most words available</a>: {{ maxWords5x5.maxWords }}<br/>
+                <a href="?id={{ low_maxScore5x5._id }}&username={{ username }}&page=view&prev=stats">low possible score</a>: {{ low_maxScore5x5.maxScore }}<br/>
+                <a href="?id={{ low_maxWords5x5._id }}&username={{ username }}&page=view&prev=stats">least words available</a>: {{ low_maxWords5x5.maxWords }}<br/>
+                <a href="?id={{ duplicates5x5._id }}&username={{ username }}&page=view&prev=stats">most duplicates</a>: {{ duplicates5x5.duplicates }}<br/>
             </div>
-            <div v-if="games4x4.length > 0" class="grayBox">
+            {% endif %}
+            {% if has4x4 %}
+            <div class="grayBox">
                 <h3>4x4, 3 letters, 3 min</h3>
-                <a :href="'?id=' + highScore4x4._id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScore4x4.winScore ]]<br/>
-                <a :href="'?id=' + highWords4x4._id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWords4x4.numWordsPlayersFound ]]<br/>
-                <a :href="'?id=' + highPercent4x4._id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercent4x4.percentFound * 100) / 100).toFixed(2) ]]%<br/>
-                <a :href="'?id=' + highMaxScore4x4._id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScore4x4.maxScore ]]<br/>
-                <a :href="'?id=' + highMaxWords4x4._id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWords4x4.maxWords ]]<br/>
-                <a :href="'?id=' + lowMaxScore4x4._id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScore4x4.maxScore ]]<br/>
-                <a :href="'?id=' + lowMaxWords4x4._id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWords4x4.maxWords ]]<br/>
-                <a :href="'?id=' + highDuplicates4x4._id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicates4x4.duplicates ]]<br/>
+                <a href="?id={{ winScore4x4._id }}&username={{ username }}&page=view&prev=stats">high score</a>: {{ winScore4x4.winScore }}<br/>
+                <a href="?id={{ numWordsPlayersFound4x4._id }}&username={{ username }}&page=view&prev=stats">most words found</a>: {{ numWordsPlayersFound4x4.numWordsPlayersFound }}<br/>
+                <a href="?id={{ percentFound4x4._id }}&username={{ username }}&page=view&prev=stats">highest % found</a>: {{ ((percentFound4x4.percentFound*100)|round)/100 }}%<br/>
+                <a href="?id={{ maxScore4x4._id }}&username={{ username }}&page=view&prev=stats">high possible score</a>: {{ maxScore4x4.maxScore }}<br/>
+                <a href="?id={{ maxWords4x4._id }}&username={{ username }}&page=view&prev=stats">most words available</a>: {{ maxWords4x4.maxWords }}<br/>
+                <a href="?id={{ low_maxScore4x4._id }}&username={{ username }}&page=view&prev=stats">low possible score</a>: {{ low_maxScore4x4.maxScore }}<br/>
+                <a href="?id={{ low_maxWords4x4._id }}&username={{ username }}&page=view&prev=stats">least words available</a>: {{ low_maxWords4x4.maxWords }}<br/>
+                <a href="?id={{ duplicates4x4._id }}&username={{ username }}&page=view&prev=stats">most duplicates</a>: {{ duplicates4x4.duplicates }}<br/>
             </div>
-            <div v-if="games.length > 0" class="grayBox">
+            {% endif %}
+            {% if hasSel %}
+            <div class="grayBox">
                 <h3>Games Selected</h3>
-                <a :href="'?id=' + highScoreSel._id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScoreSel.winScore ]]<br/>
-                <a :href="'?id=' + highWordsSel._id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWordsSel.numWordsPlayersFound ]]<br/>
-                <a :href="'?id=' + highPercentSel._id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercentSel.percentFound * 100) / 100).toFixed(2) ]]%<br/>
-                <a :href="'?id=' + highMaxScoreSel._id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScoreSel.maxScore ]]<br/>
-                <a :href="'?id=' + highMaxWordsSel._id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWordsSel.maxWords ]]<br/>
-                <a :href="'?id=' + lowMaxScoreSel._id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScoreSel.maxScore ]]<br/>
-                <a :href="'?id=' + lowMaxWordsSel._id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWordsSel.maxWords ]]<br/>
-                <a :href="'?id=' + highDuplicatesSel._id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicatesSel.duplicates ]]<br/>
+                <a href="?id={{ winScoreSel._id }}&username={{ username }}&page=view&prev=stats">high score</a>: {{ winScoreSel.winScore }}<br/>
+                <a href="?id={{ numWordsPlayersFoundSel._id }}&username={{ username }}&page=view&prev=stats">most words found</a>: {{ numWordsPlayersFoundSel.numWordsPlayersFound }}<br/>
+                <a href="?id={{ percentFoundSel._id }}&username={{ username }}&page=view&prev=stats">highest % found</a>: {{ ((percentFoundSel.percentFound*100)|round)/100 }}%<br/>
+                <a href="?id={{ maxScoreSel._id }}&username={{ username }}&page=view&prev=stats">high possible score</a>: {{ maxScoreSel.maxScore }}<br/>
+                <a href="?id={{ maxWordsSel._id }}&username={{ username }}&page=view&prev=stats">most words available</a>: {{ maxWordsSel.maxWords }}<br/>
+                <a href="?id={{ low_maxScoreSel._id }}&username={{ username }}&page=view&prev=stats">low possible score</a>: {{ low_maxScoreSel.maxScore }}<br/>
+                <a href="?id={{ low_maxWordsSel._id }}&username={{ username }}&page=view&prev=stats">least words available</a>: {{ low_maxWordsSel.maxWords }}<br/>
+                <a href="?id={{ duplicatesSel._id }}&username={{ username }}&page=view&prev=stats">most duplicates</a>: {{ duplicatesSel.duplicates }}<br/>
             </div>
-            <div v-if="gamesAll.length > 0" class="grayBox">
+            {% endif %}
+            {% if hasAll %}
+            <div class="grayBox">
                 <h3>All Games</h3>
-                <a :href="'?id=' + highScoreAll._id + '&username={{ username }}&page=view&prev=stats'">high score</a>: [[ highScoreAll.winScore ]]<br/>
-                <a :href="'?id=' + highWordsAll._id + '&username={{ username }}&page=view&prev=stats'">most words found</a>: [[ highWordsAll.numWordsPlayersFound ]]<br/>
-                <a :href="'?id=' + highPercentAll._id + '&username={{ username }}&page=view&prev=stats'">highest % found</a>: [[ (Math.round(highPercentAll.percentFound * 100) / 100).toFixed(2) ]]%<br/>
-                <a :href="'?id=' + highMaxScoreAll._id + '&username={{ username }}&page=view&prev=stats'">high possible score</a>: [[ highMaxScoreAll.maxScore ]]<br/>
-                <a :href="'?id=' + highMaxWordsAll._id + '&username={{ username }}&page=view&prev=stats'">most words available</a>: [[ highMaxWordsAll.maxWords ]]<br/>
-                <a :href="'?id=' + lowMaxScoreAll._id + '&username={{ username }}&page=view&prev=stats'">low possible score</a>: [[ lowMaxScoreAll.maxScore ]]<br/>
-                <a :href="'?id=' + lowMaxWordsAll._id + '&username={{ username }}&page=view&prev=stats'">least words available</a>: [[ lowMaxWordsAll.maxWords ]]<br/>
-                <a :href="'?id=' + highDuplicatesAll._id + '&username={{ username }}&page=view&prev=stats'">most duplicates</a>: [[ highDuplicatesAll.duplicates ]]<br/>
+                <a href="?id={{ winScoreAll._id }}&username={{ username }}&page=view&prev=stats">high score</a>: {{ winScoreAll.winScore }}<br/>
+                <a href="?id={{ numWordsPlayersFoundAll._id }}&username={{ username }}&page=view&prev=stats">most words found</a>: {{ numWordsPlayersFoundAll.numWordsPlayersFound }}<br/>
+                <a href="?id={{ percentFoundAll._id }}&username={{ username }}&page=view&prev=stats">highest % found</a>: {{ ((percentFoundAll.percentFound*100)|round)/100 }}%<br/>
+                <a href="?id={{ maxScoreAll._id }}&username={{ username }}&page=view&prev=stats">high possible score</a>: {{ maxScoreAll.maxScore }}<br/>
+                <a href="?id={{ maxWordsAll._id }}&username={{ username }}&page=view&prev=stats">most words available</a>: {{ maxWordsAll.maxWords }}<br/>
+                <a href="?id={{ low_maxScoreAll._id }}&username={{ username }}&page=view&prev=stats">low possible score</a>: {{ low_maxScoreAll.maxScore }}<br/>
+                <a href="?id={{ low_maxWordsAll._id }}&username={{ username }}&page=view&prev=stats">least words available</a>: {{ low_maxWordsAll.maxWords }}<br/>
+                <a href="?id={{ duplicatesAll._id }}&username={{ username }}&page=view&prev=stats">most duplicates</a>: {{ duplicatesAll.duplicates }}<br/>
             </div>
+            {% endif %}
         </p>
-        <!-- <p class="compactText" style="margin: 10px;">
-            Note: only standard boards are considered for highscores (4x4, 3 letters, 3 min OR 5x5, 4 letters, 3 min).<br/>
-        </p> -->
         <h2>Charts</h2>
         <div class="ct-chart ct-perfect-fourth" id="scoreChart"></div>
         <div class="ct-chart ct-perfect-fourth" id="possibleScoreChart"></div>
@@ -82,66 +88,98 @@
     <div class="rightCol gamesTable">
         <h2>Past Games</h2>
         <div class="compactText" style="margin: 10px;">
-            show sizes:
-            <input type="checkbox" v-model="show2x2" checked>2x2
-            <input type="checkbox" v-model="show3x3" checked>3x3
-            <input type="checkbox" v-model="show4x4" checked>4x4
-            <input type="checkbox" v-model="show5x5" checked>5x5
-            <input type="checkbox" v-model="show6x6" checked>6x6
-            <input type="checkbox" v-model="show7x7" checked>7x7
-            <input type="checkbox" v-model="showOtherSizes" checked>other sizes<br/>
-            show letters:
-            <input type="checkbox" v-model="show2L" checked>2
-            <input type="checkbox" v-model="show3L" checked>3
-            <input type="checkbox" v-model="show4L" checked>4
-            <input type="checkbox" v-model="show5L" checked>5
-            <input type="checkbox" v-model="show6L" checked>6
-            <input type="checkbox" v-model="show7L" checked>7
-            <input type="checkbox" v-model="showOtherL" checked>other letters<br/>
-            show minutes:
-            <input type="checkbox" v-model="show30Sec" checked>0.5
-            <input type="checkbox" v-model="show1Min" checked>1
-            <input type="checkbox" v-model="show2Min" checked>2
-            <input type="checkbox" v-model="show3Min" checked>3
-            <input type="checkbox" v-model="show4Min" checked>4
-            <input type="checkbox" v-model="show5Min" checked>5
-            <input type="checkbox" v-model="show6Min" checked>6
-            <input type="checkbox" v-model="show7Min" checked>7
-            <input type="checkbox" v-model="show8Min" checked>8
-            <input type="checkbox" v-model="show9Min" checked>9
-            <input type="checkbox" v-model="show10Min" checked>10
-            <input type="checkbox" v-model="showOtherMin" checked>other times<br/>
+            <form id="selectedForm">
+                <input type="hidden" name="username" value="{{ username }}"/>
+                <input type="hidden" name="page" value="stats"/>
+                <input type="hidden" name="selectedUsed" value="true"/>
+                <input type="hidden" id="sortCol" name="sortCol" value="{{ sortCol }}"/>
+                <input type="hidden" id="isAscending" name="isAscending" value="{{ isAscending }}"/>
+                show sizes:
+                <input type="checkbox" name="show2x2" {{ show2x2 }}>2x2
+                <input type="checkbox" name="show3x3" {{ show3x3 }}>3x3
+                <input type="checkbox" name="show4x4" {{ show4x4 }}>4x4
+                <input type="checkbox" name="show5x5" {{ show5x5 }}>5x5
+                <input type="checkbox" name="show6x6" {{ show6x6 }}>6x6
+                <input type="checkbox" name="show7x7" {{ show7x7 }}>7x7
+                <input type="checkbox" name="showOtherSizes" {{ showOtherSizes }}>other sizes<br/>
+                show letters:
+                <input type="checkbox" name="show2L" {{ show2L }}>2
+                <input type="checkbox" name="show3L" {{ show3L }}>3
+                <input type="checkbox" name="show4L" {{ show4L }}>4
+                <input type="checkbox" name="show5L" {{ show5L }}>5
+                <input type="checkbox" name="show6L" {{ show6L }}>6
+                <input type="checkbox" name="show7L" {{ show7L }}>7
+                <input type="checkbox" name="showOtherL" {{ showOtherL }}>other letters<br/>
+                show minutes:
+                <input type="checkbox" name="show30Sec" {{ show30Sec }}>0.5
+                <input type="checkbox" name="show1Min" {{ show1Min }}>1
+                <input type="checkbox" name="show2Min" {{ show2Min }}>2
+                <input type="checkbox" name="show3Min" {{ show3Min }}>3
+                <input type="checkbox" name="show4Min" {{ show4Min }}>4
+                <input type="checkbox" name="show5Min" {{ show5Min }}>5
+                <input type="checkbox" name="show6Min" {{ show6Min }}>6
+                <input type="checkbox" name="show7Min" {{ show7Min }}>7
+                <input type="checkbox" name="show8Min" {{ show8Min }}>8
+                <input type="checkbox" name="show9Min" {{ show9Min }}>9
+                <input type="checkbox" name="show10Min" {{ show10Min }}>10
+                <input type="checkbox" name="showOtherMin" {{ showOtherMin }}>other times<br/>
+                <input class="greenButton" type="submit" value="Apply"/>
+                <input class="grayButton" type="button" value="Reset" onclick="document.getElementById('resetForm').submit();"/>
+                select all/none: <input type="checkbox" name="selectAll" {{ selectAll }} onclick="document.querySelectorAll('input[type=checkbox]').forEach((c)=>c.checked = this.checked);"/>
+            </form>
+            <form id="resetForm">
+                <input type="hidden" name="username" value="{{ username }}"/>
+                <input type="hidden" name="page" value="stats"/>
+            </form>
             <br/>
             Click on columns headers to sort the table.<br/>
+            <script>
+                sortCol = {{ sortCol }};
+                isAscending = "{{ isAscending }}" == "True";
+                function sortTable(newSortCol, isNumber) {
+                    if (newSortCol == sortCol) {
+                        isAscending = !isAscending;
+                    } else {
+                        sortCol = newSortCol;
+                        isAscending = !isNumber; //numbers default to descending, text defaults to ascending
+                    }
+
+                    document.getElementById("sortCol").value = sortCol;
+                    document.getElementById("isAscending").value = isAscending;
+                    document.getElementById("selectedForm").submit();
+                }
+            </script>
             <table id="pastGames" class="grayTable">
                 <thead><tr>
-                    <th onclick="sortTable('pastGames', 0, true)">Game #</th>
-                    <th onclick="sortTable('pastGames', 1, false)">Host</th>
-                    <th onclick="sortTable('pastGames', 2, true)">Players</th>
-                    <th onclick="sortTable('pastGames', 3, true)">Size</th>
-                    <th onclick="sortTable('pastGames', 4, true)">Letters</th>
-                    <th onclick="sortTable('pastGames', 5, true)">Time (Min)</th>
-                    <th onclick="sortTable('pastGames', 6, true)">Total # of Words</th>
-                    <th onclick="sortTable('pastGames', 7, true)"># of Words Found</th>
-                    <th onclick="sortTable('pastGames', 8, true)">% of Words Found</th>
-                    <th onclick="sortTable('pastGames', 9, true)">Max Score</th>
-                    <th onclick="sortTable('pastGames', 10, true)">Winning Score</th>
-                    <th onclick="sortTable('pastGames', 11, false)">Winners</th>
+                    <th onclick="sortTable(0, true)">Game #</th>
+                    <th onclick="sortTable(1, false)">Host</th>
+                    <th onclick="sortTable(2, true)">Players</th>
+                    <th onclick="sortTable(3, true)">Size</th>
+                    <th onclick="sortTable(4, true)">Letters</th>
+                    <th onclick="sortTable(5, true)">Time (Min)</th>
+                    <th onclick="sortTable(6, true)">Total # of Words</th>
+                    <th onclick="sortTable(7, true)"># of Words Found</th>
+                    <th onclick="sortTable(8, true)">% of Words Found</th>
+                    <th onclick="sortTable(9, true)">Max Score</th>
+                    <th onclick="sortTable(10, true)">Winning Score</th>
+                    <th onclick="sortTable(11, false)">Winners</th>
                 </tr></thead><tbody>
-                <tr v-for="game in games">
-                    <td><a :href="'?id=' + game._id + '&username={{ username }}&page=view&prev=stats'">[[ game._id ]]</a></td>
-                    <td><span v-if="game.players.length > 0">[[ game.players[0] ]]</span></td>
-                    <td>[[ game.players.length ]]</td>
-                    <td>[[ game.size ]]x[[ game.size ]]</td>
-                    <td>[[ game.letters ]]</td>
-                    <td>[[ game.minutes ]]</td>
-                    <td>[[ game.maxWords ]]</td>
-                    <td>[[ game.numWordsPlayersFound ]]</td>
-                    <td>[[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]%</td>
-                    <td>[[ game.maxScore ]]</td>
-                    <td>[[ game.winScore ]]</td>
-                    <td><span v-for="(winner, i) in game.winners"><span v-if="i>0">, </span>[[ winner ]]</span></td>
+                {% for game in games %}
+                <tr>
+                    <td><a href="?id={{ game._id }}&username={{ username }}&page=view&prev=stats">{{ game._id }}</a></td>
+                    <td>{% if game.players|length > 0 %}{{ game.players[0] }}{% endif %}</td>
+                    <td>{{ game.players|length }}</td>
+                    <td>{{ game.size }}x{{ game.size }}</td>
+                    <td>{{ game.letters }}</td>
+                    <td>{{ game.minutes }}</td>
+                    <td>{{ game.maxWords }}</td>
+                    <td>{{ game.numWordsPlayersFound }}</td>
+                    <td>{{ ((game.percentFound*100)|round)/100 }}%</td>
+                    <td>{{ game.maxScore }}</td>
+                    <td>{{ game.winScore }}</td>
+                    <td>{% for winner in game.winners %}{{ winner }}{{ ", " if not loop.last }}{% endfor %}</td>
                 </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -150,338 +188,11 @@
 
 </form></div>
 
-<script type="text/javascript" src="/static/sorttable2.js"></script>
-
 <link rel="stylesheet" href="/static/chartist.min.css">
 <script src="/static/chartist.min.js"></script>
 <script src="/static/chartist-plugin-axistitle.min.js"></script>
 
-{% include 'boggle/common.html' %}
-
 <script>
-    const app = new Vue ({
-        delimiters: ['[[',']]'],
-        el: "#app",
-        data: {
-            gamesAll: [],
-            show2x2: true,
-            show3x3: true,
-            show4x4: true,
-            show5x5: true,
-            show6x6: true,
-            show7x7: true,
-            showOtherSizes: true,
-            show2L: true,
-            show3L: true,
-            show4L: true,
-            show5L: true,
-            show6L: true,
-            show7L: true,
-            showOtherL: true,
-            show30Sec: true,
-            show1Min: true,
-            show2Min: true,
-            show3Min: true,
-            show4Min: true,
-            show5Min: true,
-            show6Min: true,
-            show7Min: true,
-            show8Min: true,
-            show9Min: true,
-            show10Min: true,
-            showOtherMin: true,
-            updateCharts: false
-        },
-        computed: {
-            games: function () {
-                filtered = []
-                for (var i=0; i<this.gamesAll.length; i++) {
-                    game = this.gamesAll[i];
-                    if (
-                        game.isArchived &&
-                            (
-                                this.show2x2 && game.size == 2 ||
-                                this.show3x3 && game.size == 3 ||
-                                this.show4x4 && game.size == 4 ||
-                                this.show5x5 && game.size == 5 ||
-                                this.show6x6 && game.size == 6 ||
-                                this.show7x7 && game.size == 7 ||
-                                this.showOtherSizes && (game.size < 2 || game.size > 7)
-                            ) &&
-                            (
-                                this.show2L && game.letters == 2 ||
-                                this.show3L && game.letters == 3 ||
-                                this.show4L && game.letters == 4 ||
-                                this.show5L && game.letters == 5 ||
-                                this.show6L && game.letters == 6 ||
-                                this.show7L && game.letters == 7 ||
-                                this.showOtherL && (game.letters < 2 || game.letters > 7)
-                            ) &&
-                            (
-                                this.show30Sec && game.minutes == 0.5 ||
-                                this.show1Min && game.minutes == 1 ||
-                                this.show2Min && game.minutes == 2 ||
-                                this.show3Min && game.minutes == 3 ||
-                                this.show4Min && game.minutes == 4 ||
-                                this.show5Min && game.minutes == 5 ||
-                                this.show6Min && game.minutes == 6 ||
-                                this.show7Min && game.minutes == 7 ||
-                                this.show8Min && game.minutes == 8 ||
-                                this.show9Min && game.minutes == 9 ||
-                                this.show10Min && game.minutes == 10 ||
-                                this.showOtherMin && [0.5,1,2,3,4,5,6,7,8,9,10].indexOf(game.minutes) == -1
-                            )
-                        ) {
-                        filtered.push(game);
-                    }
-                }
-                this.updateCharts = true;
-                return filtered;
-            },
-            games5x5: function () {
-                filtered = []
-                for (var i=0; i<this.gamesAll.length; i++) {
-                    game = this.gamesAll[i];
-                    if (game.isArchived && game.size == 5 && game.letters == 4 && game.minutes == 3) {
-                        filtered.push(game);
-                    }
-                }
-                return filtered;
-            },
-            games4x4: function () {
-                filtered = []
-                for (var i=0; i<this.gamesAll.length; i++) {
-                    game = this.gamesAll[i];
-                    if (game.isArchived && game.size == 4 && game.letters == 3 && game.minutes == 3) {
-                        filtered.push(game);
-                    }
-                }
-                return filtered;
-            },
-            highScore5x5: function () {
-                if (this.games5x5.length == 0) {return undefined;}
-                return this.games5x5.reduce((prev, curr) =>
-                    prev.winScore > curr.winScore
-                ? prev : curr);
-            },
-            highWords5x5: function () {
-                if (this.games5x5.length == 0) {return undefined;}
-                return this.games5x5.reduce((prev, curr) =>
-                    prev.numWordsPlayersFound > curr.numWordsPlayersFound
-                ? prev : curr);
-            },
-            highPercent5x5: function () {
-                if (this.games5x5.length == 0) {return undefined;}
-                return this.games5x5.reduce((prev, curr) =>
-                    prev.percentFound > curr.percentFound
-                ? prev : curr);
-            },
-            highMaxScore5x5: function () {
-                if (this.games5x5.length == 0) {return undefined;}
-                return this.games5x5.reduce((prev, curr) =>
-                    prev.maxScore > curr.maxScore
-                ? prev : curr);
-            },
-            highMaxWords5x5: function () {
-                if (this.games5x5.length == 0) {return undefined;}
-                return this.games5x5.reduce((prev, curr) =>
-                    prev.maxWords > curr.maxWords
-                ? prev : curr);
-            },
-            lowMaxScore5x5: function () {
-                if (this.games5x5.length == 0) {return undefined;}
-                return this.games5x5.reduce((prev, curr) =>
-                    prev.maxScore < curr.maxScore
-                ? prev : curr);
-            },
-            lowMaxWords5x5: function () {
-                if (this.games5x5.length == 0) {return undefined;}
-                return this.games5x5.reduce((prev, curr) =>
-                    prev.maxWords < curr.maxWords
-                ? prev : curr);
-            },
-            highDuplicates5x5: function () {
-                if (this.games5x5.length == 0) {return undefined;}
-                return this.games5x5.reduce((prev, curr) =>
-                    prev.duplicates > curr.duplicates
-                ? prev : curr);
-            },
-
-            highScore4x4: function () {
-                if (this.games4x4.length == 0) {return undefined;}
-                return this.games4x4.reduce((prev, curr) =>
-                    prev.winScore > curr.winScore
-                ? prev : curr);
-            },
-            highWords4x4: function () {
-                if (this.games4x4.length == 0) {return undefined;}
-                return this.games4x4.reduce((prev, curr) =>
-                    prev.numWordsPlayersFound > curr.numWordsPlayersFound
-                ? prev : curr);
-            },
-            highPercent4x4: function () {
-                if (this.games4x4.length == 0) {return undefined;}
-                return this.games4x4.reduce((prev, curr) =>
-                    prev.percentFound > curr.percentFound
-                ? prev : curr);
-            },
-            highMaxScore4x4: function () {
-                if (this.games4x4.length == 0) {return undefined;}
-                return this.games4x4.reduce((prev, curr) =>
-                    prev.maxScore > curr.maxScore
-                ? prev : curr);
-            },
-            highMaxWords4x4: function () {
-                if (this.games4x4.length == 0) {return undefined;}
-                return this.games4x4.reduce((prev, curr) =>
-                    prev.maxWords > curr.maxWords
-                ? prev : curr);
-            },
-            lowMaxScore4x4: function () {
-                if (this.games4x4.length == 0) {return undefined;}
-                return this.games4x4.reduce((prev, curr) =>
-                    prev.maxScore < curr.maxScore
-                ? prev : curr);
-            },
-            lowMaxWords4x4: function () {
-                if (this.games4x4.length == 0) {return undefined;}
-                return this.games4x4.reduce((prev, curr) =>
-                    prev.maxWords < curr.maxWords
-                ? prev : curr);
-            },
-            highDuplicates4x4: function () {
-                if (this.games4x4.length == 0) {return undefined;}
-                return this.games4x4.reduce((prev, curr) =>
-                    prev.duplicates > curr.duplicates
-                ? prev : curr);
-            },
-
-            highScoreSel: function () {
-                if (this.games.length == 0) {return undefined;}
-                return this.games.reduce((prev, curr) =>
-                    prev.winScore > curr.winScore
-                ? prev : curr);
-            },
-            highWordsSel: function () {
-                if (this.games.length == 0) {return undefined;}
-                return this.games.reduce((prev, curr) =>
-                    prev.numWordsPlayersFound > curr.numWordsPlayersFound
-                ? prev : curr);
-            },
-            highPercentSel: function () {
-                if (this.games.length == 0) {return undefined;}
-                return this.games.reduce((prev, curr) =>
-                    prev.percentFound > curr.percentFound
-                ? prev : curr);
-            },
-            highMaxScoreSel: function () {
-                if (this.games.length == 0) {return undefined;}
-                return this.games.reduce((prev, curr) =>
-                    prev.maxScore > curr.maxScore
-                ? prev : curr);
-            },
-            highMaxWordsSel: function () {
-                if (this.games.length == 0) {return undefined;}
-                return this.games.reduce((prev, curr) =>
-                    prev.maxWords > curr.maxWords
-                ? prev : curr);
-            },
-            lowMaxScoreSel: function () {
-                if (this.games.length == 0) {return undefined;}
-                return this.games.reduce((prev, curr) =>
-                    prev.maxScore < curr.maxScore
-                ? prev : curr);
-            },
-            lowMaxWordsSel: function () {
-                if (this.games.length == 0) {return undefined;}
-                return this.games.reduce((prev, curr) =>
-                    prev.maxWords < curr.maxWords
-                ? prev : curr);
-            },
-            highDuplicatesSel: function () {
-                if (this.games.length == 0) {return undefined;}
-                return this.games.reduce((prev, curr) =>
-                    prev.duplicates > curr.duplicates
-                ? prev : curr);
-            },
-
-            highScoreAll: function () {
-                if (this.gamesAll.length == 0) {return undefined;}
-                return this.gamesAll.reduce((prev, curr) =>
-                    prev.winScore > curr.winScore
-                ? prev : curr);
-            },
-            highWordsAll: function () {
-                if (this.gamesAll.length == 0) {return undefined;}
-                return this.gamesAll.reduce((prev, curr) =>
-                    prev.numWordsPlayersFound > curr.numWordsPlayersFound
-                ? prev : curr);
-            },
-            highPercentAll: function () {
-                if (this.gamesAll.length == 0) {return undefined;}
-                return this.gamesAll.reduce((prev, curr) =>
-                    prev.percentFound > curr.percentFound
-                ? prev : curr);
-            },
-            highMaxScoreAll: function () {
-                if (this.gamesAll.length == 0) {return undefined;}
-                return this.gamesAll.reduce((prev, curr) =>
-                    prev.maxScore > curr.maxScore
-                ? prev : curr);
-            },
-            highMaxWordsAll: function () {
-                if (this.gamesAll.length == 0) {return undefined;}
-                return this.gamesAll.reduce((prev, curr) =>
-                    prev.maxWords > curr.maxWords
-                ? prev : curr);
-            },
-            lowMaxScoreAll: function () {
-                if (this.gamesAll.length == 0) {return undefined;}
-                return this.gamesAll.reduce((prev, curr) =>
-                    prev.maxScore < curr.maxScore
-                ? prev : curr);
-            },
-            lowMaxWordsAll: function () {
-                if (this.gamesAll.length == 0) {return undefined;}
-                return this.gamesAll.reduce((prev, curr) =>
-                    prev.maxWords < curr.maxWords
-                ? prev : curr);
-            },
-            highDuplicatesAll: function () {
-                if (this.gamesAll.length == 0) {return undefined;}
-                return this.gamesAll.reduce((prev, curr) =>
-                    prev.duplicates > curr.duplicates
-                ? prev : curr);
-            },
-
-
-
-            highSolveTimeSel: function () {
-                if (this.games.length == 0) {return undefined;}
-                return this.games.reduce((prev, curr) =>
-                    prev.secondsToSolve > curr.secondsToSolve
-                ? prev : curr);
-            }
-        },
-        created () {
-            this.getGames();
-        },
-        methods: {
-            getGames: function() {
-                fetch('?request=games&page=stats')
-                .then(response => response.json())
-                .then(json => {
-                    this.gamesAll = json.games.reverse()
-                })
-            }
-        },
-        mounted () {
-            setInterval(() => {
-                this.getGames();
-            }, 10000);
-        }
-    });
-
     //have to wait for the page to load to access the footer
     window.onload = function() {
     // hide the footer since it gets in the way
@@ -525,70 +236,17 @@
         };
     }
 
-    function histogram(maxGame, property) {
-        if (maxGame == undefined) {
-            return {
-                labels: [],
-                series: [[]]
-            };
-        }
-        hs = maxGame[property];
-        bins = []
-        data = []
-        if (hs < 10) {
-            for (var i=0; i<=hs; i++) {
-                bins.push(i);
-                data.push(0);
-            }
-        } else {
-            for (var i=1; i<=10; i++) {
-                // bins.push(i*hs/10);
-                // bins.push(Math.round(i*hs/10));
-                bins.push(Math.round(i*hs)/10);
-                data.push(0);
-            }
-        }
-
-        for (var i=0; i<app.games.length; i++) {
-            s = app.games[i][property]
-            for (var j=0; j<bins.length; j++) {
-                if (Math.round(s*10)/10 <= bins[j]) {
-                    data[j]++;
-                    break;
-                }
-            }
-        }
-        return {
-            labels: bins,
-            series: [data]
-        };
-    }
-
-    function charts() {
-        new Chartist.Bar('#scoreChart', histogram(app.highScoreSel, "winScore"), settings("winning score", "# of games"));
-        new Chartist.Bar('#possibleScoreChart', histogram(app.highMaxScoreSel, "maxScore"), settings("possible score", "# of games"));
-        new Chartist.Bar('#wordsFoundChart', histogram(app.highWordsSel, "numWordsPlayersFound"), settings("# of words found", "# of games"));
-        new Chartist.Bar('#wordsPossibleChart', histogram(app.highMaxWordsSel, "maxWords"), settings("# of words possible", "# of games"));
-        new Chartist.Bar('#percentFoundChart', histogram(app.highPercentSel, "percentFound"), settings("% of words found", "# of games"));
-        new Chartist.Bar('#duplicatesChart', histogram(app.highDuplicatesSel, "duplicates"), settings("# of duplicate words", "# of games"));
-        sizeHist = histogram({size: 7}, "size");
-        sizeHist.labels = ["2x2", "3x3", "4x4", "5x5", "6x6", "7x7"];
-        sizeHist.series[0].shift();
-        sizeHist.series[0].shift();
-        new Chartist.Bar('#boardSizeChart', sizeHist, settings("board size", "# of games"));
-        // new Chartist.Bar('#numPlayersChart', histogram(app., "players".length), settings("# of players", "# of games"));
-        new Chartist.Bar('#solveTimeChart', histogram(app.highSolveTimeSel, "secondsToSolve"), settings("computer solve time (sec)", "# of games"));
-
-        
-    }
-    charts();
-    setInterval(function(){
-        if (app.updateCharts) {
-            app.updateCharts = false;
-            charts();
-        }
-    }, 250);
+    {% if hasSel %}
+    new Chartist.Bar('#scoreChart', {{ winScoreChart|safe }}, settings("winning score", "# of games"));
+    new Chartist.Bar('#possibleScoreChart', {{ maxScoreChart|safe }}, settings("possible score", "# of games"));
+    new Chartist.Bar('#wordsFoundChart', {{ maxWordsChart|safe }}, settings("# of words found", "# of games"));
+    new Chartist.Bar('#wordsPossibleChart', {{ maxWordsChart|safe }}, settings("# of words possible", "# of games"));
+    new Chartist.Bar('#percentFoundChart', {{ percentFoundChart|safe }}, settings("% of words found", "# of games"));
+    new Chartist.Bar('#duplicatesChart', {{ duplicatesChart|safe }}, settings("# of duplicate words", "# of games"));
+    new Chartist.Bar('#boardSizeChart', {{ sizeChart|safe }}, settings("board size", "# of games"));
+    // new Chartist.Bar('#numPlayersChart', histogram(app., "players".length), settings("# of players", "# of games"));
+    new Chartist.Bar('#solveTimeChart', {{ secondsToSolveChart|safe }}, settings("computer solve time (sec)", "# of games"));
+    {% endif %}
 </script>
 
-{% include 'boggle/common.html' %}
 {% include 'footer.html' %}
