@@ -9,6 +9,8 @@ ROOT_DIR = "/srv/boggle"
 # GAMES_FILE = ROOT_DIR + "/games.json"
 # GAMES_LOCK_FILE = ROOT_DIR + "/games.json.lock"
 
+IMAGE_UPLOAD_DIR = ROOT_DIR + '/upload-board/'
+
 DEFINITIONS_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019WithDefinitions.json'
 WORD_LIST_FILE = ROOT_DIR + '/lists/CollinsScrabbleWords2019.json'
 
@@ -419,12 +421,16 @@ def getAllGames():
     games = [game for game in games if game] #remove entries that are "None"
     return games
 
+def isValidImage(image):
+    ext = os.path.splitext(image)[1]
+    return ext in (".png", ".jpg", ".jpeg", ".gif", ".PNG", ".JPG", ".JPEG", ".GIF")
+
 """
 This method doesn't return html, but JSON data for JS to digest.
 It is called with AJAX requests, and the data will be formatted
 to update part of the page without reloading the whole thing.
 """
-def request_data(form):
+def request_data(form, files):
     request = filterWord(form["request"])
     if request == "game":
         if "id" in form:
@@ -529,6 +535,36 @@ def request_data(form):
         if id in invitations:
             invitedTo = invitations[id]
             return json.dumps({"invitation": invitedTo})
+    if request == "upload":
+        # create image directory if not found
+        if not os.path.isdir(IMAGE_UPLOAD_DIR):
+            os.mkdir(IMAGE_UPLOAD_DIR)
+        print(files)
+        print(len(files))
+        if len(files) > 0:
+            upload = files.getlist("upload")[0]
+            print("File name: {}".format(upload.filename))
+            filename = upload.filename.replace("'","") #filter out '
+            # file support verification
+            if isValidImage(filename):
+                destination = IMAGE_UPLOAD_DIR + filename
+                i=0
+                while os.path.exists(destination):
+                    spl = os.path.splitext(destination)
+                    destination = spl[0] + "_" + str(i) + spl[1]
+                    i += 1
+                # save file
+                print("File saved to to:", destination)
+                upload.save(destination)
+                message = "File uploaded"
+                lettersGuessed, confidence = processImage(destination)
+                message += "; " + lettersGuessed
+                message += "; " + str(confidence)
+            else:
+                message = "File type not supported, please use .png, .jpg, .jpeg, or .gif"
+        else:
+            message = "no file provided"
+        return json.dumps({"result": message})
 
     return json.dumps({})
 
@@ -846,6 +882,15 @@ def load_page(form, page=None, id=None):
 
     if page == "json":
         return json.dumps([x for x in coll.find()], indent=2)
+    
+    if page == "upload":
+        return """
+        <form method="POST" enctype="multipart/form-data" action="">
+            <input type="hidden" name="request" value="upload">
+            <input type="file" name="upload" accept="image/*"/>
+            <input type="submit" value="Upload">
+        </form>
+        """
 
     if page == "lobby":
         return render_template("boggle/lobby.html", remove_completed_from_lobby_timeout=REMOVE_COMPLETED_FROM_LOBBY_TIMEOUT, **kwargs)
@@ -869,13 +914,15 @@ request - ask for a certain type of data, such as current
     do the action, then return the requested data,
     ignoring the page variable.
 """
-def app(form):
+def app(request):
+    form = request.args | request.form
+    print("boggle http request:", form)
     page = None
     id = None
     if "action" in form and "username" in form:
         page, id = do_action(form)
     
     if "request" in form:
-        return request_data(form)
+        return request_data(form, request.files)
     else:
         return load_page(form, page, id)

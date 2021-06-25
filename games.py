@@ -113,8 +113,7 @@ def showmaze_page():
 #START BOGGLE
 @app.route("/boggle", methods=["GET", "POST"])
 def boggle_page():
-    print('boggle http request: ', request.args)
-    return boggle.app(request.args)
+    return boggle.app(request)
 #END BOGGLE
 
 #START BOGGLE_OLD
