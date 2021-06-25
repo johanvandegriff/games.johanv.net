@@ -32,25 +32,28 @@ def run_perl_page(request, perl_program, title):
 def main():
     return render_template("index.html", nav=nav, active="games")
 
-#START profanity-tests
-@app.route("/profanity-test")
-def profanitytest():
+#START checks
+@app.route("/check.txt")
+def check():
+    return "success"
+
+@app.route("/profanity-check-1")
+def profanity_check_1():
     return profanity_test.test()
 
-@app.route("/profanity-test2")
-def profanitytest2():
+@app.route("/profanity-check-2")
+def profanity_check_2():
     try:
         channel = request.args.get("channel", "")
     except ValueError:
         channel = ""
     return profanity_test.test2(channel)
-#END profanity-tests
 
-#START check
-@app.route("/check.txt")
-def check():
-    return "success"
-#END check
+@app.route("/tensorflow-check")
+def tensorflow_check():
+    import tensorflow as tf
+    return tf.__version__
+#END checks
 
 #START STOICHIOMETRY
 def chem_whitelist(s):

@@ -2,6 +2,7 @@ from flask import render_template
 import sys, cgi, json, datetime, re, time, decimal, subprocess, random, threading, os, pymongo
 
 from nav import nav #file in same dir
+from BoggleCVPipeline import processImage, BoggleError
 
 ROOT_DIR = "/srv/boggle"
 # GAMES_FILE = ROOT_DIR + "/games.json"
