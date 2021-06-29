@@ -2,9 +2,15 @@
 
 <div id="app" class="gameArea">
     <div class="leftCol">
+        <h1 class="scale">Boggle 2.0 Lobby</h1>
+        <p class="scale">Welcome, {{ username }}! Select a game type, or join an existing game.</p>
+        <form>
+            <input type="hidden" name="username" value="{{ username }}"/>
+            <input type="hidden" name="page" value="upload"/>
+            <input class="greenButton" type="submit" value="BoggleCV (new!)"/>
+        </form>
+        <p>Take a picture of a Boggle board and BoggleCV will use machine learning to detect the letters. Then you can play it here like a normal game, and see what words the computer found.</p>
         <form method="{{ formMethod }}">
-            <h1 class="scale">Boggle 2.0 Lobby</h1>
-            <p class="scale">Welcome, {{ username }}! Select a game type, or join an existing game.</p>
             <input class="radioHide" type="radio" name="preset" id="5x5" value="5x5" v-model="preset">
             <label class="leftCol grayBox" for="5x5">
                 5x5, find words with 4 letters or more in 3 minutes<br/>
@@ -74,7 +80,6 @@
     <div class="rightCol">
         <h2 class="scale">Video Call</h2>
         <p><a target="_blank" href="https://drive.confuzer.cloud/index.php/call/wscgqe9r">Join the video chat!</a></p>
-        <p><a href="?username={{ username}}&page=upload">process an image with BoggleCV (beta)</a></p>
         <h2 class="scale" style="margin-bottom: 1em">Current Games</h2>
 
         <div v-for="game in games" class="grayBox" v-cloak>

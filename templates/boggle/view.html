@@ -41,6 +41,7 @@
                     It took [[ (Math.round(game.secondsToSolve * 100) / 100).toFixed(2) ]] seconds for the computer to solve this board.<br/>
                     [[ game.maxWords ]] words were possible for a max score of [[ game.maxScore ]] possible points.<br/>
                     [[ game.numWordsPlayersFound ]] words ([[ (Math.round(game.percentFound * 100) / 100).toFixed(2) ]]% of words) were found by players. [[ game.duplicates ]] were duplicates.<br/>
+                    <span v-if="game.wasImported != undefined && game.wasImported">This game was imported from BoggleCV.</span><br/>
                 </span>
                 <span v-else>
                     The computer is still solving the board. This will update when it's done.<br/>

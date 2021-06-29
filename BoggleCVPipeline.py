@@ -627,7 +627,8 @@ def findBoggleBoard(image, normalPlots=True, harshErrors=False, generate=("debug
 
 def processImage(filepath):
     image = cv2.imread(filepath)
-    _, letters5x5grid = findBoggleBoard(image, normalPlots=False, harshErrors=True, generate=())
+    resultImages, letters5x5grid = findBoggleBoard(image, normalPlots=False, harshErrors=True, generate=("warpedimage"))
+    cv2.imwrite(filepath+"_warpedimage.png", resultImages["warpedimage"])
     
     lettersGuessed = ""
     confidence = []

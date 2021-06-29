@@ -246,6 +246,7 @@ table.boggleBoard tbody tr td div span {
   font-weight: bold;
   margin: 0;
   padding: 0;
+  text-align: center;
 }
 
 /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting#4407335 */

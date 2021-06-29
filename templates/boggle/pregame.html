@@ -5,6 +5,7 @@
         <h1 class="scale" style="margin-bottom: 1em">Boggle 2.0</h1>
         <p class="scale" v-if="game != undefined">
             Game #[[ game._id ]]<br/>
+            <span v-if="game.wasImported != undefined && game.wasImported">This game was imported from BoggleCV.</span><br/>
             [[ game.size ]]x[[ game.size ]], [[ game.letters ]] letters, [[ game.minutes ]] min<br/>
             <span v-if="isHost">
                 host (you): [[ username ]]<br/>

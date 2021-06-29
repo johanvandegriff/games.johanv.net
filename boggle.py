@@ -1,5 +1,5 @@
 from flask import render_template
-import sys, cgi, json, datetime, re, time, decimal, subprocess, random, threading, os, pymongo, traceback
+import sys, cgi, json, datetime, re, time, decimal, subprocess, random, threading, os, pymongo, traceback, base64
 from functools import reduce
 
 from nav import nav #file in same dir
@@ -78,7 +78,7 @@ def rq(s):
   return s.replace("'", "&apos;").replace('"', '&quot;')
   #return cgi.escape(s).replace("'", "&apos;").replace('"', '&quot;')
 
-def create(size=5, letters=None, minutes=3):
+def create(size=5, letters=None, minutes=3, board=None):
     if letters is None:
         if size >=5:
             letters = 4
@@ -98,8 +98,11 @@ def create(size=5, letters=None, minutes=3):
 
     random.shuffle(dice)
 
-    #construct the board, nested item-by-item
-    board = [[dice[i*size+j][random.randint(0,5)] for j in range(size)] for i in range(size)]
+    wasImported = True #the board was passed in from some other method
+    if board is None:
+        wasImported = False #the board was randomly generated rather than given
+        #construct the board, nested item-by-item
+        board = [[dice[i*size+j][random.randint(0,5)] for j in range(size)] for i in range(size)]
 
     #construct a dict with all the info
     game = {
@@ -107,6 +110,7 @@ def create(size=5, letters=None, minutes=3):
         "letters": letters,
         "minutes": minutes,
         "board": board,
+        "wasImported": wasImported,
         "isStarted": False,
         "isDone": False,
         "isArchived": False,
@@ -421,9 +425,20 @@ def getAllGames():
     games = [game for game in games if game] #remove entries that are "None"
     return games
 
-def isValidImage(image):
-    ext = os.path.splitext(image)[1]
-    return ext in (".png", ".jpg", ".jpeg", ".gif", ".PNG", ".JPG", ".JPEG", ".GIF")
+def boardFrom5x5Str(board_flat):
+    board = []
+    for i in range(5):
+        row = []
+        for j in range(5):
+            n = i*5+j
+            letter = board_flat[n]
+            if letter == "Q":
+                letter = "Qu"
+            row.append(letter)
+        board.append(row)
+    return board
+
+tmp_images = {}
 
 """
 This method doesn't return html, but JSON data for JS to digest.
@@ -536,6 +551,7 @@ def request_data(form, files):
             invitedTo = invitations[id]
             return json.dumps({"invitation": invitedTo})
     if request == "upload":
+        response = {}
         # create image directory if not found
         if not os.path.isdir(IMAGE_UPLOAD_DIR):
             os.mkdir(IMAGE_UPLOAD_DIR)
@@ -543,34 +559,44 @@ def request_data(form, files):
         print(len(files))
         if len(files) > 0:
             upload = files.getlist("upload")[0]
-            print("File name: {}".format(upload.filename))
+            print("filename: {}".format(upload.filename))
+            if upload.filename == "blob":
+                upload.filename = str(datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S"))
+                print("new filename: {}".format(upload.filename))
             filename = upload.filename.replace("'","") #filter out '
-            # file support verification
-            if isValidImage(filename):
-                destination = IMAGE_UPLOAD_DIR + filename
-                i=0
-                while os.path.exists(destination):
-                    spl = os.path.splitext(destination)
-                    destination = spl[0] + "_" + str(i) + spl[1]
-                    i += 1
-                # save file
-                print("File saved to to:", destination)
-                upload.save(destination)
-                message = "File uploaded"
-                try:
-                    lettersGuessed, confidence = processImage(destination)
-                    message += "; " + lettersGuessed
-                    message += "; " + str(confidence)
-                except Exception as e:
-                    message += "; " + str(e) + "; " + repr(e) + "; " + traceback.format_exc()
-                with open(destination+".txt", "w") as f:
-                    print("Message saved to to:", destination+".txt")
-                    f.write(message)
-            else:
-                message = "File type not supported, please use .png, .jpg, .jpeg, or .gif"
+            destination = IMAGE_UPLOAD_DIR + filename
+            i=0
+            while os.path.exists(destination):
+                spl = os.path.splitext(destination)
+                destination = spl[0] + "_" + str(i) + spl[1]
+                i += 1
+            # save file
+            print("File saved to to:", destination)
+            upload.save(destination)
+            message = "File uploaded"
+            try:
+                lettersGuessed, confidence = processImage(destination)
+                response["board"] = boardFrom5x5Str(lettersGuessed)
+                message += "; " + lettersGuessed
+                message += "; " + str(confidence)
+            except Exception as e:
+                message += "; " + str(e) + "; " + repr(e) + "; " + traceback.format_exc()
+            with open(destination+".txt", "w") as f:
+                print("Message saved to to:", destination+".txt")
+                f.write(message)
         else:
             message = "no file provided"
-        return json.dumps({"result": message})
+        response["message"] = message
+        if os.path.exists(destination+"_warpedimage.png"):
+            key = str(random.randint(1000000000000000,9999999999999999))
+            tmp_images[key] = destination
+            response["warpedimage"] = "?request=tmpimage&key="+key
+        return json.dumps(response)
+    if request == "tmpimage":
+        if "key" in form and form["key"] in tmp_images:
+            filename = tmp_images[form["key"]]+"_warpedimage.png"
+            with open(filename, 'rb') as f:
+                return f.read()
 
     return json.dumps({})
 
@@ -580,6 +606,7 @@ def do_action(form):
     username = filterUsername(form["username"])
 
     if action == "create":
+        board = None
         if "preset" in form:
             preset = form["preset"]
             if preset == "5x5":
@@ -604,6 +631,20 @@ def do_action(form):
                 letters = letters[size]
                 minutes = random.randint(0,10)
                 if minutes == 0: minutes = 0.5
+            elif preset == "5x5bogglecv" and "board" in form:
+                board = boardFrom5x5Str(form["board"].split(','))
+                print(board)
+                size = 5
+                letters = 4
+                minutes = 3
+                if "letters" in form:
+                    letters = toIntOrDefault(form["letters"], 4)
+                if "minutes" in form:
+                    minutes = toFloatOrDefault(form["minutes"], 3)
+                if "key" in form:
+                    board_file = tmp_images[form["key"]] + "_board_corrected.txt"
+                    with open(board_file, 'w') as f:
+                        f.write(str(board))
             elif preset == "custom" and "size" in form and "letters" in form and "minutes" in form:
                 size = form["size"]
                 matched = re.match("^(\d+)x(\d+)$", size)
@@ -622,7 +663,7 @@ def do_action(form):
             # lockGamesFile()
             # games = loadGamesFile()
             print("creating game: size={}, letters={}, minutes={}".format(size, letters, minutes))
-            game = create(size=size, letters=letters, minutes=minutes)
+            game = create(size=size, letters=letters, minutes=minutes, board=board) #usually board is None
             game["_id"] = newGameID()
             BackgroundSolver(game)
             game["players"].append(username)
@@ -781,6 +822,9 @@ def load_page(form, page=None, id=None):
         games = getAllGames()
         games = [game for game in games if game["isArchived"]]
 
+        #exclude games that were from BoggleCV from the highscore
+        games = [game for game in games if not ("wasImported" in game and game["wasImported"])]
+
         get_param(form, kwargs, "selectedUsed", text2bool, False)
         
         if kwargs["selectedUsed"]:
@@ -890,22 +934,7 @@ def load_page(form, page=None, id=None):
         return json.dumps([x for x in coll.find()], indent=2)
     
     if page == "upload":
-        return """
-        <!DOCTYPE html><html lang="en">
-        <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=2.0">
-        </head>
-        <body>
-        <form method="POST" enctype="multipart/form-data" action="">
-            <input type="hidden" name="request" value="upload">
-            <input type="file" name="upload" accept="image/*"/>
-            <br/><br/>
-            <input type="submit" value="Upload">
-        </form>
-        </body>
-        </html>
-        """
+        return render_template("boggle/upload.html", **kwargs)
 
     if page == "lobby":
         return render_template("boggle/lobby.html", remove_completed_from_lobby_timeout=REMOVE_COMPLETED_FROM_LOBBY_TIMEOUT, **kwargs)
