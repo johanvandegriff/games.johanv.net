@@ -92,6 +92,7 @@
     </div>
   </div>
   <div class="rightCol">
+    <p style="text-align: center" v-if="board != undefined">tap/click on the letters that are wrong to change them</p>
     <table id="board" v-if="board != undefined" class="boggleBoard noselect">
       <tbody>
         <tr v-for="(row, i) in board">

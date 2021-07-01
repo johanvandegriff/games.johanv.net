@@ -566,10 +566,12 @@ def request_data(form, files):
             filename = upload.filename.replace("'","") #filter out '
             destination = IMAGE_UPLOAD_DIR + filename
             i=0
-            while os.path.exists(destination):
-                spl = os.path.splitext(destination)
-                destination = spl[0] + "_" + str(i) + spl[1]
+            destination_extra = destination
+            spl = os.path.splitext(destination)
+            while os.path.exists(destination_extra):
+                destination_extra = spl[0] + "_" + str(i) + spl[1]
                 i += 1
+            destination = destination_extra
             # save file
             print("File saved to to:", destination)
             upload.save(destination)
