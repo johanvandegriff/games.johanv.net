@@ -6,6 +6,7 @@ from flask import Flask, request, render_template, url_for
 import os, re, sys
 
 import CARL, boggle, boggle_old
+import hornswiggle
 from nav import nav
 import profanity_test
 
@@ -149,6 +150,21 @@ def carl_page():
         carl2=carl2
     )
 #END CARL
+
+#START HORNSWIGGLE
+@app.route("/hornswiggle_api", methods=["GET", "POST"])
+def hornswiggle_api():
+    return hornswiggle.generate()
+
+@app.route("/hornswiggle", methods=["GET", "POST"])
+def hornswiggle_page():
+    return render_template(
+        "hornswiggle.html",
+        nav=nav,
+        active="Dr. H",
+        item=hornswiggle.generate()
+    )
+#END HORNSWIGGLE
 
 if __name__ == "__main__":
     # app.run()

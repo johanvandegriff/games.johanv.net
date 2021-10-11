@@ -73,46 +73,6 @@ p.scale {
 }
 
 
-.greenButton, .purpleButton, .redButton, .blueButton, .grayButton {
-  font-size: 1em;
-  height: 2em;
-  /* background: #10ee10; */
-  /* text-align: center; */
-  /* margin: 0 auto; */
-  border-radius: 0.3em;
-  border: 2px solid black;
-  /* display: inline-block; */
-}
-
-.bigButton {
-  font-size: 1.2em;
-  margin: 3px;
-}
-
-input[type="submit"].greenButton{
-  background: #10ee10;
-}
-
-input[type="submit"].purpleButton {
-  background: #631fa3;
-  color: white;
-}
-
-input[type="submit"].redButton {
-  background: #f00;
-  color: white;
-}
-
-input[type="submit"].blueButton {
-  background: #9af;
-  /* color: white; */
-}
-
-input[type="submit"].grayButton {
-  background: #ccc;
-}
-
-
 .underlineText {
   font-size: 0.8em;
   margin: 1em auto;
