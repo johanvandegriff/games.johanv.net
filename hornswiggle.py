@@ -89,6 +89,12 @@ Trancendental
 Additional
 Namby-Pamby
 Solemn
+Angy
+Hungy
+Precarious
+Gargantuan
+Monotone
+Meddling
 """,
   "nouns":"""
 Calvacade
@@ -130,6 +136,11 @@ Technobabble
 Pandemonium
 Tardigrade
 Phantasm
+Jargon
+Mushroom
+Buzzard
+Marsupial
+Hysterical
 """,
   "descriptors":"""
 Box
@@ -147,14 +158,15 @@ Parade
 Festival
 Contraption
 Prototype
+Accessory
 """,
   "conjunctions":"""
 , and
-, Containing
+, Containing One
 , Lacking One
 , Sans One
-, Fused with
 , with Part of One
+, Fused with
 , with Optional
 , with Bonus
 """,
