@@ -5,4 +5,5 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y libcgi-session-perl libhunspell-dev default-jre && rm -rf /var/lib/apt/lists/*
 RUN pip install -r requirements.txt
 EXPOSE  8000
-CMD ["python", "games.py"]
+# CMD ["python", "games.py"]
+CMD ["gunicorn", "games:app"]
