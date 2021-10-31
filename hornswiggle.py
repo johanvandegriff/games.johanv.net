@@ -27,7 +27,9 @@ Mr. Lensfoggle's
 Mrs. Cangrooble's
 Ms. Rocktobble's
 Mx. Ferntibble's
+The Reverend Dr. Hefflebottom's
 """,
+
   "adverbs":"""
 Aesthetically
 Dimensionally
@@ -46,6 +48,7 @@ Very
 Extremely
 Extraordinarily
 """,
+
   "prefixes":"""
 Anti-
 Non-
@@ -54,6 +57,7 @@ Post-
 Semi-
 Super-
 """,
+
   "adjectives":"""
 Fantabulous
 Quintessential
@@ -95,7 +99,11 @@ Precarious
 Gargantuan
 Monotone
 Meddling
+Cromulent
+Corpulent
+Hysterical
 """,
+
   "nouns":"""
 Calvacade
 Cavalcade
@@ -140,8 +148,9 @@ Jargon
 Mushroom
 Buzzard
 Marsupial
-Hysterical
+Wormhole
 """,
+
   "descriptors":"""
 Box
 Generator
@@ -160,6 +169,7 @@ Contraption
 Prototype
 Accessory
 """,
+
   "conjunctions":"""
 , and
 , Containing One
@@ -170,6 +180,7 @@ Accessory
 , with Optional
 , with Bonus
 """,
+
   "rare postfix":"""
 & Knuckles
 , Featuring Dante from the Devil May Cry Series
