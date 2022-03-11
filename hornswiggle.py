@@ -60,6 +60,8 @@ Super-
 
   "adjectives":"""
 Fantabulous
+Fantubulous
+Fantoobulous
 Quintessential
 Hypothetical
 Pre-Owned
