@@ -1,5 +1,5 @@
 nav = [
-    ["home", "https://johanv.xyz"],
+    ["home", "https://johanv.net"],
     ["games", "/"],
     ["CARL", "/carl"],
     ["boggle", "/boggle"],
