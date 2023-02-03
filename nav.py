@@ -1,11 +1,12 @@
 nav = [
     ["home", "https://johanv.net"],
     ["games", "/"],
-    ["CARL", "/carl"],
     ["boggle", "/boggle"],
-    ["maze", "/maze"],
-    ["whack", "/whack.pl"],
-    ["math", "/math"],
+    ["CARL", "/carl"],
     ["chem", "/chem"],
-    ["Dr. H", "/hornswiggle"]
+    ["Dr. H", "/hornswiggle"],
+    ["maze", "/maze"],
+    ["maze.pl", "/maze.pl"],
+    ["math.pl", "/math.pl"],
+    ["whack.pl", "/whack.pl"],
 ]

@@ -11,6 +11,7 @@ git+https://github.com/rominf/hunspell_serializable.git
 git+https://github.com/kmike/pymorphy2.git
 spacy==2.3.5
 pymongo==3.11.2
+Pillow==9.4.0
 
 opencv-python==4.5.5.62
 scipy==1.6.0

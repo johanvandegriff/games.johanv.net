@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, render_template, url_for
+from flask import Flask, request, render_template, url_for, send_file
 
-import os, re, sys
+import os, re, sys, io
 
 import CARL, boggle, boggle_old
 import hornswiggle
 from nav import nav
 import profanity_test
+import circular_maze
 
 app = Flask(__name__)
 
@@ -81,8 +82,8 @@ def stoichiometry():
     return render_template("stoichiometry.html", nav=nav, active="chem", result=result, equation=equation, compound=compound, grams_or_moles_value=grams_or_moles_value, grams_or_moles=grams_or_moles)
 #END STOICHIOMETRY
 
-#START MATH
-@app.route("/math")
+#START MATH.pl
+@app.route("/math.pl")
 def math_page():
     return render_template("math.html", nav=nav, active="math")
 
@@ -93,23 +94,49 @@ def math_game():
 @app.route("/math_score.pl", methods=["GET", "POST"])
 def math_score():
     return run_perl_page(request, "math_score.pl", "Math")
-#END MATH
+#END MATH.pl
 
-#START WHACK
+#START WHACK.pl
 @app.route("/whack.pl", methods=["GET", "POST"])
 def whack_page():
     return run_perl_page(request, "whack.pl", "whack")
-#END WHACK
+#END WHACK.pl
 
-#START MAZE
-@app.route("/maze")
+#START MAZE.pl
+@app.route("/maze.pl")
 def maze_page():
     return render_template("maze.html", nav=nav, active="maze")
 
 @app.route("/showmaze.pl", methods=["GET", "POST"])
 def showmaze_page():
     return run_perl_page(request, "showmaze.pl", "maze")
-#END MAZE
+#END MAZE.pl
+
+#START CIRCULAR MAZE
+@app.route("/maze")
+def circular_maze_page():
+    return render_template("circular-maze.html", nav=nav, active="maze")
+
+@app.route("/maze-gen", methods=["GET", "POST"])
+def maze_gen():
+    def serve_pil_image(pil_img):
+        img_io = io.BytesIO()
+        pil_img.save(img_io, 'PNG', quality=70)
+        img_io.seek(0)
+        return send_file(img_io, mimetype='image/png')
+    return serve_pil_image(circular_maze.generate_maze(
+        num_levels=int(request.args.get('num_levels', 16)),
+        big_level_every=int(request.args.get('big_level_every', 4)),
+        img_size=int(request.args.get('img_size', 2000)),
+        max_arc_length=float(request.args.get('max_arc_length', .8)),
+        max_gaps_ratio=float(request.args.get('max_gaps_ratio', .25)),
+        narrow_line_width=float(request.args.get('narrow_line_width', .002)),
+        wide_line_width=float(request.args.get('wide_line_width', .007)),
+        foreground_color=request.args.get('foreground_color', 'black'),
+        background_color=request.args.get('background_color', '#FFF0'),
+        debug=(request.args.get('debug', 'false') == 'true'),
+    ))
+#END CIRCULAR MAZE
 
 #START BOGGLE
 @app.route("/boggle", methods=["GET", "POST"])
